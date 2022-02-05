@@ -1,11 +1,20 @@
 const router = require("express").Router();
+const xlsx = require("xlsx");
+const multer = require("multer");
+const upload = multer();
+
+const Brand = require("./brand.model");
 
 // Path: /api/1/sc/sku-list
 // Desc: Uploads product sku-list
-router.post("/sku-list", (req, res, next) => {
+router.post("/sku-list", upload.single("skuList"), (req, res, next) => {
+  const workbook = xlsx.read(req.file.buffer, { type: "buffer" });
+
   res.json({
     description: "Uploads SKU list",
-    path: req.originalUrl
+    path: req.originalUrl,
+    SheetNames: workbook.SheetNames,
+    Strings: workbook.Strings
   });
 });
 

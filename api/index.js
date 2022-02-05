@@ -3,9 +3,14 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
+const { connectDb } = require("../db/mongo.js");
+
 const { notFound, errorHandler } = require("../middleware/errorHandlers.js");
 
 const app = express();
+
+// Connect to database
+connectDb();
 
 // Middlewares
 app.use(express.json());
@@ -13,12 +18,15 @@ app.use(cors());
 app.use(morgan("combined"));
 
 app.use((req, res, next) => {
+  // Sets the cache for Vercel https://vercel.com/guides/using-express-with-vercel#standalone-express
   res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
   next();
 });
 
 // Home route
-app.get("/", (req, res) => res.json({ message: "Greetings from Mordax!" }));
+app.get("/", (req, res) =>
+  res.json({ status: "ok", message: "Greetings from Mordax!" })
+);
 
 // Routes
 app.use("/api/1", require("./router.js"));

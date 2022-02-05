@@ -6,5 +6,9 @@ exports.notFound = (req, res, next) => {
 };
 
 exports.errorHandler = (error, req, res, next) => {
+  console.log("An error occurred:", error);
+
+  res.statusCode === 200 && res.status(500);
+
   res.json({ message: "Internal error", error: error.message });
 };
