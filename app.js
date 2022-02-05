@@ -4,6 +4,7 @@ const cors = require("cors");
 const morgan = require("morgan");
 
 const { notFound, errorHandler } = require("./middleware/errorHandlers.js");
+const res = require("express/lib/response");
 
 const app = express();
 
@@ -12,6 +13,10 @@ app.use(express.json());
 app.use(cors());
 app.use(morgan("combined"));
 
+// Home route
+app.get("/", (req, res) => res.json({ message: "Greetings from Mordax!" }));
+
+// Routes
 app.use("/api/1", require("./api/router.js"));
 
 // Error handlers
