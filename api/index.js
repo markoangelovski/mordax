@@ -3,7 +3,7 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 
-const { notFound, errorHandler } = require("./middleware/errorHandlers.js");
+const { notFound, errorHandler } = require("../middleware/errorHandlers.js");
 
 const app = express();
 
@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 app.get("/", (req, res) => res.json({ message: "Greetings from Mordax!" }));
 
 // Routes
-app.use("/api/1", require("./api/router.js"));
+app.use("/api/1", require("./router.js"));
 
 // Error handlers
 app.use(notFound);
