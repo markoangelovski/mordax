@@ -6,7 +6,7 @@ exports.notFound = (req, res, next) => {
 };
 
 exports.errorHandler = (error, req, res, next) => {
-  console.log("An error occurred:", error);
+  console.log("An error occurred:", error.message);
 
   res.statusCode === 200 && res.status(500);
 

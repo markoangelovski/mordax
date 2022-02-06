@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
 const stringProps = {
-  required: true,
   type: String,
   minlength: 1,
   maxlength: 256
@@ -9,11 +8,11 @@ const stringProps = {
 
 const skuListProps = {
   value: stringProps,
+  creationDate: Date,
   history: [
     {
       previousValue: stringProps,
       updatedValue: stringProps,
-      creationDate: Date,
       updateDate: Date
     }
   ]
@@ -27,6 +26,9 @@ const brandSchema = new mongoose.Schema(
     },
     brand: stringProps,
     locale: stringProps,
+    url: stringProps,
+    scButtonKey: String,
+    scCarouselKey: String,
     skuList: [
       {
         title: skuListProps,
@@ -36,6 +38,13 @@ const brandSchema = new mongoose.Schema(
         scMpId: skuListProps,
         scApiId: skuListProps,
         buttonSellers: [
+          {
+            name: stringProps,
+            logo: stringProps,
+            url: stringProps
+          }
+        ],
+        carouselSellers: [
           {
             name: stringProps,
             logo: stringProps,
