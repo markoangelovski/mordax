@@ -262,7 +262,12 @@ router.get("/sc-data", (req, res, next) => {
 router.get("/sc-data-product", async (req, res, next) => {
   const { url, sku } = req.query;
 
-  const host = req.get("host");
+  // Detect if Vercel app is being used and forward the request to Heroku app
+  // Vercel app does not fetch retailer links so Heroku app needs to be used
+  if (req.headers["x-vercel-forwarded-for"]) {
+    const query = new URLSearchParams(req.query);
+    return axios(require("../../config").hostHeroku + "?" + query);
+  }
 
   const brand = await Brand.findOne({ "url.value": url });
 
@@ -291,9 +296,6 @@ router.get("/sc-data-product", async (req, res, next) => {
 
   // scCarouselUrl
   res.json({
-    host,
-    reqHeaders: req.headers,
-    resHeaders: res.getHeaders(),
     brand: brand.brand.value,
     locale: brand.locale.value,
     url: brand.url.value,
