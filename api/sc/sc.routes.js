@@ -292,6 +292,8 @@ router.get("/sc-data-product", async (req, res, next) => {
   // scCarouselUrl
   res.json({
     host,
+    reqHeaders: req.headers,
+    resHeaders: res.getHeaders(),
     brand: brand.brand.value,
     locale: brand.locale.value,
     url: brand.url.value,
