@@ -1,23 +1,36 @@
 const path = require("path");
 const router = require("express").Router();
 const xlsx = require("xlsx");
+const axios = require("axios");
 const multer = require("multer");
 const upload = multer();
 
 const Brand = require("./brand.model");
 
+const { scButtonUrl, scCarouselUrl } = require("../../config");
+
 // Path: /api/1/sc/sku-list?key=123456789&brand=Herbal Essences&locale=en-us&url=https://www.herbalessences.com&scButtonKey=12ed8c04-265f-4c6b-838e-bd390431accd&scCarouselKey=1234
 // Desc: Uploads product sku-list
 router.post("/sku-list", upload.single("skuList"), async (req, res, next) => {
   try {
-    const { key, brand, locale, url, scButtonKey, scCarouselKey } = req.query;
+    const { key, brand, locale, url, newUrl, scButtonKey, scCarouselKey } =
+      req.query;
     const buffer = req.file?.buffer;
 
     const newBrand = {
       createdBy: key,
-      brand,
-      locale,
-      url,
+      brand: {
+        value: brand,
+        createdAt: new Date().toISOString()
+      },
+      locale: {
+        value: locale,
+        createdAt: new Date().toISOString()
+      },
+      url: {
+        value: url,
+        createdAt: new Date().toISOString()
+      },
       scButtonKey,
       scCarouselKey,
       skuList: []
@@ -36,42 +49,84 @@ router.post("/sku-list", upload.single("skuList"), async (req, res, next) => {
         newBrand.skuList.push({
           title: {
             value: product.Title,
-            creationDate: new Date().toISOString()
+            createdAt: new Date().toISOString()
           },
           url: {
             value: product.URL,
-            creationDate: new Date().toISOString()
+            createdAt: new Date().toISOString()
           },
           sku: {
             value: product.SKU,
-            creationDate: new Date().toISOString()
+            createdAt: new Date().toISOString()
           },
           scMpId: {
             value: product.mpId,
-            creationDate: new Date().toISOString()
+            createdAt: new Date().toISOString()
           },
           scApiId: {
             value: product.apiId,
-            creationDate: new Date().toISOString()
+            createdAt: new Date().toISOString()
           }
         });
       });
     }
 
-    const existingBrand = await Brand.findOne({ url });
-
-    let createdBrand;
+    const existingBrand = await Brand.findOne({ "url.value": url });
 
     if (existingBrand) {
-      // TODO: napravi provjeru ako brend postoji, da se updateaju proizvodi po SKU broju
-    } else {
-      createdBrand = await Brand.create(newBrand);
-    }
+      let brandUpdated = false;
+      if (existingBrand.skuList.length !== newBrand.skuList.length) {
+        // TODO: napravi provjeru ako brend postoji, da se updateaju proizvodi po SKU broju
+        existingBrand.skuList = newBrand.skuList;
+        brandUpdated = true;
+      }
 
-    res.json({
-      status: "ok",
-      brand: createdBrand
-    });
+      // Updates the Brand name and stores the previous value in history
+      if (brand && existingBrand.brand.value !== brand) {
+        existingBrand.brand.history.push({
+          previousValue: existingBrand.brand.value,
+          updatedValue: brand,
+          updatedAt: new Date().toISOString(),
+          updatedBy: key
+        });
+        existingBrand.brand.value = brand;
+        brandUpdated = true;
+      }
+
+      // Updates the Locale and stores the previous value in history
+      if (locale && existingBrand.locale.value !== locale) {
+        existingBrand.locale.history.push({
+          previousValue: existingBrand.locale.value,
+          updatedValue: locale,
+          updatedAt: new Date().toISOString(),
+          updatedBy: key
+        });
+        existingBrand.locale.value = locale;
+        brandUpdated = true;
+      }
+
+      // Updates the Locale and stores the previous value in history
+      if (newUrl && existingBrand.url.value !== newUrl) {
+        existingBrand.url.history.push({
+          previousValue: existingBrand.url.value,
+          updatedValue: newUrl,
+          updatedAt: new Date().toISOString(),
+          updatedBy: key
+        });
+        existingBrand.url.value = newUrl;
+        brandUpdated = true;
+      }
+
+      res.json({
+        status: "ok",
+        brand: brandUpdated ? await existingBrand.save() : existingBrand
+      });
+    } else {
+      res.json({
+        status: "ok",
+        brand: await Brand.create(newBrand)
+      });
+    }
   } catch (error) {
     console.warn("Error occurred in POST /api/1/sc/sku-list route", error);
     next(error);
@@ -84,7 +139,7 @@ router.get("/sku-list", async (req, res, next) => {
   const { url, download } = req.query;
 
   try {
-    const existingBrand = await Brand.findOne({ url });
+    const existingBrand = await Brand.findOne({ "url.value": url });
 
     if (existingBrand) {
       // TODO: napravi da se može downloadat ili cijela SKU lista kao exelica, ili samo proizvodi bez sellera
@@ -110,7 +165,7 @@ router.delete("/sku-list", async (req, res, next) => {
   const { url } = req.query;
 
   try {
-    const { deletedCount } = await Brand.deleteOne({ url });
+    const { deletedCount } = await Brand.deleteOne({ "url.value": url });
 
     if (deletedCount) {
       res.json({
@@ -174,7 +229,11 @@ router.get("/brands", async (req, res, next) => {
       res.json({
         status: "ok",
         brandsCount: brands.length,
-        brands
+        brands: brands.map(brand => ({
+          brand: brand.brand.value,
+          locale: brand.locale.value,
+          url: brand.url.value
+        }))
       });
     } else {
       res.status(404);
@@ -198,13 +257,48 @@ router.get("/sc-data", (req, res, next) => {
   });
 });
 
-// Path: /api/1/sc/sc-data-product
+// Path: /api/1/sc/sc-data-product?url=https://herbalessences.com/en-us/&sku=1
 // Desc: Fetches the SC data for a single product for single locale in one SKU List
-router.get("/sc-data-product", (req, res, next) => {
+router.get("/sc-data-product", async (req, res, next) => {
+  const { url, sku } = req.query;
+
+  const brand = await Brand.findOne({ "url.value": url });
+
+  const product = brand.skuList.filter(skuData => skuData.sku.value === sku);
+
+  if (product.length > 1) {
+    res.status(422);
+    return next({
+      message: `Multiple products with SKU ${sku} found.`,
+      products: product
+    });
+  }
+
+  const [buttonData, carouselData] = await Promise.all([
+    axios(
+      scButtonUrl
+        .replace("{{scButtonKey}}", brand.scButtonKey)
+        .replace("{{scMpId}}", product[0].scMpId.value)
+    ),
+    axios(
+      scCarouselUrl
+        .replace("{{scCarouselKey}}", brand.scCarouselKey)
+        .replace("{{scMpId}}", product[0].scMpId.value)
+    )
+  ]);
+
+  // scCarouselUrl
   res.json({
-    description:
-      "Fetches the SC data for a single product for single locale in one SKU List",
-    path: req.originalUrl
+    brand: brand.brand.value,
+    locale: brand.locale.value,
+    url: brand.url.value,
+    product: product[0].title.value,
+    productUrl: product[0].url.value,
+    sku: product[0].sku.value,
+    scMpId: product[0].scMpId.value,
+    scApiId: product[0].scApiId.value,
+    buttonData: buttonData.data,
+    carouselData: carouselData.data
   });
 });
 

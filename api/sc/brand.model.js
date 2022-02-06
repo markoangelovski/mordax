@@ -6,14 +6,15 @@ const stringProps = {
   maxlength: 256
 };
 
-const skuListProps = {
+const objProps = {
   value: stringProps,
-  creationDate: Date,
+  createdAt: Date,
   history: [
     {
       previousValue: stringProps,
       updatedValue: stringProps,
-      updateDate: Date
+      updatedAt: Date,
+      updatedBy: stringProps
     }
   ]
 };
@@ -24,19 +25,19 @@ const brandSchema = new mongoose.Schema(
       required: true,
       type: String
     },
-    brand: stringProps,
-    locale: stringProps,
-    url: stringProps,
+    brand: objProps,
+    locale: objProps,
+    url: objProps,
     scButtonKey: String,
     scCarouselKey: String,
     skuList: [
       {
-        title: skuListProps,
-        url: skuListProps,
-        sku: skuListProps,
-        scTitle: skuListProps,
-        scMpId: skuListProps,
-        scApiId: skuListProps,
+        title: objProps,
+        url: objProps,
+        sku: objProps,
+        scTitle: objProps,
+        scMpId: objProps,
+        scApiId: objProps,
         buttonSellers: [
           {
             name: stringProps,
