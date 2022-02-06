@@ -24,13 +24,14 @@ app.use((req, res, next) => {
 });
 
 // Home route
-app.get("/", (req, res) =>
+app.get("/", (req, res) => {
+  const host = process.env.NODE_ENV === "development" ? "http://" : "https://";
   res.json({
     status: "ok",
     message: "Greetings from Mordax!",
-    docs: req.get("host") + "/api/1/docs"
-  })
-);
+    docs: host + req.get("host") + "/api/1/docs"
+  });
+});
 
 // Routes
 app.use("/api/1", require("./router.js"));
