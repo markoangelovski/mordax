@@ -262,18 +262,14 @@ router.get("/sc-data", (req, res, next) => {
 router.get("/sc-data-product", async (req, res, next) => {
   const { url, sku } = req.query;
 
+  console.log("req: ", req);
+
   // Detect if Vercel app is being used and forward the request to Heroku app
   // Vercel app does not fetch retailer links so Heroku app needs to be used
-  if (req.headers["x-vercel-forwarded-for"]) {
-    const query = new URLSearchParams(req.query);
-    console.log(
-      "path: ",
-      require("../../config").hostHeroku + "?" + query.toString()
-    );
-    return axios(require("../../config").hostHeroku + "?" + query.toString())
+  if (req.headers["x-vercel-forwarded-for"])
+    return axios(require("../../config").hostHeroku + req.originalUrl)
       .then(response => res.json(response.data))
       .catch(err => next(err));
-  }
 
   const brand = await Brand.findOne({ "url.value": url });
 

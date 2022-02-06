@@ -1,7 +1,7 @@
 {
   "hostLocal": "http://localhost:3000",
-  "hostVercel": "https://mordax.vercel.app/",
-  "hostHeroku": "https://mordax.herokuapp.com/",
+  "hostVercel": "https://mordax.vercel.app",
+  "hostHeroku": "https://mordax.herokuapp.com",
   "scButtonUrl": "https://api.smartcommerce.co/api/v1/smartbutton/{{scButtonKey}}?globalCatalog=true&sepmId={{scMpId}}",
   "scCarouselUrl": "https://api.smartcommerce.co/api/v1/widget/{{scCarouselKey}}?sepmId={{scMpId}}"
 }
