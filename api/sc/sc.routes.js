@@ -266,6 +266,10 @@ router.get("/sc-data-product", async (req, res, next) => {
   // Vercel app does not fetch retailer links so Heroku app needs to be used
   if (req.headers["x-vercel-forwarded-for"]) {
     const query = new URLSearchParams(req.query);
+    console.log(
+      "path: ",
+      require("../../config").hostHeroku + "?" + query.toString()
+    );
     return axios(require("../../config").hostHeroku + "?" + query.toString())
       .then(response => res.json(response.data))
       .catch(err => next(err));
