@@ -262,6 +262,8 @@ router.get("/sc-data", (req, res, next) => {
 router.get("/sc-data-product", async (req, res, next) => {
   const { url, sku } = req.query;
 
+  const host = req.get("host");
+
   const brand = await Brand.findOne({ "url.value": url });
 
   const product = brand.skuList.filter(skuData => skuData.sku.value === sku);
@@ -289,6 +291,7 @@ router.get("/sc-data-product", async (req, res, next) => {
 
   // scCarouselUrl
   res.json({
+    host,
     brand: brand.brand.value,
     locale: brand.locale.value,
     url: brand.url.value,
