@@ -25,7 +25,11 @@ app.use((req, res, next) => {
 
 // Home route
 app.get("/", (req, res) =>
-  res.json({ status: "ok", message: "Greetings from Mordax!" })
+  res.json({
+    status: "ok",
+    message: "Greetings from Mordax!",
+    docs: req.get("host") + "/api/1/docs"
+  })
 );
 
 // Routes

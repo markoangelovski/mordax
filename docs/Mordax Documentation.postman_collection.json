@@ -1,0 +1,669 @@
+{
+	"info": {
+		"_postman_id": "744c2c6a-06cd-4a1d-b5a7-87878f29ec1e",
+		"name": "Mordax Documentation",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "SmartCommerce",
+			"item": [
+				{
+					"name": "SKU List",
+					"item": [
+						{
+							"name": "POST SKU List",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "formdata",
+									"formdata": [
+										{
+											"key": "skuList",
+											"description": "SKU List/product feed in xlsx format",
+											"type": "file",
+											"src": []
+										}
+									]
+								},
+								"url": {
+									"raw": "{{host}}/api/1/sc/sku-list?key={{key}}&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&scButtonKey=12ed8c04-265f-4c6b-838e-bd390431accd&scCarouselKey=ff8d4135-a1bb-4f47-ad78-9791a31b7d17",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"sku-list"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "brand",
+											"value": "Herbal Essences",
+											"description": "Brand name, required"
+										},
+										{
+											"key": "locale",
+											"value": "en-us",
+											"description": "Locale, for example en-us, required"
+										},
+										{
+											"key": "url",
+											"value": "https://herbalessences.com/en-us/",
+											"description": "Locale URL, unique identifier, required"
+										},
+										{
+											"key": "newUrl",
+											"value": "",
+											"description": "Use to update the Brand URL",
+											"disabled": true
+										},
+										{
+											"key": "scButtonKey",
+											"value": "12ed8c04-265f-4c6b-838e-bd390431accd",
+											"description": "SC SmartButton widget key"
+										},
+										{
+											"key": "scCarouselKey",
+											"value": "ff8d4135-a1bb-4f47-ad78-9791a31b7d17",
+											"description": "SC SmartCarousel widget key"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET SKU List",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/sku-list?key={{key}}&url=https://herbalessences.com/en-us/",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"sku-list"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "url",
+											"value": "https://herbalessences.com/en-us/",
+											"description": "Locale URL, unique identifier, required"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE SKU List",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/sku-list?key={{key}}&url=https://herbalessences.com/en-us/",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"sku-list"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "url",
+											"value": "https://herbalessences.com/en-us/",
+											"description": "Locale URL, unique identifier, required"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET SKU List template",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/sku-list-template",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"sku-list-template"
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Product",
+					"item": [
+						{
+							"name": "POST Product",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/product?key={{key}}&url=https://herbalessences.com/en-us/&sku=1",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"product"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "url",
+											"value": "https://herbalessences.com/en-us/",
+											"description": "Locale URL, unique identifier, required"
+										},
+										{
+											"key": "sku",
+											"value": "1",
+											"description": "Product SKU value, unique identifier, required"
+										},
+										{
+											"key": "productTitle",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "productUrl",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "scMpId",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "scApiId",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "PATCH Product",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/sc/product?key={{key}}&url=https://herbalessences.com/en-us/&sku=3",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"product"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "url",
+											"value": "https://herbalessences.com/en-us/",
+											"description": "Locale URL, unique identifier, required"
+										},
+										{
+											"key": "sku",
+											"value": "3",
+											"description": "Product SKU value, unique identifier, required"
+										},
+										{
+											"key": "newSku",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "productTitle",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "productUrl",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "scMpId",
+											"value": "",
+											"disabled": true
+										},
+										{
+											"key": "scApiId",
+											"value": "",
+											"disabled": true
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "DELETE Product",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/product?key={{key}}&url=https://herbalessences.com/en-us/&sku=46",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"product"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "url",
+											"value": "https://herbalessences.com/en-us/",
+											"description": "Locale URL, unique identifier, required"
+										},
+										{
+											"key": "sku",
+											"value": "46",
+											"description": "Product SKU value, unique identifier, required"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Brands",
+					"item": [
+						{
+							"name": "GET Brands",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/brands?key={{key}}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"brands"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "SC Data",
+					"item": [
+						{
+							"name": "GET Fecth SC Data for all products",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/sc-data?key={{key}}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"sc-data"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "POST Fetch SC Data for single product",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/sc-data-product?key={{key}}&sku=1&url=https://herbalessences.com/en-us/",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"sc-data-product"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "sku",
+											"value": "1",
+											"description": "Product SKU value, unique identifier, required"
+										},
+										{
+											"key": "url",
+											"value": "https://herbalessences.com/en-us/",
+											"description": "Locale URL, unique identifier, required"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET Fetch SC Button data for single product",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/sc-data-button?key={{key}}&sku=1&url=https://herbalessences.com/en-us/",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"sc-data-button"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "sku",
+											"value": "1",
+											"description": "Product SKU value, unique identifier, required"
+										},
+										{
+											"key": "url",
+											"value": "https://herbalessences.com/en-us/",
+											"description": "Locale URL, unique identifier, required"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "GET Fecth SC Carousel data for single product",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/sc/sc-data-carousel?key={{key}}&sku=1&url=https://herbalessences.com/en-us/",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"sc",
+										"sc-data-carousel"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "sku",
+											"value": "1",
+											"description": "Product SKU value, unique identifier, required"
+										},
+										{
+											"key": "url",
+											"value": "https://herbalessences.com/en-us/",
+											"description": "Locale URL, unique identifier, required"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
+		},
+		{
+			"name": "PriceSpider",
+			"item": []
+		},
+		{
+			"name": "Docs",
+			"item": [
+				{
+					"name": "GET Docs",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/docs",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"docs"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Keys",
+			"item": [
+				{
+					"name": "POST Create key",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/keys/create-key?key={{key}}&privilege=readWrite&issuedFor=",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"keys",
+								"create-key"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "privilege",
+									"value": "readWrite",
+									"description": "read or readWrite"
+								},
+								{
+									"key": "issuedFor",
+									"value": "",
+									"description": "Name or description of who the key is for"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Deactivate key",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{hostDev}}/api/1/keys/deactivate-key?key={{key}}&keyToDeactivate=",
+							"host": [
+								"{{hostDev}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"keys",
+								"deactivate-key"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "keyToDeactivate",
+									"value": "",
+									"description": "Key for deactivation, required"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Key info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostDev}}/api/1/keys/key-info?key={{key}}",
+							"host": [
+								"{{hostDev}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"keys",
+								"key-info"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "checkKey",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "host",
+			"value": "https://mordax.vercel.app",
+			"type": "string"
+		}
+	]
+}

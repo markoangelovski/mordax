@@ -32,21 +32,21 @@ router.post("/create-key", readWrite, async (req, res, next) => {
 // Path: /api/1/keys/deactivate-key?keyToDeactivate=12345
 // Desc: Deactivates API key
 router.post("/deactivate-key", readWrite, async (req, res, next) => {
-  const { keyToDeactivate } = req.query;
+  const { key, keyToDeactivate } = req.query;
 
   try {
-    const key = await Keys.updateOne(
+    const result = await Keys.updateOne(
       { key: keyToDeactivate },
       {
         $set: {
           active: false,
-          deactivationDate: new Date().toISOString()
-          // deactivationIssuer: stringProps,
+          deactivationDate: new Date().toISOString(),
+          deactivationIssuer: req.admin ? "admin" : key
         }
       }
     );
 
-    if (key.modifiedCount > 0) {
+    if (result.modifiedCount > 0) {
       res.json({ message: `Key ${keyToDeactivate} successfully deactivated.` });
     } else {
       res.status(404);

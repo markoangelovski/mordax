@@ -40,16 +40,21 @@ const brandSchema = new mongoose.Schema(
         scApiId: objProps,
         buttonSellers: [
           {
-            name: stringProps,
-            logo: stringProps,
-            url: stringProps
+            retailerName: stringProps,
+            productName: stringProps,
+            url: stringProps,
+            price: stringProps
           }
         ],
+        carouselSellersOk: {
+          type: Boolean
+        },
         carouselSellers: [
           {
-            name: stringProps,
-            logo: stringProps,
-            url: stringProps
+            retailerName: stringProps,
+            productName: stringProps,
+            url: stringProps,
+            price: stringProps
           }
         ]
       }
