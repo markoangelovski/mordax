@@ -6,7 +6,18 @@
 
 ### Vercel project: https://vercel.com/markoangelovski/mordax
 
+- hosts the entire application
+
+### Heroku project: https://dashboard.heroku.com/apps/mordax
+
+- SC does not pass seller data to Vercel app
+- requests that need to fech SC data are forwarded to the same endpoint on Heroku
+
+## Pipeline
+
+Both Vercel and Heroku are connected to the Github repo. Pushing to master branch triggers automatic deployments for both Vercel and Heroku.
+
 DOMAINS
 
-- mordax.vercel.app
-- mordax-markoangelovski.vercel.app
+- https://mordax.vercel.app
+- https://mordax.herokuapp.com
