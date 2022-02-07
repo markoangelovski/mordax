@@ -4,6 +4,14 @@ exports.readOnly = async (req, res, next) => {
   const { key } = req.query;
 
   try {
+    if (key && key === process.env.MASTER_KEY) {
+      // Admin can create readWrite keys
+      // readWrite keys can create read keys
+      req.admin = true;
+
+      return next();
+    }
+
     const existingKey = await Keys.find({ key, active: true }, { _id: 1 });
 
     if (key && existingKey.length > 0) {

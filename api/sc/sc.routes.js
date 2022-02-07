@@ -138,7 +138,7 @@ router.post(
           brandUpdated = true;
         }
 
-        // Updates the Locale and stores the previous value in url.history
+        // Updates the URL and stores the previous value in url.history
         if (newUrl && existingBrand.url.value !== newUrl) {
           existingBrand.url.history.push({
             previousValue: existingBrand.url.value,
