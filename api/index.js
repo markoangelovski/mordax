@@ -25,11 +25,12 @@ app.use((req, res, next) => {
 
 // Home route
 app.get("/", (req, res) => {
-  const host = process.env.NODE_ENV === "development" ? "http://" : "https://";
+  const protocol =
+    process.env.NODE_ENV === "development" ? "http://" : "https://";
   res.json({
     status: "ok",
     message: "Greetings from Mordax!",
-    docs: host + req.get("host") + "/api/1/docs"
+    docs: protocol + req.get("host") + "/api/1/docs"
   });
 });
 
