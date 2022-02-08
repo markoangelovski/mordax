@@ -2,8 +2,11 @@ const path = require("path");
 
 const router = require("express").Router();
 
-// KEY routes
+// Key routes
 router.use("/keys", require("./keys/keys.routes.js"));
+
+// Web pages routes
+router.use("/pages", require("./webPages/webPages.routes.js"));
 
 // PriceSpider routes
 

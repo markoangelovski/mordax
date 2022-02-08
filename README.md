@@ -6,7 +6,7 @@
 
 ### Vercel project: https://vercel.com/markoangelovski/mordax
 
-- hosts the entire application
+- Vercel hosts the entire application
 
 ### Heroku project: https://dashboard.heroku.com/apps/mordax
 
