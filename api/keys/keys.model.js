@@ -14,11 +14,13 @@ const keySchema = new mongoose.Schema(
     active: { type: Boolean, default: true },
     deactivationDate: Date,
     deactivationIssuer: stringProps,
-    privilege: {
-      type: String,
-      enum: ["read", "readWrite"],
-      default: "read"
-    }
+    roles: [
+      {
+        type: String,
+        enum: require("../../lib/userRoles.json").allRoles,
+        default: "user"
+      }
+    ]
   },
   { timestamps: true }
 );

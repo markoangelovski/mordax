@@ -1,7 +1,7 @@
 const router = require("express").Router();
 const axios = require("axios");
 
-const Brand = require("../webPages/brand.model.js");
+const Locale = require("../locale/locale.model.js");
 
 const { scButtonUrl, scCarouselUrl } = require("../../config");
 const { readOnly, readWrite } = require("../../middleware/auth.js");
@@ -13,22 +13,22 @@ router.post("/product", readWrite, async (req, res, next) => {
     req.query;
 
   try {
-    const brand = await Brand.findOne({
+    const locale = await Locale.findOne({
       "url.value": url
     });
 
-    if (!brand) {
+    if (!locale) {
       res.status(404);
       next({
         message: `URL ${url} not found.`
       });
     }
 
-    const productExists = brand.skuList.findIndex(
+    const productExists = locale.skuList.findIndex(
       product => product.sku.value === sku
     );
 
-    if (brand && productExists === -1) {
+    if (locale && productExists === -1) {
       const product = {
         title: {
           value: productTitle,
@@ -118,7 +118,7 @@ router.post("/product", readWrite, async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.warn("Error occurred in GET /api/1/sc/sku-list route", error);
+    console.warn("Error occurred in GET /api/1/sc/product route", error);
     next(error);
   }
 });
@@ -130,7 +130,7 @@ router.patch("/product", readWrite, async (req, res, next) => {
     req.query;
 
   try {
-    const existingProduct = await Brand.findOne({
+    const existingProduct = await Locale.findOne({
       "url.value": url,
       "skuList.sku.value": sku
     });
@@ -258,7 +258,7 @@ router.patch("/product", readWrite, async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.warn("Error occurred in GET /api/1/sc/sku-list route", error);
+    console.warn("Error occurred in GET /api/1/sc/product route", error);
     next(error);
   }
 });
@@ -268,7 +268,8 @@ router.patch("/product", readWrite, async (req, res, next) => {
 router.delete("/product", readWrite, async (req, res, next) => {
   const { url, sku } = req.query;
   try {
-    const existingBrand = await Brand.updateOne(
+    // TODO: promijeni sve "brand" u "locale"
+    const existingBrand = await Locale.updateOne(
       { "url.value": url, "skuList.sku.value": sku },
       { $pull: { skuList: { "sku.value": sku } } }
     );
@@ -285,50 +286,50 @@ router.delete("/product", readWrite, async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.warn("Error occurred in GET /api/1/sc/sku-list route", error);
+    console.warn("Error occurred in GET /api/1/sc/product route", error);
     next(error);
   }
 });
 
 // Path: /api/1/sc/brands
 // Desc: Fetches all brands and locales
-router.get("/brands", readOnly, async (req, res, next) => {
-  try {
-    const brands = await Brand.find().select("-_id brand locale url");
+// router.get("/brands", readOnly, async (req, res, next) => {
+//   try {
+//     const brands = await Brand.find().select("-_id brand locale url");
 
-    if (brands) {
-      res.json({
-        status: "ok",
-        brandsCount: brands.length,
-        brands: brands
-          .map(brand => ({
-            brand: brand.brand.value,
-            locale: brand.locale.value,
-            url: brand.url.value
-          }))
-          .sort((first, second) => {
-            var A = first.brand.toUpperCase();
-            var B = second.brand.toUpperCase();
-            if (A < B) {
-              return -1;
-            }
-            if (A > B) {
-              return 1;
-            }
-            return 0;
-          })
-      });
-    } else {
-      res.status(404);
-      next({
-        message: `No brands found.`
-      });
-    }
-  } catch (error) {
-    console.warn("Error occurred in GET /api/1/sc/brands route", error);
-    next(error);
-  }
-});
+//     if (brands) {
+//       res.json({
+//         status: "ok",
+//         brandsCount: brands.length,
+//         brands: brands
+//           .map(brand => ({
+//             brand: brand.brand.value,
+//             locale: brand.locale.value,
+//             url: brand.url.value
+//           }))
+//           .sort((first, second) => {
+//             var A = first.brand.toUpperCase();
+//             var B = second.brand.toUpperCase();
+//             if (A < B) {
+//               return -1;
+//             }
+//             if (A > B) {
+//               return 1;
+//             }
+//             return 0;
+//           })
+//       });
+//     } else {
+//       res.status(404);
+//       next({
+//         message: `No brands found.`
+//       });
+//     }
+//   } catch (error) {
+//     console.warn("Error occurred in GET /api/1/sc/brands route", error);
+//     next(error);
+//   }
+// });
 
 // Path: /api/1/sc/sc-data
 // Desc: Fetches the SC data for all products for single locale in one SKU List

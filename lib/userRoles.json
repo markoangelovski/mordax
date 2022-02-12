@@ -1,0 +1,29 @@
+{
+  "allRoles": ["user", "team", "editor", "analyst"],
+  "roleMap": {
+    "admin": {
+      "allowedRoles": ["// All roles"],
+      "allowedEndpoints": ["// All endpoints"]
+    },
+    "user": {
+      "allowedRoles": [],
+      "allowedEndpoints": []
+    },
+    "team": {
+      "allowedRoles": ["user", "editor"],
+      "allowedEndpoints": [
+        [["POST"], "/create-key"],
+        [["POST"], "/deactivate-key"],
+        [["GET"], "/key-info"]
+      ]
+    },
+    "editor": {
+      "allowedRoles": ["user"],
+      "allowedEndpoints": [[["GET"], "/key-info"]]
+    },
+    "analyst": {
+      "allowedRoles": [],
+      "allowedEndpoints": []
+    }
+  }
+}

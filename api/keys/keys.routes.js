@@ -1,28 +1,47 @@
 const crypto = require("crypto");
 const router = require("express").Router();
 
-const { readWrite, admin } = require("../../middleware/auth.js");
+const { checkKey } = require("../../middleware/auth.js");
+const { response } = require("../../lib/helpers.js");
+
+const { ERROR_FORBIDDEN } = require("../../lib/errorCodes.json");
 
 const Keys = require("./keys.model.js");
 
-// Path: /api/1/keys/create-key?owner=Key owner&privilege=readWrite
+// Path: /api/1/keys/create-key?owner=Key owner&roles=user,team,editor,analyst
 // Desc: Creates new API key
-router.post("/create-key", readWrite, async (req, res, next) => {
-  const { key, issuedFor, privilege } = req.query;
+router.post("/create-key", checkKey, async (req, res, next) => {
+  const { key, issuedFor, roles } = req.query;
 
   try {
-    // Admin can create readWrite keys
-    // readWrite keys can create read keys
+    const requestedRoles = roles.split(",").map(role => role.trim());
+
+    // Handle roles creation
+    let availableRoles = new Set();
+    const { roleMap } = require("../../lib/userRoles.json");
+
+    if (!req.admin)
+      req.roles.forEach(userRole => {
+        requestedRoles.forEach(requestedRole => {
+          if (roleMap[userRole].allowedRoles.indexOf(requestedRole) !== -1)
+            availableRoles.add(requestedRole);
+        });
+      });
+
+    // If the requestor does not have an authority to add create a key with requested role, return 403
+    if (!req.admin && !availableRoles.size)
+      return response(res, 403, true, {}, ERROR_FORBIDDEN);
+
     const newKey = await Keys.create({
       key: crypto.randomBytes(16).toString("hex"),
       issuer: req.admin ? "admin" : key,
       issuedFor,
-      privilege: req.admin ? privilege : "read"
+      roles: req.admin ? requestedRoles : [...availableRoles]
     });
     delete newKey._doc._id;
     delete newKey._doc.__v;
 
-    res.json(newKey._doc);
+    response(res, 200, false, {}, newKey._doc);
   } catch (error) {
     console.warn("Error occurred in GET /api/1/keys/create-key route", error);
     next(error);
@@ -31,12 +50,12 @@ router.post("/create-key", readWrite, async (req, res, next) => {
 
 // Path: /api/1/keys/deactivate-key?keyToDeactivate=12345
 // Desc: Deactivates API key
-router.post("/deactivate-key", readWrite, async (req, res, next) => {
+router.post("/deactivate-key", checkKey, async (req, res, next) => {
   const { key, keyToDeactivate } = req.query;
 
   try {
     const result = await Keys.updateOne(
-      { key: keyToDeactivate },
+      { key: keyToDeactivate, active: true },
       {
         $set: {
           active: false,
@@ -47,7 +66,13 @@ router.post("/deactivate-key", readWrite, async (req, res, next) => {
     );
 
     if (result.modifiedCount > 0) {
-      res.json({ message: `Key ${keyToDeactivate} successfully deactivated.` });
+      response(
+        res,
+        200,
+        false,
+        {},
+        { message: `Key ${keyToDeactivate} successfully deactivated.` }
+      );
     } else {
       res.status(404);
       next({
@@ -62,15 +87,21 @@ router.post("/deactivate-key", readWrite, async (req, res, next) => {
 
 // Path: /api/1/keys/key-info
 // Desc: Fetch read key
-router.get("/key-info", admin, async (req, res, next) => {
-  const { checkKey } = req.query;
+router.get("/key-info", checkKey, async (req, res, next) => {
+  const { key, checkKey } = req.query;
+
+  // Only admin can check all keys and other keys
+  // Other users can check their own key
+  if (!req.admin && key !== checkKey)
+    return response(res, 403, true, {}, ERROR_FORBIDDEN);
 
   try {
     if (checkKey) {
-      const key = await Keys.findOne({ key: checkKey }).select("-_id -__v");
+      const key = await Keys.find({ key: checkKey }).select("-_id -__v");
 
       if (key) {
-        res.json(key);
+        // res.json(key);
+        response(res, 200, false, {}, key);
       } else {
         res.status(404);
         next({
@@ -79,7 +110,8 @@ router.get("/key-info", admin, async (req, res, next) => {
       }
     } else {
       const keys = await Keys.find().select("-_id -__v");
-      res.json(keys);
+      // res.json(keys);
+      response(res, 200, false, {}, keys);
     }
   } catch (error) {
     console.warn("Error occurred in GET /api/1/keys/create-key route", error);

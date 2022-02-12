@@ -1,19 +1,57 @@
 const path = require("path");
 const router = require("express").Router();
 const xlsx = require("xlsx");
-const axios = require("axios");
 const multer = require("multer");
 const upload = multer();
 
-const Brand = require("./brand.model.js");
+const Brand = require("./locale.model.js");
 
-const { scButtonUrl, scCarouselUrl } = require("../../config");
 const { readOnly, readWrite } = require("../../middleware/auth.js");
 
-// Path: /api/1/pages/data?key=123456789&brand=Herbal Essences&locale=en-us&url=https://www.herbalessences.com&scButtonKey=12ed8c04-265f-4c6b-838e-bd390431accd&scCarouselKey=1234
+// Path: /api/1/locale/all
+// Desc: Fetches all brands and locales
+router.get("/brands", readOnly, async (req, res, next) => {
+  try {
+    const brands = await Brand.find().select("-_id brand locale url");
+
+    if (brands) {
+      res.json({
+        status: "ok",
+        brandsCount: brands.length,
+        brands: brands
+          .map(brand => ({
+            brand: brand.brand.value,
+            locale: brand.locale.value,
+            url: brand.url.value
+          }))
+          .sort((first, second) => {
+            var A = first.brand.toUpperCase();
+            var B = second.brand.toUpperCase();
+            if (A < B) {
+              return -1;
+            }
+            if (A > B) {
+              return 1;
+            }
+            return 0;
+          })
+      });
+    } else {
+      res.status(404);
+      next({
+        message: `No brands found.`
+      });
+    }
+  } catch (error) {
+    console.warn("Error occurred in GET /api/1/sc/brands route", error);
+    next(error);
+  }
+});
+
+// Path: /api/1/locale/single?key=123456789&brand=Herbal Essences&locale=en-us&url=https://www.herbalessences.com&scButtonKey=12ed8c04-265f-4c6b-838e-bd390431accd&scCarouselKey=1234
 // Desc: Uploads pages data in excel spreadsheet
 router.post(
-  "/data",
+  "/single",
   readWrite,
   upload.single("skuList"),
   async (req, res, next) => {
@@ -175,9 +213,9 @@ router.post(
   }
 );
 
-// Path: /api/1/pages/data?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
+// Path: /api/1/locale/single?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
 // Desc: Fetches the pages data for a single locale
-router.get("/data", readOnly, async (req, res, next) => {
+router.get("/single", readOnly, async (req, res, next) => {
   const { url, download } = req.query;
 
   try {
@@ -203,9 +241,9 @@ router.get("/data", readOnly, async (req, res, next) => {
   }
 });
 
-// Path: /api/1/pages/data?key=123456789&url=https://www.herbalessences.com
+// Path: /api/1/locale/single?key=123456789&url=https://www.herbalessences.com
 // Desc: Deletes the locale and related pages list
-router.delete("/data", readWrite, async (req, res, next) => {
+router.delete("/single", readWrite, async (req, res, next) => {
   const { url } = req.query;
 
   try {
@@ -228,9 +266,9 @@ router.delete("/data", readWrite, async (req, res, next) => {
   }
 });
 
-// Path: /api/1/pages/data-list/template
+// Path: /api/1/locale/template
 // Desc: Downloads the Pages List template
-router.get("/data-template", async (req, res, next) => {
+router.get("/template", async (req, res, next) => {
   res.download(
     path.join(__dirname, "../../public/Test Herbal Essences en-us.xlsx")
   );

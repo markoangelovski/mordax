@@ -1,0 +1,17 @@
+{
+  "ERROR_UNAUTHORIZED": {
+    "message": "401 - Unauthorized",
+    "code": "ERROR_UNAUTHORIZED"
+  },
+  "ERROR_FORBIDDEN": {
+    "message": "403 - Forbidden",
+    "code": "ERROR_FORBIDDEN"
+  },
+  "ERROR_NOT_FOUND": {
+    "message": "404 - Request not found",
+    "code": "ERROR_NOT_FOUND"
+  },
+  "ERROR_INTERNAL_ISSUE": {
+    "code": "ERROR_INTERNAL_ISSUE"
+  }
+}

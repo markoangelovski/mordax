@@ -6,12 +6,12 @@ const router = require("express").Router();
 router.use("/keys", require("./keys/keys.routes.js"));
 
 // Web pages routes
-router.use("/pages", require("./webPages/webPages.routes.js"));
+// router.use("/pages", require("./webPages/webPages.routes.js"));
 
 // PriceSpider routes
 
 // Smartcommerce routes
-router.use("/sc", require("./sc/sc.routes.js"));
+// router.use("/sc", require("./sc/sc.routes.js"));
 
 // Documentation route
 router.get("/docs", (req, res) => {
