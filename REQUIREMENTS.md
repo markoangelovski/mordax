@@ -4,10 +4,12 @@
 
 - API Keys:
 
-  - Admin key can create other Read, ReadWrite or Analytics keys
-  - ReadWrite keys can create Read keys
+  - Admin key can create other keys
+  - Team keys can create Editor and Read keys
+  - Editor keys can create Read keys
+  - Read keys cannot create keys
   - Read keys can be disabled by Admin and ReadWrite keys
-  - Admin keys can review all keys, ReadWrite and Read keys can review their keys and no others
+  - Admin keys can review all keys, other keys can review their keys and no others
 
 - Locale:
 

@@ -8,7 +8,7 @@
     "code": "ERROR_FORBIDDEN"
   },
   "ERROR_NOT_FOUND": {
-    "message": "404 - Request not found",
+    "message": "404 - Resource not found",
     "code": "ERROR_NOT_FOUND"
   },
   "ERROR_INTERNAL_ISSUE": {

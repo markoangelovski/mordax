@@ -1,7 +1,6 @@
 const crypto = require("crypto");
 const router = require("express").Router();
 
-const { checkKey } = require("../../middleware/auth.js");
 const { response } = require("../../lib/helpers.js");
 
 const { ERROR_FORBIDDEN } = require("../../lib/errorCodes.json");
@@ -10,7 +9,7 @@ const Keys = require("./keys.model.js");
 
 // Path: /api/1/keys/create-key?owner=Key owner&roles=user,team,editor,analyst
 // Desc: Creates new API key
-router.post("/create-key", checkKey, async (req, res, next) => {
+router.post("/create-key", async (req, res, next) => {
   const { key, issuedFor, roles } = req.query;
 
   try {
@@ -20,6 +19,7 @@ router.post("/create-key", checkKey, async (req, res, next) => {
     let availableRoles = new Set();
     const { roleMap } = require("../../lib/userRoles.json");
 
+    // Check if requester has the correct role needed to create the key
     if (!req.admin)
       req.roles.forEach(userRole => {
         requestedRoles.forEach(requestedRole => {
@@ -50,7 +50,7 @@ router.post("/create-key", checkKey, async (req, res, next) => {
 
 // Path: /api/1/keys/deactivate-key?keyToDeactivate=12345
 // Desc: Deactivates API key
-router.post("/deactivate-key", checkKey, async (req, res, next) => {
+router.post("/deactivate-key", async (req, res, next) => {
   const { key, keyToDeactivate } = req.query;
 
   try {
@@ -87,7 +87,7 @@ router.post("/deactivate-key", checkKey, async (req, res, next) => {
 
 // Path: /api/1/keys/key-info
 // Desc: Fetch read key
-router.get("/key-info", checkKey, async (req, res, next) => {
+router.get("/key-info", async (req, res, next) => {
   const { key, checkKey } = req.query;
 
   // Only admin can check all keys and other keys

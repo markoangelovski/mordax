@@ -1,7 +1,7 @@
 const Keys = require("../api/keys/keys.model.js");
 
 const { response } = require("../lib/helpers.js");
-const { roleMap } = require("../lib/userRoles.json");
+const { openEndpoints, roleMap } = require("../lib/userRoles.json");
 
 const {
   ERROR_UNAUTHORIZED,
@@ -10,15 +10,25 @@ const {
 
 exports.checkKey = async (req, res, next) => {
   const { key } = req.query;
+  const path =
+    req._parsedUrl.pathname.length > 1 ? req._parsedUrl.pathname : "";
+
+  console.log("path. ", path);
+
+  if (key && key === process.env.MASTER_KEY) {
+    // Admin keys have access to all endpoints
+    req.admin = true;
+
+    return next();
+  }
+
+  // Allow traffic to open endpoints
+  if (openEndpoints.indexOf(path) !== -1) {
+    req.key = req.query.key || "anonymous";
+    return next();
+  }
 
   try {
-    if (key && key === process.env.MASTER_KEY) {
-      // Admin keys have access to all endpoints
-      req.admin = true;
-
-      return next();
-    }
-
     const existingKey = await Keys.find({ key, active: true }).select(
       "-_id roles"
     );
@@ -30,7 +40,7 @@ exports.checkKey = async (req, res, next) => {
         let ok = false;
         roleMap[userRole].allowedEndpoints.every(allowedEndpoint => {
           const methodOk = allowedEndpoint[0].indexOf(req.method) !== -1;
-          const endpointOk = req.originalUrl.indexOf(allowedEndpoint[1]) !== -1;
+          const endpointOk = req.baseUrl + path === allowedEndpoint[1];
 
           // Check if allowed endpoint is a substring of the requested url
           if (methodOk && endpointOk) {

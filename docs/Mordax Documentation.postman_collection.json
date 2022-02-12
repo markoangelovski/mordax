@@ -6,6 +6,112 @@
 	},
 	"item": [
 		{
+			"name": "API Keys",
+			"item": [
+				{
+					"name": "POST Create key",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/keys/create-key?key={{key}}&roles=readWrite&issuedFor=",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"keys",
+								"create-key"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "roles",
+									"value": "readWrite",
+									"description": "user,team,editor,analyst"
+								},
+								{
+									"key": "issuedFor",
+									"value": "",
+									"description": "Name or description of who the key is for"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Deactivate key",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{hostDev}}/api/1/keys/deactivate-key?key={{key}}&keyToDeactivate=",
+							"host": [
+								"{{hostDev}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"keys",
+								"deactivate-key"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "keyToDeactivate",
+									"value": "",
+									"description": "Key for deactivation, required"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Key info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{hostDev}}/api/1/keys/key-info?key={{key}}",
+							"host": [
+								"{{hostDev}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"keys",
+								"key-info"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "checkKey",
+									"value": "",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
 			"name": "SmartCommerce",
 			"item": [
 				{
@@ -367,112 +473,6 @@
 								"api",
 								"1",
 								"docs"
-							]
-						}
-					},
-					"response": []
-				}
-			]
-		},
-		{
-			"name": "Keys",
-			"item": [
-				{
-					"name": "POST Create key",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{host}}/api/1/keys/create-key?key={{key}}&privilege=readWrite&issuedFor=",
-							"host": [
-								"{{host}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"keys",
-								"create-key"
-							],
-							"query": [
-								{
-									"key": "key",
-									"value": "{{key}}",
-									"description": "API key, required"
-								},
-								{
-									"key": "privilege",
-									"value": "readWrite",
-									"description": "read or readWrite"
-								},
-								{
-									"key": "issuedFor",
-									"value": "",
-									"description": "Name or description of who the key is for"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "POST Deactivate key",
-					"request": {
-						"method": "POST",
-						"header": [],
-						"url": {
-							"raw": "{{hostDev}}/api/1/keys/deactivate-key?key={{key}}&keyToDeactivate=",
-							"host": [
-								"{{hostDev}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"keys",
-								"deactivate-key"
-							],
-							"query": [
-								{
-									"key": "key",
-									"value": "{{key}}",
-									"description": "API key, required"
-								},
-								{
-									"key": "keyToDeactivate",
-									"value": "",
-									"description": "Key for deactivation, required"
-								}
-							]
-						}
-					},
-					"response": []
-				},
-				{
-					"name": "GET Key info",
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{hostDev}}/api/1/keys/key-info?key={{key}}",
-							"host": [
-								"{{hostDev}}"
-							],
-							"path": [
-								"api",
-								"1",
-								"keys",
-								"key-info"
-							],
-							"query": [
-								{
-									"key": "key",
-									"value": "{{key}}",
-									"description": "API key, required"
-								},
-								{
-									"key": "checkKey",
-									"value": "",
-									"disabled": true
-								}
 							]
 						}
 					},

@@ -1,5 +1,6 @@
 {
   "allRoles": ["user", "team", "editor", "analyst"],
+  "openEndpoints": ["", "/", "/api/1/docs"],
   "roleMap": {
     "admin": {
       "allowedRoles": ["// All roles"],
@@ -12,14 +13,20 @@
     "team": {
       "allowedRoles": ["user", "editor"],
       "allowedEndpoints": [
-        [["POST"], "/create-key"],
-        [["POST"], "/deactivate-key"],
-        [["GET"], "/key-info"]
+        [["POST"], "/api/1/keys/create-key"],
+        [["POST"], "/api/1/keys/deactivate-key"],
+        [["GET"], "/api/1/keys/key-info"],
+        [["GET", "POST"], "/api/1/locales"],
+        [["GET"], "/api/1/locales/single"]
       ]
     },
     "editor": {
       "allowedRoles": ["user"],
-      "allowedEndpoints": [[["GET"], "/key-info"]]
+      "allowedEndpoints": [
+        [["GET"], "/api/1/keys/key-info"],
+        [["GET"], "/api/1/locales"],
+        [["GET"], "/api/1/locales/single"]
+      ]
     },
     "analyst": {
       "allowedRoles": [],
