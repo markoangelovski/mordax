@@ -216,13 +216,13 @@ router.get("/single", async (req, res, next) => {
 router.get("/single/download", async (req, res, next) => {
   // Detect if Vercel app is being used and forward the request to Heroku app
   // Vercel app does not fetch retailer links so Heroku app needs to be used
-  if (req.headers["x-vercel-forwarded-for"])
-    return axios(require("../../config").hostHeroku + req.originalUrl)
-      .then(response => {
-        console.log("response: ", response);
-        res.json(response.data);
-      })
-      .catch(err => next(err));
+  // if (req.headers["x-vercel-forwarded-for"])
+  //   return axios(require("../../config").hostHeroku + req.originalUrl)
+  //     .then(response => {
+  //       console.log("response: ", response);
+  //       res.json(response.data);
+  //     })
+  //     .catch(err => next(err));
 
   let { url } = req.query;
 
