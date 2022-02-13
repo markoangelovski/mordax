@@ -172,10 +172,10 @@ router.post("/", upload.single("template"), async (req, res, next) => {
   }
 });
 
-// Path: /api/1/locales/single?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
+// Path: /api/1/locales/single?key=123456789&url=https://www.herbalessences.com
 // Desc: Fetches the pages data for a single locale
 router.get("/single", async (req, res, next) => {
-  let { url, includePages, download } = req.query;
+  let { url, includePages } = req.query;
   includePages = includePages === "true";
 
   try {
@@ -198,6 +198,57 @@ router.get("/single", async (req, res, next) => {
         { pagesCount: existingLocalePages.length },
         { ...existingLocale._doc, pages: existingLocalePages }
       );
+    } else {
+      res.status(404);
+      next({
+        message: `Locale ${url} not found.`
+      });
+    }
+  } catch (error) {
+    console.warn("Error occurred in GET /api/1/locales/single route", error);
+    next(error);
+  }
+});
+
+// Path: /api/1/locales/single/download?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
+// Desc: Fetches the pages data for a single locale
+router.get("/single/download", async (req, res, next) => {
+  let { url } = req.query;
+
+  try {
+    const existingLocalePages = await Page.find({ localeUrl: url }).select(
+      "-_id url type data"
+    );
+
+    if (existingLocalePages.length) {
+      const json = existingLocalePages.map(({ url, type, data }) => {
+        const keys = data && Object.keys(data);
+
+        const payload = {
+          url,
+          type
+        };
+
+        keys && keys.forEach(key => (payload[key] = data[key].value));
+        return payload;
+      });
+
+      const wb = xlsx.utils.book_new();
+
+      const ws_name = "Download";
+
+      const ws = xlsx.utils.json_to_sheet(json);
+
+      xlsx.utils.book_append_sheet(wb, ws, ws_name);
+
+      const savePath = `${path.join(__dirname, "../../", "/downloads")}/${url
+        .replace("https://", "")
+        .replace(/\//gi, "-")}_${Date.now()}.xlsx`;
+
+      xlsx.writeFile(wb, savePath);
+
+      res.download(savePath);
+      // TODO: napravi da se može downloadat ili cijela SKU lista kao exelica, ili samo proizvodi bez sellera
     } else {
       res.status(404);
       next({
