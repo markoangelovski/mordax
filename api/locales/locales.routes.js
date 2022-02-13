@@ -213,6 +213,13 @@ router.get("/single", async (req, res, next) => {
 // Path: /api/1/locales/single/download?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
 // Desc: Fetches the pages data for a single locale
 router.get("/single/download", async (req, res, next) => {
+  // Detect if Vercel app is being used and forward the request to Heroku app
+  // Vercel app does not fetch retailer links so Heroku app needs to be used
+  if (req.headers["x-vercel-forwarded-for"])
+    return axios(require("../../config").hostHeroku + req.originalUrl)
+      .then(response => res.json(response.data))
+      .catch(err => next(err));
+
   let { url } = req.query;
 
   try {
