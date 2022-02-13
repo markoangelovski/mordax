@@ -1,17 +1,21 @@
 {
   "ERROR_UNAUTHORIZED": {
     "message": "401 - Unauthorized",
+    "statusCode": 401,
     "code": "ERROR_UNAUTHORIZED"
   },
   "ERROR_FORBIDDEN": {
     "message": "403 - Forbidden",
+    "statusCode": 403,
     "code": "ERROR_FORBIDDEN"
   },
   "ERROR_NOT_FOUND": {
     "message": "404 - Resource not found",
+    "statusCode": 404,
     "code": "ERROR_NOT_FOUND"
   },
   "ERROR_INTERNAL_ISSUE": {
+    "statusCode": 500,
     "code": "ERROR_INTERNAL_ISSUE"
   }
 }
