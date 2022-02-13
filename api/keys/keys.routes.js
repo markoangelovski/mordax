@@ -100,8 +100,7 @@ router.get("/key-info", async (req, res, next) => {
       const key = await Keys.find({ key: checkKey }).select("-_id -__v");
 
       if (key) {
-        // res.json(key);
-        response(res, 200, false, {}, key);
+        response(res, 200, false, { keys: key.length }, key);
       } else {
         res.status(404);
         next({
@@ -111,7 +110,7 @@ router.get("/key-info", async (req, res, next) => {
     } else {
       const keys = await Keys.find().select("-_id -__v");
       // res.json(keys);
-      response(res, 200, false, {}, keys);
+      response(res, 200, false, { keys: keys.length }, keys);
     }
   } catch (error) {
     console.warn("Error occurred in GET /api/1/keys/create-key route", error);

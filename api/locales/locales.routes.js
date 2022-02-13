@@ -29,7 +29,7 @@ router.get("/", async (req, res, next) => {
         res,
         200,
         false,
-        {},
+        { locales: locales.length },
         sortItems(
           locales.map(locale => makeLocaleForRes(locale)),
           "brand"

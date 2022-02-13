@@ -8,7 +8,7 @@ const {
   ERROR_FORBIDDEN
 } = require("../lib/errorCodes.json");
 
-exports.checkKey = async (req, res, next) => {
+exports.checkKey = savedKeys => async (req, res, next) => {
   const { key } = req.query;
   const path =
     req._parsedUrl.pathname.length > 1 ? req._parsedUrl.pathname : "";
@@ -27,9 +27,14 @@ exports.checkKey = async (req, res, next) => {
   }
 
   try {
-    const existingKey = await Keys.find({ key, active: true }).select(
-      "-_id key roles"
-    );
+    // Check if key has already been fetched
+    let existingKey = savedKeys.find(savedKey => savedKey[0].key === key);
+
+    // If key is not found, check in db
+    if (!existingKey)
+      existingKey = await Keys.find({ key, active: true }).select(
+        "-_id key roles"
+      );
 
     if (key && existingKey.length > 0) {
       let authorized = false;
@@ -57,6 +62,11 @@ exports.checkKey = async (req, res, next) => {
       if (authorized) {
         req.key = existingKey[0].key;
         req.roles = existingKey[0].roles;
+
+        // Save fetched key to memory
+        const index = savedKeys.findIndex(savedKey => savedKey[0].key === key);
+        if (index === -1) savedKeys.push(existingKey);
+
         return next();
       }
 

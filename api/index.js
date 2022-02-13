@@ -18,7 +18,8 @@ connectDb();
 app.use(express.json());
 app.use(cors());
 app.use(morgan("combined"));
-app.use(checkKey);
+const savedKeys = [];
+app.use(checkKey(savedKeys));
 app.use(analytics);
 app.use((req, res, next) => {
   // Sets the cache for Vercel https://vercel.com/guides/using-express-with-vercel#standalone-express
