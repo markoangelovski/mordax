@@ -218,7 +218,10 @@ router.get("/single/download", async (req, res, next) => {
   // Vercel app does not fetch retailer links so Heroku app needs to be used
   if (req.headers["x-vercel-forwarded-for"])
     return axios(require("../../config").hostHeroku + req.originalUrl)
-      .then(response => res.download(response.data))
+      .then(response => {
+        console.log("response: ", response);
+        res.json(response.data);
+      })
       .catch(err => next(err));
 
   let { url } = req.query;
