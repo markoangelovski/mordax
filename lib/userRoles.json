@@ -17,7 +17,7 @@
         [["POST"], "/api/1/keys/deactivate-key"],
         [["GET"], "/api/1/keys/key-info"],
         [["GET", "POST"], "/api/1/locales"],
-        [["GET"], "/api/1/locales/single"]
+        [["GET", "DELETE"], "/api/1/locales/single"]
       ]
     },
     "editor": {

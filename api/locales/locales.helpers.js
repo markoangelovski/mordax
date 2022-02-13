@@ -4,10 +4,10 @@ exports.makeLocaleForDb = req => {
     createdAt: new Date().toISOString()
   });
 
-  const fieldsArray = ["url"];
+  let fieldsArray = ["url"];
 
   if (req.query.fields)
-    fields = fieldsArray.concat(
+    fieldsArray = fieldsArray.concat(
       req.query.fields.split(",").map(field => field.trim())
     );
 
@@ -16,7 +16,9 @@ exports.makeLocaleForDb = req => {
     brand: makeAttr(req.query.brand),
     locale: makeAttr(req.query.locale),
     url: makeAttr(req.query.url),
-    fields: fieldsArray,
+    fields: fieldsArray.filter(
+      field => field.charAt(0) !== "-" && field.length > 0
+    ), // In case some attributes with "-" were passed
     capitol: makeAttr(req.query.capitol),
     scButtonKey: makeAttr(req.query.scButtonKey),
     scCarouselKey: makeAttr(req.query.scCarouselKey),
@@ -56,11 +58,39 @@ exports.updateLocale = (locale, req) => {
     return prevAttr;
   };
 
-  const { key } = req.query;
+  const { key, fields } = req.query;
+
+  // Join existing fields and new fields to set to filter for duplicates
+  if (fields)
+    newFields = new Set([
+      ...locale.fields,
+      ...fields.split(",").map(field => field.trim())
+    ]);
+
+  // If new fields are submitted use them, otherwise use old fields
+  let updatedFields = fields ? [...newFields] : locale.fields;
+
+  // Do not allow for url field to be removed
+  const index = updatedFields.indexOf("-url");
+  if (index) updatedFields = updatedFields.filter((_, i) => index !== i);
+
+  // Check if any attribute is prefixed with '-' and remove it from the fields array
+  updatedFields.every(field => {
+    const argToRemove = field.charAt(0) === "-" && field.slice(1);
+
+    if (updatedFields.indexOf(argToRemove) > -1)
+      updatedFields = updatedFields.filter(
+        filterField => filterField !== argToRemove
+      );
+    return true;
+  });
 
   locale.brand = updateAttr(locale.brand, req.query.brand, key);
   locale.locale = updateAttr(locale.locale, req.query.locale, key);
   locale.url = updateAttr(locale.url, req.query.newUrl, key);
+  locale.fields = updatedFields.filter(
+    field => field.charAt(0) !== "-" && field.length > 0
+  ); // Filters out the attribute marked for deletion
   locale.capitol = updateAttr(locale.capitol, req.query.capitol, key);
   locale.scButtonKey = updateAttr(
     locale.scButtonKey,

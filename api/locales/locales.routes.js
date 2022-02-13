@@ -9,7 +9,8 @@ const {
   makeLocaleForDb,
   makeLocaleForRes,
   updateLocale,
-  sortItems
+  sortItems,
+  santizeLocale
 } = require("./locales.helpers.js");
 
 const { response } = require("../../lib/helpers.js");
@@ -76,7 +77,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// Path: ?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
+// Path: /api/1/locales/single?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
 // Desc: Fetches the pages data for a single locale
 router.get("/single", async (req, res, next) => {
   const { url, download } = req.query;
@@ -101,37 +102,34 @@ router.get("/single", async (req, res, next) => {
   }
 });
 
-// // Path: /api/1/locale/single?key=123456789&url=https://www.herbalessences.com
-// // Desc: Deletes the locale and related pages list
-// router.delete("/single", readWrite, async (req, res, next) => {
-//   const { url } = req.query;
+// Path: /api/1/locales/single?key=123456789&url=https://www.herbalessences.com
+// Desc: Deletes the locale and related pages list
+router.delete("/single", async (req, res, next) => {
+  const { url } = req.query;
 
-//   try {
-//     const { deletedCount } = await Brand.deleteOne({ "url.value": url });
+  try {
+    const { deletedCount } = await Locale.deleteOne({ "url.value": url });
 
-//     if (deletedCount) {
-//       res.json({
-//         status: "ok",
-//         message: `Locale ${url} deleted successfully.`
-//       });
-//     } else {
-//       res.status(404);
-//       next({
-//         message: `Locale ${url} not found.`
-//       });
-//     }
-//   } catch (error) {
-//     console.warn("Error occurred in DELETE /api/1/sc/sku-list route", error);
-//     next(error);
-//   }
-// });
-
-// // Path: /api/1/locale/template
-// // Desc: Downloads the Pages List template
-// router.get("/template", async (req, res, next) => {
-//   res.download(
-//     path.join(__dirname, "../../public/Test Herbal Essences en-us.xlsx")
-//   );
-// });
+    if (deletedCount) {
+      response(
+        res,
+        200,
+        false,
+        {},
+        {
+          message: `Locale ${url} deleted successfully.`
+        }
+      );
+    } else {
+      res.status(404);
+      next({
+        message: `Locale ${url} not found.`
+      });
+    }
+  } catch (error) {
+    console.warn("Error occurred in DELETE /api/1/sc/sku-list route", error);
+    next(error);
+  }
+});
 
 module.exports = router;
