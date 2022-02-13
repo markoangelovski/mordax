@@ -156,7 +156,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{host}}/api/1/locales?key=38bdc151d133343bd6234563d40895c5&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&fields=type,Title,SKU,mpId&capitol=Washington&scButtonKey=&scCarouselKey=",
+							"raw": "{{host}}/api/1/locales?key=38bdc151d133343bd6234563d40895c5&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&capitol=Washington&scButtonKey=&scCarouselKey=",
 							"host": [
 								"{{host}}"
 							],
@@ -194,7 +194,7 @@
 								},
 								{
 									"key": "fields",
-									"value": "type,Title,SKU,mpId",
+									"value": "Title,SKU,mpId",
 									"description": "Name of the attribute, prefix with - to remove. ex: upc,-bvid"
 								},
 								{
