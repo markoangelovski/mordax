@@ -13,8 +13,6 @@ exports.checkKey = async (req, res, next) => {
   const path =
     req._parsedUrl.pathname.length > 1 ? req._parsedUrl.pathname : "";
 
-  console.log("path. ", path);
-
   if (key && key === process.env.MASTER_KEY) {
     // Admin keys have access to all endpoints
     req.admin = true;
@@ -24,13 +22,13 @@ exports.checkKey = async (req, res, next) => {
 
   // Allow traffic to open endpoints
   if (openEndpoints.indexOf(path) !== -1) {
-    req.key = req.query.key || "anonymous";
+    req.key = req.query.key ? req.query.key : "anonymous";
     return next();
   }
 
   try {
     const existingKey = await Keys.find({ key, active: true }).select(
-      "-_id roles"
+      "-_id key roles"
     );
 
     if (key && existingKey.length > 0) {
@@ -57,7 +55,7 @@ exports.checkKey = async (req, res, next) => {
       });
 
       if (authorized) {
-        req.key = existingKey[0];
+        req.key = existingKey[0].key;
         req.roles = existingKey[0].roles;
         return next();
       }

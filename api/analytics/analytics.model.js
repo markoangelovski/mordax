@@ -5,7 +5,8 @@ const stringProps = {
   maxlength: 256
 };
 
-const endpoint = {
+const analyticsSchema = new mongoose.Schema({
+  key: stringProps,
   endpoint: stringProps,
   method: stringProps,
   date: Date,
@@ -15,11 +16,6 @@ const endpoint = {
   os: { name: stringProps, version: stringProps },
   device: { vendor: stringProps, model: stringProps, type: stringProps },
   cpu: { architecture: stringProps }
-};
-
-const analyticsSchema = new mongoose.Schema({
-  key: stringProps,
-  requests: [endpoint]
 });
 
 module.exports = mongoose.model("Analytics", analyticsSchema);
