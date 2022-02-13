@@ -172,3 +172,46 @@ exports.getPageUrls = async (id, url) => {
 
   return urls;
 };
+
+exports.mapTemplateDataToPage = (req, fields, template, pages) =>
+  // Iterate over items in uploaded xlsx template file {Title: "page title", SKU: "product sku",etc}
+  template.map(item => {
+    // Find the corresponding page in the list of all pages
+    const page = pages.find(page => page.url === item.URL);
+    const { data } = page;
+
+    const updatedData = {};
+    fields
+      .filter(field => field !== "url") // Remove url from fields, it is already available
+      .forEach(field => {
+        // Create the data entry for specific key/column in the uploaded xlsx template file
+        updatedData[field] = {
+          value: item[field],
+          createdAt: new Date().toISOString(),
+          history: []
+        };
+
+        // If page exists and it has the data for the specific key/column, check if they are different and store the difference in history array
+        if (page && data && page.data[field].value !== item[field]) {
+          updatedData[field] = {
+            value: item[field],
+            createdAt: page.data[field].createdAt,
+            history: [
+              ...page.data[field].history,
+              {
+                previousValue: page.data[field].value,
+                updatedValue: item[field],
+                updatedAt: new Date().toISOString(),
+                updatedBy: req.admin ? "admin" : req.query.key
+              }
+            ]
+          };
+        }
+      });
+
+    return {
+      _id: page._id,
+      url: page.url || item.URL,
+      data: updatedData
+    };
+  });

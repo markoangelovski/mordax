@@ -8,7 +8,7 @@
     },
     "user": {
       "allowedRoles": [],
-      "allowedEndpoints": []
+      "allowedEndpoints": [[["GET"], "/api/1/locales/template"]]
     },
     "team": {
       "allowedRoles": ["user", "editor"],
@@ -17,7 +17,8 @@
         [["POST"], "/api/1/keys/deactivate-key"],
         [["GET"], "/api/1/keys/key-info"],
         [["GET", "POST"], "/api/1/locales"],
-        [["GET", "DELETE"], "/api/1/locales/single"]
+        [["GET", "DELETE"], "/api/1/locales/single"],
+        [["GET"], "/api/1/locales/template"]
       ]
     },
     "editor": {
@@ -25,7 +26,8 @@
       "allowedEndpoints": [
         [["GET"], "/api/1/keys/key-info"],
         [["GET"], "/api/1/locales"],
-        [["GET"], "/api/1/locales/single"]
+        [["GET"], "/api/1/locales/single"],
+        [["GET"], "/api/1/locales/template"]
       ]
     },
     "analyst": {

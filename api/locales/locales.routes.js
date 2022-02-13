@@ -12,7 +12,8 @@ const {
   makeLocaleForRes,
   updateLocale,
   sortItems,
-  getPageUrls
+  getPageUrls,
+  mapTemplateDataToPage
 } = require("./locales.helpers.js");
 
 const { response } = require("../../lib/helpers.js");
@@ -48,23 +49,68 @@ router.get("/", async (req, res, next) => {
 
 // Path: /api/1/locales
 // Desc: Creates a new locale
-router.post("/", async (req, res, next) => {
-  const { url, newUrl, action } = req.query;
+router.post("/", upload.single("template"), async (req, res, next) => {
+  const { url, newUrl } = req.query;
+  const buffer = req.file?.buffer;
+
+  let templateData;
+  if (buffer) {
+    const workbook = xlsx.read(buffer, { type: "buffer" });
+    templateData = xlsx.utils.sheet_to_json(
+      workbook.Sheets[workbook.SheetNames[0]]
+    );
+  }
 
   try {
     const locales = await Locale.find({ "url.value": url });
 
     if (locales.length) {
-      if (action !== "update")
-        return response(res, 200, false, {}, makeLocaleForRes(locales[0]));
-
       const updatedLocale = new Locale(updateLocale(locales[0], req));
 
       const savedLocale = await updatedLocale.save();
 
-      response(res, 200, false, {}, makeLocaleForRes(savedLocale._doc));
+      // Update pages if template is uploaded
+      let pagesCount, updateResult;
+      if (buffer) {
+        const existingPages = await Page.find({ locale: savedLocale._id });
+        pagesCount = existingPages.length;
 
-      // Update the URL
+        const updatedPages = mapTemplateDataToPage(
+          req,
+          savedLocale.fields,
+          templateData,
+          existingPages
+        );
+
+        const bulkWrites = updatedPages.map(page => {
+          const filter = {};
+          if (page._id) {
+            filter._id = page._id;
+          } else {
+            file.url = page.url;
+          }
+
+          return {
+            updateOne: {
+              filter,
+              update: { $set: { data: page.data } },
+              upsert: true
+            }
+          };
+        });
+
+        updateResult = await Page.bulkWrite(bulkWrites);
+      }
+
+      response(
+        res,
+        200,
+        false,
+        { pages: pagesCount, updatedPages: updateResult.nModified },
+        makeLocaleForRes(savedLocale._doc)
+      );
+
+      // Update the URL in pages
       if (newUrl && newUrl !== url)
         Page.updateMany(
           { locale: savedLocale._id },
@@ -72,7 +118,7 @@ router.post("/", async (req, res, next) => {
         )
           .then(_ => _)
           .catch(err =>
-            console.warn("Error updating locale URL in pages for ", url)
+            console.warn("Error updating new locale URL in pages for ", url)
           );
     } else {
       const newLocalePayload = makeLocaleForDb(req);
@@ -81,13 +127,43 @@ router.post("/", async (req, res, next) => {
 
       const savedLocale = await newLocale.save();
 
-      response(res, 200, false, {}, makeLocaleForRes(savedLocale._doc));
+      let pagesData = await getPageUrls(savedLocale._id, url);
 
-      const pages = await getPageUrls(savedLocale._id, url);
+      // Update pages if xlsx template is uploaded
+      let updatedPagesCount;
+      if (buffer) {
+        updatedPages = mapTemplateDataToPage(
+          req,
+          savedLocale.fields,
+          templateData,
+          pagesData
+        );
 
-      Page.insertMany(pages)
-        .then(_ => _)
-        .catch(err => console.warn("Error saving pages for ", url));
+        updatedPagesCount = updatedPages.length;
+
+        pagesData = pagesData.map(page => {
+          updatedPages.forEach(updatedPage => {
+            if (page.url === updatedPage.url)
+              page = {
+                locale: page.locale,
+                localeUrl: page.localeUrl,
+                url: page.url,
+                data: updatedPage.data
+              };
+          });
+          return page;
+        });
+      }
+
+      const pages = await Page.insertMany(pagesData);
+
+      response(
+        res,
+        200,
+        false,
+        { pages: pages.length, updatedPages: updatedPagesCount },
+        makeLocaleForRes(savedLocale._doc)
+      );
     }
   } catch (error) {
     console.warn("Error occurred in POST /api/1/locales route", error);
@@ -139,14 +215,20 @@ router.delete("/single", async (req, res, next) => {
   const { url } = req.query;
 
   try {
-    const { deletedCount } = await Locale.deleteOne({ "url.value": url });
+    const [deletedLocales, deletedPages] = await Promise.all([
+      Locale.deleteOne({ "url.value": url }),
+      Page.deleteMany({ localeUrl: url })
+    ]);
 
-    if (deletedCount) {
+    if (deletedLocales.deletedCount) {
       response(
         res,
         200,
         false,
-        {},
+        {
+          deletedLocales: deletedLocales.deletedCount,
+          deletedPages: deletedPages.deletedCount
+        },
         {
           message: `Locale ${url} deleted successfully.`
         }
@@ -161,6 +243,14 @@ router.delete("/single", async (req, res, next) => {
     console.warn("Error occurred in DELETE /api/1/sc/sku-list route", error);
     next(error);
   }
+});
+
+// Path: /api/1/locales/template
+// Desc: Downloads the Pages List template
+router.get("/template", async (req, res, next) => {
+  res.download(
+    path.join(__dirname, "../../public/Test Herbal Essences en-us.xlsx")
+  );
 });
 
 module.exports = router;

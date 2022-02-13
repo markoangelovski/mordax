@@ -17,7 +17,7 @@ const pageSchema = new mongoose.Schema(
       maxlength: 2048,
       required: true
     },
-    data: []
+    data: {}
   },
   { timestamps: true }
 );
