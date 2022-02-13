@@ -1,3 +1,8 @@
+const { default: axios } = require("axios");
+const xmlParser = require("xml2js").parseStringPromise;
+
+const { urlRgx, localeRgx } = require("../../lib/regex");
+
 exports.makeLocaleForDb = req => {
   const makeAttr = attribute => ({
     value: attribute,
@@ -125,3 +130,45 @@ exports.sortItems = (items, attr) =>
     }
     return 0;
   });
+
+exports.getPageUrls = async (id, url) => {
+  let robotsUrl = url.replace(localeRgx, "");
+  robotsUrl =
+    robotsUrl.charAt(robotsUrl.length - 1) === "/"
+      ? robotsUrl + "robots.txt"
+      : robotsUrl + "/robots.txt";
+
+  console.log("robotsUrl", robotsUrl);
+
+  const { data: robotsData } = await axios(robotsUrl);
+
+  const xmlUrl = robotsData.match(urlRgx)[0];
+
+  const { data: xmlSitemapData } = await axios(xmlUrl);
+
+  const {
+    urlset: { url: rawUrls }
+  } = await xmlParser(xmlSitemapData);
+
+  const urls = rawUrls
+    .map(rawUrl => ({
+      locale: id,
+      localeUrl: url,
+      url: /https:\/\//gi.test(rawUrl.loc[0])
+        ? rawUrl.loc[0]
+        : "https://" + rawUrl.loc[0]
+    }))
+    .sort((first, second) => {
+      var A = first;
+      var B = second;
+      if (A < B) {
+        return -1;
+      }
+      if (A > B) {
+        return 1;
+      }
+      return 0;
+    });
+
+  return urls;
+};
