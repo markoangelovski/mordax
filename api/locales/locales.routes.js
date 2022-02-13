@@ -93,7 +93,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
           return {
             updateOne: {
               filter,
-              update: { $set: { data: page.data } },
+              update: { $set: { type: page.type, data: page.data } },
               upsert: true
             }
           };
@@ -106,7 +106,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
         res,
         200,
         false,
-        { pages: pagesCount, updatedPages: updateResult.nModified },
+        { locale: 1, pages: pagesCount, updatedPages: updateResult?.nModified },
         makeLocaleForRes(savedLocale._doc)
       );
 
@@ -148,6 +148,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
                 locale: page.locale,
                 localeUrl: page.localeUrl,
                 url: page.url,
+                type: updatedPage.type,
                 data: updatedPage.data
               };
           });
@@ -161,7 +162,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
         res,
         200,
         false,
-        { pages: pages.length, updatedPages: updatedPagesCount },
+        { locale: 1, pages: pages.length, updatedPages: updatedPagesCount },
         makeLocaleForRes(savedLocale._doc)
       );
     }
@@ -184,7 +185,7 @@ router.get("/single", async (req, res, next) => {
       )
     ];
     if (includePages)
-      queries.push(Page.find({ localeUrl: url }).select("-_id url data"));
+      queries.push(Page.find({ localeUrl: url }).select("-_id url type data"));
 
     const [existingLocale, existingLocalePages] = await Promise.all(queries);
 

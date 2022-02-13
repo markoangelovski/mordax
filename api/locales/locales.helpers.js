@@ -9,12 +9,7 @@ exports.makeLocaleForDb = req => {
     createdAt: new Date().toISOString()
   });
 
-  let fieldsArray = ["url"];
-
-  if (req.query.fields)
-    fieldsArray = fieldsArray.concat(
-      req.query.fields.split(",").map(field => field.trim())
-    );
+  const fieldsArray = req.query.fields.split(",").map(field => field.trim());
 
   return {
     createdBy: req.admin ? "admin" : req.query.key,
@@ -74,10 +69,6 @@ exports.updateLocale = (locale, req) => {
 
   // If new fields are submitted use them, otherwise use old fields
   let updatedFields = fields ? [...newFields] : locale.fields;
-
-  // Do not allow for url field to be removed
-  const index = updatedFields.indexOf("-url");
-  if (index) updatedFields = updatedFields.filter((_, i) => index !== i);
 
   // Check if any attribute is prefixed with '-' and remove it from the fields array
   updatedFields.every(field => {
@@ -181,37 +172,36 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
     const { data } = page;
 
     const updatedData = {};
-    fields
-      .filter(field => field !== "url") // Remove url from fields, it is already available
-      .forEach(field => {
-        // Create the data entry for specific key/column in the uploaded xlsx template file
+    fields.forEach(field => {
+      // Create the data entry for specific key/column in the uploaded xlsx template file
+      updatedData[field] = {
+        value: item[field],
+        createdAt: new Date().toISOString(),
+        history: []
+      };
+
+      // If page exists and it has the data for the specific key/column, check if they are different and store the difference in history array
+      if (page && data && page.data[field].value !== item[field]) {
         updatedData[field] = {
           value: item[field],
-          createdAt: new Date().toISOString(),
-          history: []
+          createdAt: page.data[field].createdAt,
+          history: [
+            ...page.data[field].history,
+            {
+              previousValue: page.data[field].value,
+              updatedValue: item[field],
+              updatedAt: new Date().toISOString(),
+              updatedBy: req.admin ? "admin" : req.query.key
+            }
+          ]
         };
-
-        // If page exists and it has the data for the specific key/column, check if they are different and store the difference in history array
-        if (page && data && page.data[field].value !== item[field]) {
-          updatedData[field] = {
-            value: item[field],
-            createdAt: page.data[field].createdAt,
-            history: [
-              ...page.data[field].history,
-              {
-                previousValue: page.data[field].value,
-                updatedValue: item[field],
-                updatedAt: new Date().toISOString(),
-                updatedBy: req.admin ? "admin" : req.query.key
-              }
-            ]
-          };
-        }
-      });
+      }
+    });
 
     return {
       _id: page._id,
       url: page.url || item.URL,
+      type: item.type,
       data: updatedData
     };
   });

@@ -17,6 +17,10 @@ const pageSchema = new mongoose.Schema(
       maxlength: 2048,
       required: true
     },
+    type: {
+      type: String,
+      max: 256
+    },
     data: {}
   },
   { timestamps: true }
