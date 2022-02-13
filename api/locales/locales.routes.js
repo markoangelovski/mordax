@@ -249,13 +249,14 @@ router.get("/single/download", async (req, res, next) => {
 
       xlsx.utils.book_append_sheet(wb, ws, ws_name);
 
-      const savePath = `${path.join(__dirname, "../../", "/downloads")}/${url
+      const savePath = `${path.join(__dirname, "../../", "/public")}/${url
         .replace("https://", "")
         .replace(/\//gi, "-")}_${Date.now()}.xlsx`;
 
       xlsx.writeFile(wb, savePath);
 
       res.download(savePath);
+
       // TODO: napravi da se može downloadat ili cijela SKU lista kao exelica, ili samo proizvodi bez sellera
     } else {
       res.status(404);
