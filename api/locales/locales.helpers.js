@@ -168,20 +168,31 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
   // Iterate over items in uploaded xlsx template file {Title: "page title", SKU: "product sku",etc}
   template.map(item => {
     // Find the corresponding page in the list of all pages
-    const page = pages.find(page => page.url === item.URL);
+    const page = pages.find(page => page.url === item.url);
     const { data } = page;
 
     const updatedData = {};
     fields.forEach(field => {
-      // Create the data entry for specific key/column in the uploaded xlsx template file
-      updatedData[field] = {
-        value: item[field],
-        createdAt: new Date().toISOString(),
-        history: []
-      };
+      const pageDataValue = data && page.data[field].value;
+      const templateItem = item[field];
+
+      if (templateItem) {
+        // Create the data entry for specific key/column in the uploaded xlsx template file
+        updatedData[field] = {
+          value: item[field],
+          createdAt: new Date().toISOString(),
+          history: []
+        };
+      }
 
       // If page exists and it has the data for the specific key/column, check if they are different and store the difference in history array
-      if (page && data && page.data[field].value !== item[field]) {
+      if (
+        page &&
+        data &&
+        pageDataValue &&
+        templateItem &&
+        pageDataValue !== templateItem
+      ) {
         updatedData[field] = {
           value: item[field],
           createdAt: page.data[field].createdAt,
@@ -199,8 +210,8 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
     });
 
     return {
-      _id: page._id,
-      url: page.url || item.URL,
+      _id: page?._id,
+      url: page?.url || item.url,
       type: item.type,
       data: updatedData
     };

@@ -88,7 +88,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
           if (page._id) {
             filter._id = page._id;
           } else {
-            file.url = page.url;
+            filter.url = page.url;
           }
 
           return {
@@ -142,19 +142,42 @@ router.post("/", upload.single("template"), async (req, res, next) => {
 
         updatedPagesCount = updatedPages.length;
 
-        pagesData = pagesData.map(page => {
-          updatedPages.forEach(updatedPage => {
-            if (page.url === updatedPage.url)
-              page = {
-                locale: page.locale,
-                localeUrl: page.localeUrl,
-                url: page.url,
-                type: updatedPage.type,
-                data: updatedPage.data
-              };
+        pagesData = pagesData
+          .map(page => {
+            updatedPages.forEach(updatedPage => {
+              if (page.url === updatedPage.url)
+                page = {
+                  locale: page.locale,
+                  localeUrl: page.localeUrl,
+                  url: page.url,
+                  type: updatedPage.type,
+                  data: updatedPage.data
+                };
+            });
+            return page;
+          })
+          .sort((first, second) => {
+            var A = first;
+            var B = second;
+
+            // Sort the pages with type first
+            if (A.type && !B.type) {
+              return -1;
+            }
+            if (!A.type && B.type) {
+              return 1;
+            }
+
+            // Sort the pages with type alphabetically?
+            if (A.type < B.type) {
+              return -1;
+            }
+            if (A.type > B.type) {
+              return 1;
+            }
+
+            return 0;
           });
-          return page;
-        });
       }
 
       const pages = await Page.insertMany(pagesData);
