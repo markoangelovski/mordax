@@ -219,8 +219,32 @@ router.get("/single", async (req, res, next) => {
         res,
         200,
         false,
-        { pagesCount: existingLocalePages.length },
-        { ...existingLocale._doc, pages: existingLocalePages }
+        { locale: 1, pages: existingLocalePages.length },
+        {
+          ...existingLocale._doc,
+          pages: existingLocalePages.sort((first, second) => {
+            var A = first;
+            var B = second;
+
+            // Sort the pages with type first
+            if (A.type && !B.type) {
+              return -1;
+            }
+            if (!A.type && B.type) {
+              return 1;
+            }
+
+            // Sort the pages with type alphabetically?
+            if (A.type < B.type) {
+              return -1;
+            }
+            if (A.type > B.type) {
+              return 1;
+            }
+
+            return 0;
+          })
+        }
       );
     } else {
       res.status(404);
