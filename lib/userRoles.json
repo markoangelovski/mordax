@@ -20,7 +20,7 @@
         [["GET", "DELETE"], "/api/1/locales/single"],
         [["GET"], "/api/1/locales/single/download"],
         [["GET"], "/api/1/locales/template"],
-        [["GET", "POST", "PATCH", "DELETE"], "/api/1/pages"]
+        [["GET", "POST", "DELETE"], "/api/1/pages"]
       ]
     },
     "editor": {
@@ -31,7 +31,7 @@
         [["GET"], "/api/1/locales/single"],
         [["GET"], "/api/1/locales/single/download"],
         [["GET"], "/api/1/locales/template"],
-        [["GET", "POST", "PATCH", "DELETE"], "/api/1/pages"]
+        [["GET", "POST", "DELETE"], "/api/1/pages"]
       ]
     },
     "analyst": {
