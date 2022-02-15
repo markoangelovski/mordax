@@ -18,6 +18,7 @@ const {
 } = require("./locales.helpers.js");
 
 const { response } = require("../../lib/helpers.js");
+const { makePagesForRes } = require("../pages/pages.helpers.js");
 
 // Path: /api/1/locales
 // Desc: Fetches all brands and locales
@@ -209,7 +210,7 @@ router.get("/single", async (req, res, next) => {
       )
     ];
     if (includePages)
-      queries.push(Page.find({ localeUrl: url }).select("-_id url type data"));
+      queries.push(Page.find({ localeUrl: url }).select("url type data"));
 
     const [existingLocale, existingLocalePages] = await Promise.all(queries);
 
@@ -222,7 +223,7 @@ router.get("/single", async (req, res, next) => {
         { locale: 1, pages: existingLocalePages.length },
         {
           ...existingLocale._doc,
-          pages: existingLocalePages.sort((first, second) => {
+          pages: makePagesForRes(existingLocalePages).sort((first, second) => {
             var A = first;
             var B = second;
 

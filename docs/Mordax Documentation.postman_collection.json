@@ -51,9 +51,9 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{hostDev}}/api/1/keys/deactivate-key?key={{key}}&keyToDeactivate=",
+							"raw": "{{host}}/api/1/keys/deactivate-key?key={{key}}&keyToDeactivate=",
 							"host": [
-								"{{hostDev}}"
+								"{{host}}"
 							],
 							"path": [
 								"api",
@@ -83,9 +83,9 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{hostDev}}/api/1/keys/key-info?key={{key}}",
+							"raw": "{{host}}/api/1/keys/key-info?key={{key}}",
 							"host": [
-								"{{hostDev}}"
+								"{{host}}"
 							],
 							"path": [
 								"api",
@@ -156,7 +156,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{host}}/api/1/locales?key=38bdc151d133343bd6234563d40895c5&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&capitol=Washington&scButtonKey=&scCarouselKey=",
+							"raw": "{{host}}/api/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&capitol=Washington&scButtonKey=&scCarouselKey=",
 							"host": [
 								"{{host}}"
 							],
@@ -168,7 +168,7 @@
 							"query": [
 								{
 									"key": "key",
-									"value": "38bdc151d133343bd6234563d40895c5",
+									"value": "{{key}}",
 									"description": "API key, required"
 								},
 								{
@@ -278,6 +278,39 @@
 					"response": []
 				},
 				{
+					"name": "GET Download Locale as xlsx",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/locales/single/download?key={{key}}&url=https://herbalessences.com/en-us/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"locales",
+								"single",
+								"download"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://herbalessences.com/en-us/",
+									"description": "Locale URL, unique identifier, required"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "DELETE Locale",
 					"request": {
 						"method": "DELETE",
@@ -340,7 +373,122 @@
 		},
 		{
 			"name": "Pages",
-			"item": []
+			"item": [
+				{
+					"name": "GET Page",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/pages?key={{key}}&pageUrl=https://alwaysdiscreet.com/en-us/incontinence-products/liners-and-pads/boutique-extra-heavy-long-pads",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"pages"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "pageUrl",
+									"value": "https://alwaysdiscreet.com/en-us/incontinence-products/liners-and-pads/boutique-extra-heavy-long-pads",
+									"description": "Required page's url"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Page",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/pages?key={{key}}&localeUrl=https://alwaysdiscreet.com/en-us&pageUrl=https://alwaysdiscreet.com/en-us/test-url&type=product&data=Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"pages"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "localeUrl",
+									"value": "https://alwaysdiscreet.com/en-us",
+									"description": "Locale url"
+								},
+								{
+									"key": "id",
+									"value": "620ae9292b805e3199d1bea6",
+									"description": "Page ID. Send to update single page.",
+									"disabled": true
+								},
+								{
+									"key": "pageUrl",
+									"value": "https://alwaysdiscreet.com/en-us/test-url",
+									"description": "Page URL. Send to add a new page"
+								},
+								{
+									"key": "type",
+									"value": "product",
+									"description": "Page type"
+								},
+								{
+									"key": "data",
+									"value": "Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
+									"description": "Page data, colon separated field:value list. field1:value1;field2:value2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "DELETE Page",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/pages?key={{key}}&id=620ae72dacb101245ab58ca7,620ae7c6d7b2a9cbdf8db46f,620ae7d94aa551be32b35a4a,620ae7edcd2eed3314232630",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"pages"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "id",
+									"value": "620ae72dacb101245ab58ca7,620ae7c6d7b2a9cbdf8db46f,620ae7d94aa551be32b35a4a,620ae7edcd2eed3314232630",
+									"description": "Comma separated ids of pages marked for deletion"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
 			"name": "SmartCommerce",

@@ -8,8 +8,8 @@ router.use("/keys", require("./keys/keys.routes.js"));
 // Locales routes
 router.use("/locales", require("./locales/locales.routes.js"));
 
-// Web pages routes
-// router.use("/pages", require("./webPages/webPages.routes.js"));
+// Pages routes
+router.use("/pages", require("./pages/pages.routes.js"));
 
 // PriceSpider routes
 

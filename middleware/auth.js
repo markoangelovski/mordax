@@ -22,7 +22,7 @@ exports.checkKey = savedKeys => async (req, res, next) => {
 
   // Allow traffic to open endpoints
   if (openEndpoints.indexOf(path) !== -1) {
-    req.key = req.query.key ? req.query.key : "anonymous";
+    req.key = key ? key : "anonymous";
     return next();
   }
 
@@ -45,7 +45,6 @@ exports.checkKey = savedKeys => async (req, res, next) => {
           const methodOk = allowedEndpoint[0].indexOf(req.method) !== -1;
           const endpointOk = req.baseUrl + path === allowedEndpoint[1];
 
-          // Check if allowed endpoint is a substring of the requested url
           if (methodOk && endpointOk) {
             authorized = true;
             // Break out the main loop switch
