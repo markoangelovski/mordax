@@ -21,6 +21,10 @@ const pageSchema = new mongoose.Schema(
       type: String,
       max: 256
     },
+    source: {
+      type: String,
+      enum: ["feed", "single"]
+    },
     data: {}
   },
   { timestamps: true }

@@ -46,11 +46,33 @@ const localeSchema = new mongoose.Schema(
       }
     },
     fields: [stringProps],
-    scButtonKey: objProps,
-    scCarouselKey: objProps,
-    scEcEndpointKey: objProps,
-    BINLiteKey: objProps,
-    PSKey: objProps,
+    thirdParties: [stringProps],
+    SC: {
+      scButtonKey: objProps,
+      scCarouselKey: objProps,
+      scEcEndpointKey: objProps
+    },
+    BINLite: {
+      BINLiteKey: objProps
+    },
+    PS: {
+      psType: {
+        value: {
+          type: String,
+          enum: ["embedded", "lightbox"]
+        },
+        createdAt: Date,
+        history: [
+          {
+            previousValue: stringProps,
+            updatedValue: stringProps,
+            updatedAt: Date,
+            updatedBy: stringProps
+          }
+        ]
+      },
+      psKey: objProps
+    },
     capitol: objProps
   },
   { timestamps: true }

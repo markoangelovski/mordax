@@ -1,3 +1,4 @@
 node_modules
-downloads/*
+public/*
+!public/Example_Template.xlsx
 .env

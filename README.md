@@ -4,20 +4,31 @@
 
 ### Github repo: https://github.com/markoangelovski/mordax
 
-### Vercel project: https://vercel.com/markoangelovski/mordax
-
-- Vercel hosts the entire application
-
 ### Heroku project: https://dashboard.heroku.com/apps/mordax
-
-- SC does not pass seller data to Vercel app
-- requests that need to fech SC data are forwarded to the same endpoint on Heroku
 
 ## Pipeline
 
-Both Vercel and Heroku are connected to the Github repo. Pushing to master branch triggers automatic deployments for both Vercel and Heroku.
+Main app is hosted on Heroku and the project is connected to Github repo. Pushing to master branch triggers automatic deployment for Heroku.
+
+---
+
+# Mordax Proxy
+
+## Hosting
+
+### Github repo: https://github.com/markoangelovski/mordax-proxy
+
+### Vercel project: https://vercel.com/markoangelovski/mordax
+
+## Pipeline
+
+Mordax Proxy is implemented because of Vercel's limitation on number of endpoints. Mordax Proxy is proxying all requests to Heroku app. Mordax Proxy is connected to the Github repo. Pushing to master branch triggers automatic deployment.
 
 DOMAINS
 
-- https://mordax.vercel.app
-- https://mordax.herokuapp.com
+- Vercel Proxy:
+
+  - https://mordax.vercel.app
+
+- Heroku main app:
+  - https://mordax.herokuapp.com

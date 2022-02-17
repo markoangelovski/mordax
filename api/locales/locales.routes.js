@@ -95,7 +95,9 @@ router.post("/", upload.single("template"), async (req, res, next) => {
           return {
             updateOne: {
               filter,
-              update: { $set: { type: page.type, data: page.data } },
+              update: {
+                $set: { type: page.type, source: "feed", data: page.data }
+              },
               upsert: true
             }
           };
@@ -123,9 +125,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
             console.warn("Error updating new locale URL in pages for ", url)
           );
     } else {
-      const newLocalePayload = makeLocaleForDb(req);
-
-      const newLocale = new Locale(newLocalePayload);
+      const newLocale = new Locale(makeLocaleForDb(req));
 
       const savedLocale = await newLocale.save();
 
@@ -152,6 +152,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
                   localeUrl: page.localeUrl,
                   url: page.url,
                   type: updatedPage.type,
+                  source: "feed",
                   data: updatedPage.data
                 };
             });
@@ -206,11 +207,13 @@ router.get("/single", async (req, res, next) => {
   try {
     const queries = [
       Locale.findOne({ "url.value": url }).select(
-        "-_id -__v -brand.history._id -locale.history._id -url.history._id -fields.history._id -scButtonKey.history._id -scCarouselKey.history._id -scEcEndpointKey.history._id -BINLiteKey.history._id -PSKey.history._id -capitol.history._id"
+        "-createdBy -_id -__v -brand.history._id -locale.history._id -url.history._id -fields.history._id -scButtonKey.history._id -scCarouselKey.history._id -scEcEndpointKey.history._id -BINLiteKey.history._id -PSKey.history._id -capitol.history._id"
       )
     ];
     if (includePages)
-      queries.push(Page.find({ localeUrl: url }).select("url type data"));
+      queries.push(
+        Page.find({ localeUrl: url }).select("url type source data")
+      );
 
     const [existingLocale, existingLocalePages] = await Promise.all(queries);
 

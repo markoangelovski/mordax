@@ -156,7 +156,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{host}}/api/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&capitol=Washington&scButtonKey=&scCarouselKey=",
+							"raw": "{{host}}/api/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&thirdParties=Bazaarvoice,SmartCommerce,PriceSpider&capitol=Washington&scButtonKey=&scCarouselKey=&psType=embedded&psKey=123",
 							"host": [
 								"{{host}}"
 							],
@@ -198,6 +198,11 @@
 									"description": "Name of the attribute, prefix with - to remove. ex: upc,-bvid"
 								},
 								{
+									"key": "thirdParties",
+									"value": "Bazaarvoice,SmartCommerce,PriceSpider",
+									"description": "Names of the 3rd parties, prefix with - to remove. ex: Bazaarvoice,-PriceSpider"
+								},
+								{
 									"key": "capitol",
 									"value": "Washington",
 									"description": "Locale capitol, for location"
@@ -229,6 +234,16 @@
 									"value": "",
 									"description": "PS key",
 									"disabled": true
+								},
+								{
+									"key": "psType",
+									"value": "embedded",
+									"description": "embedded or lightbox"
+								},
+								{
+									"key": "psKey",
+									"value": "123",
+									"description": "PS key"
 								}
 							]
 						}
@@ -241,7 +256,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/locales/single?key={{key}}&url=https://herbalessences.com/en-us/&download&includePages=true",
+							"raw": "{{host}}/api/1/locales/single?key={{key}}&url=https://herbalessences.com/en-us/&includePages=true",
 							"host": [
 								"{{host}}"
 							],
@@ -265,7 +280,8 @@
 								{
 									"key": "download",
 									"value": null,
-									"description": "Not available"
+									"description": "Not available",
+									"disabled": true
 								},
 								{
 									"key": "includePages",

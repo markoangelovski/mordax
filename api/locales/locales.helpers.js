@@ -9,37 +9,53 @@ exports.makeLocaleForDb = req => {
     createdAt: new Date().toISOString()
   });
 
-  const fieldsArray = req.query.fields.split(",").map(field => field.trim());
+  const fieldsArray = req.query.fields?.split(",").map(field => field.trim());
+  const thirdPartiesArray = req.query.thirdParties
+    ?.split(",")
+    .map(party => party.trim());
 
   return {
     createdBy: req.admin ? "admin" : req.query.key,
     brand: makeAttr(req.query.brand),
     locale: makeAttr(req.query.locale),
     url: makeAttr(req.query.url),
-    fields: fieldsArray.filter(
+    fields: fieldsArray?.filter(
       field => field.charAt(0) !== "-" && field.length > 0
     ), // In case some attributes with "-" were passed
+    thirdParties: thirdPartiesArray?.filter(
+      party => party.charAt(0) !== "-" && party.length > 0
+    ), // In case some attributes with "-" were passed
     capitol: makeAttr(req.query.capitol),
-    scButtonKey: makeAttr(req.query.scButtonKey),
-    scCarouselKey: makeAttr(req.query.scCarouselKey),
-    scEcEndpointKey: makeAttr(req.query.scEcEndpointKey),
-    BINLiteKey: makeAttr(req.query.BINLiteKey),
-    PSKey: makeAttr(req.query.PSKey)
+    SC: {
+      scButtonKey: makeAttr(req.query.scButtonKey),
+      scCarouselKey: makeAttr(req.query.scCarouselKey),
+      scEcEndpointKey: makeAttr(req.query.scEcEndpointKey)
+    },
+    BINLite: {
+      BINLiteKey: makeAttr(req.query.BINLiteKey)
+    },
+    PS: {
+      psType: makeAttr(req.query.psType),
+      psKey: makeAttr(req.query.psKey)
+    }
   };
 };
 
 exports.makeLocaleForRes = locale => ({
-  createdBy: locale.createdBy,
+  // createdBy: locale.createdBy,
   brand: locale.brand.value,
   locale: locale.locale.value,
   url: locale.url.value,
   fields: locale.fields,
+  thirdParties: locale.thirdParties,
   capitol: locale.capitol.value,
-  scButtonKey: locale.scButtonKey.value,
-  scCarouselKey: locale.scCarouselKey.value,
-  scEcEndpointKey: locale.scEcEndpointKey.value,
-  BINLiteKey: locale.BINLiteKey.value,
-  PSKey: locale.PSKey.value
+  scButtonKey: locale.SC.scButtonKey.value,
+  scCarouselKey: locale.SC.scCarouselKey.value,
+  scEcEndpointKey: locale.SC.scEcEndpointKey.value,
+  BINLiteKey: locale.BINLite.BINLiteKey.value,
+  psType: locale.PS.psType.value,
+  psKey: locale.PS.psKey.value,
+  psType: locale.PS.psType.value
 });
 
 exports.updateLocale = (locale, req) => {
@@ -58,53 +74,64 @@ exports.updateLocale = (locale, req) => {
     return prevAttr;
   };
 
-  const { key, fields } = req.query;
+  const { key, fields, thirdParties } = req.query;
 
-  // Join existing fields and new fields to set to filter for duplicates
-  if (fields)
-    newFields = new Set([
-      ...locale.fields,
-      ...fields.split(",").map(field => field.trim())
-    ]);
+  // Adds or removes atributes from the "fields" and "thirdParties" list
+  const updateList = (locale, attr, attrs) => {
+    // Join existing attributes and new attributes to set to filter for duplicates
+    if (attrs)
+      newAttrs = new Set([
+        ...locale[attr],
+        ...attrs.split(",").map(field => field.trim())
+      ]);
 
-  // If new fields are submitted use them, otherwise use old fields
-  let updatedFields = fields ? [...newFields] : locale.fields;
+    // If new attributes are submitted use them, otherwise use old attribute
+    let updatedAttrs = attrs ? [...newAttrs] : locale[attr];
 
-  // Check if any attribute is prefixed with '-' and remove it from the fields array
-  updatedFields.every(field => {
-    const argToRemove = field.charAt(0) === "-" && field.slice(1);
+    // Check if any attribute is prefixed with '-' and remove it from the attributes array
+    updatedAttrs.every(attr => {
+      const argToRemove = attr.charAt(0) === "-" && attr.slice(1);
 
-    if (updatedFields.indexOf(argToRemove) > -1)
-      updatedFields = updatedFields.filter(
-        filterField => filterField !== argToRemove
-      );
-    return true;
-  });
+      if (updatedAttrs.indexOf(argToRemove) > -1)
+        updatedAttrs = updatedAttrs.filter(
+          filterField => filterField !== argToRemove
+        );
+      return true;
+    });
+
+    return updatedAttrs;
+  };
 
   locale.brand = updateAttr(locale.brand, req.query.brand, key);
   locale.locale = updateAttr(locale.locale, req.query.locale, key);
   locale.url = updateAttr(locale.url, req.query.newUrl, key);
-  locale.fields = updatedFields.filter(
+  locale.fields = updateList(locale, "fields", fields).filter(
     field => field.charAt(0) !== "-" && field.length > 0
   ); // Filters out the attribute marked for deletion
+  locale.thirdParties = updateList(locale, "thirdParties", thirdParties).filter(
+    party => party.charAt(0) !== "-" && party.length > 0
+  ); // Filters out the attribute marked for deletion
   locale.capitol = updateAttr(locale.capitol, req.query.capitol, key);
-  locale.scButtonKey = updateAttr(
-    locale.scButtonKey,
-    req.query.scButtonKey,
-    key
-  );
-  locale.scCarouselKey = updateAttr(
-    locale.scCarouselKey,
-    req.query.scCarouselKey,
-    key
-  );
-  locale.scEcEndpointKey = updateAttr(
-    locale.scEcEndpointKey,
-    req.query.scEcEndpointKey,
-    key
-  );
-  locale.BINLiteKey = updateAttr(locale.BINLiteKey, req.query.BINLiteKey, key);
-  locale.PSKey = updateAttr(locale.PSKey, req.query.BINLiteKey, key);
+  locale.SC = {
+    scButtonKey: updateAttr(locale.SC.scButtonKey, req.query.scButtonKey, key),
+    scCarouselKey: updateAttr(
+      locale.SC.scCarouselKey,
+      req.query.scCarouselKey,
+      key
+    ),
+    scEcEndpointKey: updateAttr(
+      locale.SC.scEcEndpointKey,
+      req.query.scEcEndpointKey,
+      key
+    )
+  };
+  locale.BINLite = {
+    BINLiteKey: updateAttr(locale.BINLite.bnlKey, req.query.BINLiteKey, key)
+  };
+  locale.PS = {
+    psType: updateAttr(locale.PS.psType, req.query.psType, key),
+    psKey: updateAttr(locale.PS.psKey, req.query.psKey, key)
+  };
 
   return locale;
 };
@@ -129,8 +156,6 @@ exports.getPageUrls = async (id, url) => {
       ? robotsUrl + "robots.txt"
       : robotsUrl + "/robots.txt";
 
-  console.log("robotsUrl", robotsUrl);
-
   const { data: robotsData } = await axios(robotsUrl);
 
   const xmlUrl = robotsData.match(urlRgx)[0];
@@ -141,7 +166,7 @@ exports.getPageUrls = async (id, url) => {
     urlset: { url: rawUrls }
   } = await xmlParser(xmlSitemapData);
 
-  const urls = rawUrls
+  return rawUrls
     .map(rawUrl => ({
       locale: id,
       localeUrl: url,
@@ -160,8 +185,6 @@ exports.getPageUrls = async (id, url) => {
       }
       return 0;
     });
-
-  return urls;
 };
 
 exports.mapTemplateDataToPage = (req, fields, template, pages) =>

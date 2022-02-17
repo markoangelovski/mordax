@@ -6,7 +6,7 @@
   "private": "true",
   "scripts": {
     "start": "node ./api/index.js",
-    "dev": "nodemon ./api/index.js"
+    "dev": "docker-compose up & nodemon ./api/index.js"
   },
   "keywords": [],
   "author": "",
