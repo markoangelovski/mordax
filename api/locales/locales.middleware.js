@@ -26,6 +26,7 @@ exports.locMw = (req, res, next) => {
           message: "Provided Parameter is malformed.",
           parameter: queryKey,
           value: element,
+          required: "Valid URL string.",
           statusCode: ERROR_INVALID_INPUT.statusCode,
           code: ERROR_INVALID_INPUT.code
         });
