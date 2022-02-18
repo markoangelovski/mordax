@@ -32,3 +32,7 @@ DOMAINS
 
 - Heroku main app:
   - https://mordax.herokuapp.com
+
+## Local development
+
+npm run dev runs docker-compose up and starts a mongo container on local machine.

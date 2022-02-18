@@ -57,21 +57,24 @@ const localeSchema = new mongoose.Schema(
     },
     PS: {
       psType: {
+        ...objProps,
         value: {
           type: String,
           enum: ["embedded", "lightbox"]
-        },
-        createdAt: Date,
-        history: [
-          {
-            previousValue: stringProps,
-            updatedValue: stringProps,
-            updatedAt: Date,
-            updatedBy: stringProps
-          }
-        ]
+        }
       },
       psKey: objProps
+    },
+    privacy: {
+      // TODO: dodaj i privacy da se šalje
+      type: {
+        ...objProps,
+        value: {
+          type: String,
+          enum: ["GDPR", "CCPA", "LGPD", "AMA"]
+        }
+      },
+      overlayId: objProps
     },
     capitol: objProps
   },

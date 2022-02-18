@@ -156,7 +156,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{host}}/api/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&thirdParties=Bazaarvoice,SmartCommerce,PriceSpider&capitol=Washington&scButtonKey=&scCarouselKey=&psType=embedded&psKey=123",
+							"raw": "{{host}}/api/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&thirdParties=Bazaarvoice,SmartCommerce,PriceSpider&capitol=Washington&scButtonKey=&scCarouselKey=",
 							"host": [
 								"{{host}}"
 							],
@@ -230,20 +230,16 @@
 									"disabled": true
 								},
 								{
-									"key": "PSKey",
-									"value": "",
-									"description": "PS key",
-									"disabled": true
-								},
-								{
 									"key": "psType",
 									"value": "embedded",
-									"description": "embedded or lightbox"
+									"description": "embedded or lightbox",
+									"disabled": true
 								},
 								{
 									"key": "psKey",
 									"value": "123",
-									"description": "PS key"
+									"description": "PS key",
+									"disabled": true
 								}
 							]
 						}
@@ -567,7 +563,7 @@
 		},
 		{
 			"key": "key",
-			"value": "",
+			"value": "38bdc151d133343bd6234563d40895c5",
 			"type": "string"
 		}
 	]

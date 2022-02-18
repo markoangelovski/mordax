@@ -8,6 +8,7 @@ const upload = multer();
 const Locale = require("./locales.model.js");
 const Page = require("../pages/pages.model.js");
 
+const { locMw } = require("./locales.middleware.js");
 const {
   makeLocaleForDb,
   makeLocaleForRes,
@@ -200,7 +201,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
 
 // Path: /api/1/locales/single?key=123456789&url=https://www.herbalessences.com
 // Desc: Fetches the pages data for a single locale
-router.get("/single", async (req, res, next) => {
+router.get("/single", locMw, async (req, res, next) => {
   let { url, includePages } = req.query;
   includePages = includePages === "true";
 
@@ -321,7 +322,7 @@ router.get("/single/download", async (req, res, next) => {
 
 // Path: /api/1/locales/single?key=123456789&url=https://www.herbalessences.com
 // Desc: Deletes the locale and related pages list
-router.delete("/single", async (req, res, next) => {
+router.delete("/single", locMw, async (req, res, next) => {
   const { url } = req.query;
 
   try {
