@@ -7,7 +7,6 @@ exports.locMw = (req, res, next) => {
     const { query } = req;
     const errObj = {
       errors: [],
-      fetch() {},
       add(err) {
         this.errors.push(err);
       }
@@ -18,15 +17,19 @@ exports.locMw = (req, res, next) => {
       const element = query[queryKey];
 
       const isUrl = queryKey === "url";
-      if (isUrl && urlRgx.test(element)) {
+      const urlIsValid = urlRgx.test(element);
+
+      if (isUrl && urlIsValid) {
         url = element;
-      } else if (isUrl && !urlRgx.test(element)) {
+      } else if (isUrl && !urlIsValid) {
         url = true;
         errObj.add({
           message: "Provided Parameter is malformed.",
-          parameter: queryKey,
-          value: element,
-          required: "Valid URL string.",
+          data: {
+            parameter: queryKey,
+            value: element,
+            required: "Valid URL string."
+          },
           statusCode: ERROR_INVALID_INPUT.statusCode,
           code: ERROR_INVALID_INPUT.code
         });
@@ -47,7 +50,7 @@ exports.locMw = (req, res, next) => {
     }
     next();
   } catch (error) {
-    console.log("error occurred", error);
+    console.warn("error occurred", error);
     next({
       message: error.message
     });

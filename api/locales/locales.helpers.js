@@ -9,22 +9,30 @@ exports.makeLocaleForDb = req => {
     createdAt: new Date().toISOString()
   });
 
-  const fieldsArray = req.query.fields?.split(",").map(field => field.trim());
-  const thirdPartiesArray = req.query.thirdParties
-    ?.split(",")
-    .map(party => party.trim());
+  const processList = list =>
+    list
+      ?.split(",")
+      .map(field => field.trim())
+      .filter(field => field.charAt(0) !== "-" && field.length > 0); // In case some attributes with "-" were passed;
+
+  // const fieldsArray = req.query.fields?.split(",").map(field => field.trim());
+  // const thirdPartiesArray = req.query.thirdParties
+  //   ?.split(",")
+  //   .map(party => party.trim());
 
   return {
     createdBy: req.admin ? "admin" : req.query.key,
     brand: makeAttr(req.query.brand),
     locale: makeAttr(req.query.locale),
     url: makeAttr(req.query.url),
-    fields: fieldsArray?.filter(
-      field => field.charAt(0) !== "-" && field.length > 0
-    ), // In case some attributes with "-" were passed
-    thirdParties: thirdPartiesArray?.filter(
-      party => party.charAt(0) !== "-" && party.length > 0
-    ), // In case some attributes with "-" were passed
+    // fields: fieldsArray?.filter(
+    //   field => field.charAt(0) !== "-" && field.length > 0
+    // ), // In case some attributes with "-" were passed
+    // thirdParties: thirdPartiesArray?.filter(
+    //   party => party.charAt(0) !== "-" && party.length > 0
+    // ), // In case some attributes with "-" were passed
+    fields: processList(req.query.fields),
+    thirdParties: processList(req.query.thirdParties),
     capitol: makeAttr(req.query.capitol),
     SC: {
       scButtonKey: makeAttr(req.query.scButtonKey),
@@ -112,27 +120,30 @@ exports.updateLocale = (locale, req) => {
     party => party.charAt(0) !== "-" && party.length > 0
   ); // Filters out the attribute marked for deletion
   locale.capitol = updateAttr(locale.capitol, req.query.capitol, key);
-  locale.SC = {
-    scButtonKey: updateAttr(locale.SC.scButtonKey, req.query.scButtonKey, key),
-    scCarouselKey: updateAttr(
-      locale.SC.scCarouselKey,
-      req.query.scCarouselKey,
-      key
-    ),
-    scEcEndpointKey: updateAttr(
-      locale.SC.scEcEndpointKey,
-      req.query.scEcEndpointKey,
-      key
-    )
-  };
-  locale.BINLite = {
-    BINLiteKey: updateAttr(locale.BINLite.bnlKey, req.query.BINLiteKey, key)
-  };
-  locale.PS = {
-    psType: updateAttr(locale.PS.psType, req.query.psType, key),
-    psKey: updateAttr(locale.PS.psKey, req.query.psKey, key)
-  };
+  locale.SC.scButtonKey = updateAttr(
+    locale.SC.scButtonKey,
+    req.query.scButtonKey,
+    key
+  );
+  locale.SC.scCarouselKey = updateAttr(
+    locale.SC.scCarouselKey,
+    req.query.scCarouselKey,
+    key
+  );
+  locale.SC.scEcEndpointKey = updateAttr(
+    locale.SC.scEcEndpointKey,
+    req.query.scEcEndpointKey,
+    key
+  );
+  locale.BINLite.BINLiteKey = updateAttr(
+    locale.BINLite.bnlKey,
+    req.query.BINLiteKey,
+    key
+  );
+  locale.PS.psType = updateAttr(locale.PS.psType, req.query.psType, key);
+  locale.PS.psKey = updateAttr(locale.PS.psKey, req.query.psKey, key);
 
+  // console.log("locale after: ", locale);
   return locale;
 };
 
@@ -239,3 +250,16 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
       data: updatedData
     };
   });
+
+// exports.updateUrl=(url,newUrl)=>{
+//     // Update the URL in pages
+//     if (newUrl && newUrl !== url)
+//       Page.updateMany(
+//         { locale: savedLocale._id },
+//         { $set: { localeUrl: savedLocale.url.value } }
+//       )
+//         .then(_ => _)
+//         .catch(err =>
+//           console.warn("Error updating new locale URL in pages for ", url)
+//         );
+// }

@@ -51,7 +51,7 @@ router.get("/", async (req, res, next) => {
 });
 
 // Path: /api/1/locales
-// Desc: Creates a new locale
+// Desc: Updates a locale
 router.post("/", upload.single("template"), async (req, res, next) => {
   const { url, newUrl } = req.query;
   const buffer = req.file?.buffer;
@@ -126,73 +126,96 @@ router.post("/", upload.single("template"), async (req, res, next) => {
             console.warn("Error updating new locale URL in pages for ", url)
           );
     } else {
-      const newLocale = new Locale(makeLocaleForDb(req));
-
-      const savedLocale = await newLocale.save();
-
-      let pagesData = await getPageUrls(savedLocale._id, url);
-
-      // Update pages if xlsx template is uploaded
-      let updatedPagesCount;
-      if (buffer) {
-        updatedPages = mapTemplateDataToPage(
-          req,
-          savedLocale.fields,
-          templateData,
-          pagesData
-        );
-
-        updatedPagesCount = updatedPages.length;
-
-        pagesData = pagesData
-          .map(page => {
-            updatedPages.forEach(updatedPage => {
-              if (page.url === updatedPage.url)
-                page = {
-                  locale: page.locale,
-                  localeUrl: page.localeUrl,
-                  url: page.url,
-                  type: updatedPage.type,
-                  source: "feed",
-                  data: updatedPage.data
-                };
-            });
-            return page;
-          })
-          .sort((first, second) => {
-            var A = first;
-            var B = second;
-
-            // Sort the pages with type first
-            if (A.type && !B.type) {
-              return -1;
-            }
-            if (!A.type && B.type) {
-              return 1;
-            }
-
-            // Sort the pages with type alphabetically?
-            if (A.type < B.type) {
-              return -1;
-            }
-            if (A.type > B.type) {
-              return 1;
-            }
-
-            return 0;
-          });
-      }
-
-      const pages = await Page.insertMany(pagesData);
-
-      response(
-        res,
-        200,
-        false,
-        { locale: 1, pages: pages.length, updatedPages: updatedPagesCount },
-        makeLocaleForRes(savedLocale._doc)
-      );
+      // If locale is not found execute next POST /api/1/locales endpoint handler
+      next();
     }
+  } catch (error) {
+    console.warn("Error occurred in POST /api/1/locales route", error);
+    next(error);
+  }
+});
+
+// Path: /api/1/locales
+// Desc: Updates a locale
+router.post("/", upload.single("template"), async (req, res, next) => {
+  const { url, newUrl } = req.query;
+  const buffer = req.file?.buffer;
+
+  let templateData;
+  if (buffer) {
+    const workbook = xlsx.read(buffer, { type: "buffer" });
+    templateData = xlsx.utils.sheet_to_json(
+      workbook.Sheets[workbook.SheetNames[0]]
+    );
+  }
+
+  try {
+    const newLocale = new Locale(makeLocaleForDb(req));
+
+    const savedLocale = await newLocale.save();
+
+    let pagesData = await getPageUrls(savedLocale._id, url);
+
+    // Update pages if xlsx template is uploaded
+    let updatedPagesCount;
+    if (buffer) {
+      updatedPages = mapTemplateDataToPage(
+        req,
+        savedLocale.fields,
+        templateData,
+        pagesData
+      );
+
+      updatedPagesCount = updatedPages.length;
+
+      pagesData = pagesData
+        .map(page => {
+          updatedPages.forEach(updatedPage => {
+            if (page.url === updatedPage.url)
+              page = {
+                locale: page.locale,
+                localeUrl: page.localeUrl,
+                url: page.url,
+                type: updatedPage.type,
+                source: "feed",
+                data: updatedPage.data
+              };
+          });
+          return page;
+        })
+        .sort((first, second) => {
+          var A = first;
+          var B = second;
+
+          // Sort the pages with type first
+          if (A.type && !B.type) {
+            return -1;
+          }
+          if (!A.type && B.type) {
+            return 1;
+          }
+
+          // Sort the pages with type alphabetically?
+          if (A.type < B.type) {
+            return -1;
+          }
+          if (A.type > B.type) {
+            return 1;
+          }
+
+          return 0;
+        });
+    }
+
+    const pages = await Page.insertMany(pagesData);
+
+    response(
+      res,
+      200,
+      false,
+      { locale: 1, pages: pages.length, updatedPages: updatedPagesCount },
+      makeLocaleForRes(savedLocale._doc)
+    );
   } catch (error) {
     console.warn("Error occurred in POST /api/1/locales route", error);
     next(error);
@@ -358,10 +381,8 @@ router.delete("/single", locMw, async (req, res, next) => {
 
 // Path: /api/1/locales/template
 // Desc: Downloads the Pages List template
-router.get("/template", async (req, res, next) => {
-  res.download(
-    path.join(__dirname, "../../public/Test Herbal Essences en-us.xlsx")
-  );
-});
+router.get("/template", async (req, res, next) =>
+  res.download(path.join(__dirname, "../../public/Example_Template.xlsx"))
+);
 
 module.exports = router;
