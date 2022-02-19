@@ -17,7 +17,7 @@ const keySchema = new mongoose.Schema(
     roles: [
       {
         type: String,
-        enum: require("../../lib/userRoles.json").allRoles,
+        enum: require("../../config/userRoles.json").allRoles,
         default: "user"
       }
     ]

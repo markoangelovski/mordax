@@ -1,11 +1,12 @@
 const { default: axios } = require("axios");
+const chalk = require("chalk");
 const xmlParser = require("xml2js").parseStringPromise;
 
 const { urlRgx, localeRgx } = require("../../lib/regex");
 
 exports.makeLocaleForDb = req => {
   const makeAttr = attribute => ({
-    value: attribute,
+    value: attribute ? `${attribute}` : undefined,
     createdAt: new Date().toISOString()
   });
 
@@ -15,22 +16,11 @@ exports.makeLocaleForDb = req => {
       .map(field => field.trim())
       .filter(field => field.charAt(0) !== "-" && field.length > 0); // In case some attributes with "-" were passed;
 
-  // const fieldsArray = req.query.fields?.split(",").map(field => field.trim());
-  // const thirdPartiesArray = req.query.thirdParties
-  //   ?.split(",")
-  //   .map(party => party.trim());
-
   return {
     createdBy: req.admin ? "admin" : req.query.key,
     brand: makeAttr(req.query.brand),
     locale: makeAttr(req.query.locale),
     url: makeAttr(req.query.url),
-    // fields: fieldsArray?.filter(
-    //   field => field.charAt(0) !== "-" && field.length > 0
-    // ), // In case some attributes with "-" were passed
-    // thirdParties: thirdPartiesArray?.filter(
-    //   party => party.charAt(0) !== "-" && party.length > 0
-    // ), // In case some attributes with "-" were passed
     fields: processList(req.query.fields),
     thirdParties: processList(req.query.thirdParties),
     capitol: makeAttr(req.query.capitol),
@@ -68,14 +58,14 @@ exports.makeLocaleForRes = locale => ({
 
 exports.updateLocale = (locale, req) => {
   const updateAttr = (prevAttr, newAttr, key) => {
-    if (newAttr && prevAttr.value !== newAttr) {
+    if (newAttr && prevAttr.value !== `${newAttr}`) {
       prevAttr.history.push({
         previousValue: prevAttr.value,
-        updatedValue: newAttr,
+        updatedValue: `${newAttr}`,
         updatedAt: new Date().toISOString(),
         updatedBy: req.admin ? "admin" : key
       });
-      prevAttr["value"] = newAttr;
+      prevAttr["value"] = `${newAttr}`;
       return prevAttr;
     }
 
@@ -97,8 +87,8 @@ exports.updateLocale = (locale, req) => {
     let updatedAttrs = attrs ? [...newAttrs] : locale[attr];
 
     // Check if any attribute is prefixed with '-' and remove it from the attributes array
-    updatedAttrs.every(attr => {
-      const argToRemove = attr.charAt(0) === "-" && attr.slice(1);
+    updatedAttrs.every(attribute => {
+      const argToRemove = attribute.charAt(0) === "-" && attribute.slice(1);
 
       if (updatedAttrs.indexOf(argToRemove) > -1)
         updatedAttrs = updatedAttrs.filter(
@@ -107,18 +97,17 @@ exports.updateLocale = (locale, req) => {
       return true;
     });
 
-    return updatedAttrs;
+    return updatedAttrs.filter(
+      // Filters out the attribute marked for deletion
+      field => field.charAt(0) !== "-" && field.length > 0
+    );
   };
 
   locale.brand = updateAttr(locale.brand, req.query.brand, key);
   locale.locale = updateAttr(locale.locale, req.query.locale, key);
   locale.url = updateAttr(locale.url, req.query.newUrl, key);
-  locale.fields = updateList(locale, "fields", fields).filter(
-    field => field.charAt(0) !== "-" && field.length > 0
-  ); // Filters out the attribute marked for deletion
-  locale.thirdParties = updateList(locale, "thirdParties", thirdParties).filter(
-    party => party.charAt(0) !== "-" && party.length > 0
-  ); // Filters out the attribute marked for deletion
+  locale.fields = updateList(locale, "fields", fields);
+  locale.thirdParties = updateList(locale, "thirdParties", thirdParties);
   locale.capitol = updateAttr(locale.capitol, req.query.capitol, key);
   locale.SC.scButtonKey = updateAttr(
     locale.SC.scButtonKey,
@@ -207,15 +196,14 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
 
     const updatedData = {};
     fields.forEach(field => {
-      const pageDataValue = data && page.data[field].value;
-      const templateItem = item[field];
-
+      const pageDataValue = data && page.data[field]?.value;
+      const templateItem = `${item[field]}`;
       if (templateItem) {
-        // Create the data entry for specific key/column in the uploaded xlsx template file
+        // Create the data entry for specific key/column in the uploaded xlsx template file or reapply existing data
         updatedData[field] = {
-          value: item[field],
-          createdAt: new Date().toISOString(),
-          history: []
+          value: pageDataValue || templateItem,
+          createdAt: page.data?.[field]?.createdAt || new Date().toISOString(),
+          history: page.data?.[field]?.history || []
         };
       }
 
@@ -228,13 +216,13 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
         pageDataValue !== templateItem
       ) {
         updatedData[field] = {
-          value: item[field],
+          value: templateItem,
           createdAt: page.data[field].createdAt,
           history: [
             ...page.data[field].history,
             {
               previousValue: page.data[field].value,
-              updatedValue: item[field],
+              updatedValue: `${templateItem}`,
               updatedAt: new Date().toISOString(),
               updatedBy: req.admin ? "admin" : req.query.key
             }

@@ -1,7 +1,7 @@
 const Keys = require("../api/keys/keys.model.js");
 
 const { response } = require("../lib/helpers.js");
-const { openEndpoints, roleMap } = require("../lib/userRoles.json");
+const { openEndpoints, roleMap } = require("../config/userRoles.json");
 
 const {
   ERROR_UNAUTHORIZED,

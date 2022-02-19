@@ -20,7 +20,11 @@
         [["GET", "DELETE"], "/api/1/locales/single"],
         [["GET"], "/api/1/locales/single/download"],
         [["GET"], "/api/1/locales/template"],
-        [["GET", "POST", "DELETE"], "/api/1/pages"]
+        [["GET", "POST", "DELETE"], "/api/1/pages"],
+        [["GET"], "/api/1/sc/button"],
+        [["GET"], "/api/1/sc/carousel"],
+        [["GET"], "/api/1/sc/product-data"],
+        [["GET"], "/api/1/sc/retailers"]
       ]
     },
     "editor": {
@@ -31,7 +35,11 @@
         [["GET"], "/api/1/locales/single"],
         [["GET"], "/api/1/locales/single/download"],
         [["GET"], "/api/1/locales/template"],
-        [["GET", "POST", "DELETE"], "/api/1/pages"]
+        [["GET", "POST", "DELETE"], "/api/1/pages"],
+        [["GET"], "/api/1/sc/button"],
+        [["GET"], "/api/1/sc/carousel"],
+        [["GET"], "/api/1/sc/product-data"],
+        [["GET"], "/api/1/sc/retailers"]
       ]
     },
     "analyst": {

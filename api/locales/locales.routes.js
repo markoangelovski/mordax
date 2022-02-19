@@ -1,6 +1,5 @@
 const path = require("path");
 const router = require("express").Router();
-const axios = require("axios");
 const xlsx = require("xlsx");
 const multer = require("multer");
 const upload = multer();
@@ -46,7 +45,10 @@ router.get("/", async (req, res, next) => {
     }
   } catch (error) {
     console.warn("Error occurred in GET /api/1/locales route", error);
-    next(error);
+    next({
+      message: error.message,
+      ...error
+    });
   }
 });
 
@@ -130,13 +132,16 @@ router.post("/", upload.single("template"), async (req, res, next) => {
       next();
     }
   } catch (error) {
-    console.warn("Error occurred in POST /api/1/locales route", error);
-    next(error);
+    console.warn("Error occurred in POST (Update) /api/1/locales route", error);
+    next({
+      message: error.message,
+      ...error
+    });
   }
 });
 
 // Path: /api/1/locales
-// Desc: Updates a locale
+// Desc: Creates a new locale
 router.post("/", upload.single("template"), async (req, res, next) => {
   const { url, newUrl } = req.query;
   const buffer = req.file?.buffer;
@@ -217,8 +222,11 @@ router.post("/", upload.single("template"), async (req, res, next) => {
       makeLocaleForRes(savedLocale._doc)
     );
   } catch (error) {
-    console.warn("Error occurred in POST /api/1/locales route", error);
-    next(error);
+    console.warn("Error occurred in POST (New) /api/1/locales route", error);
+    next({
+      message: error.message,
+      ...error
+    });
   }
 });
 
@@ -231,7 +239,7 @@ router.get("/single", locMw, async (req, res, next) => {
   try {
     const queries = [
       Locale.findOne({ "url.value": url }).select(
-        "-createdBy -_id -__v -brand.history._id -locale.history._id -url.history._id -fields.history._id -scButtonKey.history._id -scCarouselKey.history._id -scEcEndpointKey.history._id -BINLiteKey.history._id -PSKey.history._id -capitol.history._id"
+        "-createdBy -_id -__v -brand.history._id -locale.history._id -url.history._id -SC.scButtonKey.history._id -SC.scCarouselKey.history._id -SC.scEcEndpointKey.history._id -BINLite.BINLiteKey.history._id -PS.psType.history._id -PS.psKey.history._id -capitol.history._id"
       )
     ];
     if (includePages)
@@ -282,7 +290,10 @@ router.get("/single", locMw, async (req, res, next) => {
     }
   } catch (error) {
     console.warn("Error occurred in GET /api/1/locales/single route", error);
-    next(error);
+    next({
+      message: error.message,
+      ...error
+    });
   }
 });
 
@@ -339,7 +350,10 @@ router.get("/single/download", async (req, res, next) => {
     }
   } catch (error) {
     console.warn("Error occurred in GET /api/1/locales/single route", error);
-    next(error);
+    next({
+      message: error.message,
+      ...error
+    });
   }
 });
 
@@ -375,7 +389,10 @@ router.delete("/single", locMw, async (req, res, next) => {
     }
   } catch (error) {
     console.warn("Error occurred in DELETE /api/1/sc/sku-list route", error);
-    next(error);
+    next({
+      message: error.message,
+      ...error
+    });
   }
 });
 

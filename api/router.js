@@ -14,7 +14,7 @@ router.use("/pages", require("./pages/pages.routes.js"));
 // PriceSpider routes
 
 // Smartcommerce routes
-// router.use("/sc", require("./sc/sc.routes.js"));
+router.use("/sc", require("./sc/sc.routes.js"));
 
 // Documentation route
 router.get("/docs", (req, res) => {

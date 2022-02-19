@@ -25,7 +25,20 @@ const pageSchema = new mongoose.Schema(
       type: String,
       enum: ["feed", "single"]
     },
-    data: {}
+    data: {},
+    SC: {
+      ok: Boolean,
+      matches: [
+        {
+          productName: { type: String, max: 256 },
+          retailerName: { type: String, max: 256 },
+          url: { type: String, maxlength: 2048 },
+          price: { type: String, max: 256 },
+          logo: { type: String, maxlength: 2048 },
+          miniLogo: { type: String, maxlength: 2048 }
+        }
+      ]
+    }
   },
   { timestamps: true }
 );
