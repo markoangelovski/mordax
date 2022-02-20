@@ -244,7 +244,7 @@ router.get("/single", locMw, async (req, res, next) => {
     ];
     if (includePages)
       queries.push(
-        Page.find({ localeUrl: url }).select("url type source data")
+        Page.find({ localeUrl: url }).select("url type source data SC")
       );
 
     const [existingLocale, existingLocalePages] = await Promise.all(queries);

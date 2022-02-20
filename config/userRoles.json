@@ -23,7 +23,8 @@
         [["GET", "POST", "DELETE"], "/api/1/pages"],
         [["GET"], "/api/1/sc/button"],
         [["GET"], "/api/1/sc/carousel"],
-        [["GET"], "/api/1/sc/product-data"],
+        [["GET"], "/api/1/sc/product-data/single"],
+        [["POST"], "/api/1/sc/product-data"],
         [["GET"], "/api/1/sc/retailers"]
       ]
     },
@@ -38,7 +39,8 @@
         [["GET", "POST", "DELETE"], "/api/1/pages"],
         [["GET"], "/api/1/sc/button"],
         [["GET"], "/api/1/sc/carousel"],
-        [["GET"], "/api/1/sc/product-data"],
+        [["GET"], "/api/1/sc/product-data/single"],
+        [["POST"], "/api/1/sc/product-data"],
         [["GET"], "/api/1/sc/retailers"]
       ]
     },

@@ -42,7 +42,8 @@ const localeSchema = new mongoose.Schema(
       ...objProps,
       value: {
         ...stringProps,
-        required: true
+        required: true,
+        unique: true
       }
     },
     fields: [stringProps],

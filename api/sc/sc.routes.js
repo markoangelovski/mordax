@@ -10,9 +10,9 @@ const { scButtonUrl, scCarouselUrl } = require("../../config");
 
 const { response } = require("../../lib/helpers.js");
 
-// Path: /api/1/sc/product-data?key=1234&url=https://herbalessences.com/en-us/&productUrl=https://&sku=1234
+// Path: /api/1/sc/product-data/single?key=1234&url=https://herbalessences.com/en-us/&productUrl=https://&sku=1234
 // Desc: Fetches the Button SC data for a single product for single locale in one SKU List
-router.get("/product-data", async (req, res, next) => {
+router.get("/product-data/single", async (req, res, next) => {
   const { url, id, SKU, mpIdFieldName } = req.query;
 
   const query = {};
@@ -22,7 +22,7 @@ router.get("/product-data", async (req, res, next) => {
   if (SKU) query["data.SKU.value"] = SKU;
 
   try {
-    let product = await Page.find(query).select(`-_id -__v`);
+    let product = await Page.find(query).select(`-__v`);
 
     if (product.length > 1) {
       res.status(422);
@@ -47,24 +47,23 @@ router.get("/product-data", async (req, res, next) => {
       product[0].data[mpIdFieldName].value
     );
 
-    const payload = {
-      SC: {
-        ok: sellersOk,
-        matches
-      }
-    };
-    // TODO: ovdje ne sprema sellere u bazu
-    const result = await Page.updateOne(
+    await Page.updateOne(
       { _id: product[0]._id },
       {
         $set: {
-          "SC.ok": sellersOk,
-          "SC.matches": matches
+          SC: {
+            ok: sellersOk,
+            matches
+          }
         }
       },
       { upsert: true }
     );
-    console.log("result: ", result);
+
+    product[0]._doc.id = product[0]._doc._id;
+    delete product[0]._doc._id;
+    delete product[0]._doc.locale;
+
     response(
       res,
       200,
@@ -77,6 +76,91 @@ router.get("/product-data", async (req, res, next) => {
           matches
         }
       }
+    );
+  } catch (error) {
+    console.warn("Error occurred in GET /api/1/sc/product-data route", error);
+    next({
+      message: error.message,
+      ...error
+    });
+  }
+});
+
+// Path: /api/1/sc/product-data?key=1234&url=https://herbalessences.com/en-us/&productUrl=https://&sku=1234
+// Desc: Fetches the Button SC data for a all products for single locale in one SKU List
+router.post("/product-data", async (req, res, next) => {
+  const { url, id, mpIdFieldName } = req.query;
+
+  const productsQuery = { type: "product" };
+
+  if (id) productsQuery.locale = id;
+  if (url) productsQuery.localeUrl = url;
+
+  const localeQuery = {};
+
+  if (id) localeQuery._id = id;
+  if (url) localeQuery["url.value"] = url;
+
+  try {
+    const [products, locale] = await Promise.all([
+      Page.find(productsQuery).select(`locale data.${mpIdFieldName}.value`),
+      Locale.find(localeQuery).select("SC.scCarouselKey.value")
+    ]);
+
+    if (!products.length || !locale.length) {
+      return next({
+        message: "No products or locales found that match the search query.",
+        queries: { productsQuery, localeQuery }
+      });
+    }
+
+    const sellerDataQueries = products
+      .filter(product => product.data[mpIdFieldName]?.value !== undefined)
+      .map(product =>
+        getSellerData(
+          locale[0].SC.scCarouselKey.value,
+          product.data[mpIdFieldName].value
+        )
+          .then(({ sellersOk, matches }) => ({
+            sellersOk,
+            matches
+          }))
+          .catch(err =>
+            console.warn(
+              "Error occurred while fetching SC data for product: ",
+              product.url,
+              err
+            )
+          )
+      );
+    const sellerData = await Promise.all(sellerDataQueries);
+
+    const bulkWrites = sellerData.map(({ sellersOk, matches }, i) => ({
+      updateOne: {
+        filter: { _id: products[i]._id },
+        update: {
+          $set: { SC: { ok: sellersOk, matches } }
+        },
+        upsert: true
+      }
+    }));
+
+    const { nModified } = await Page.bulkWrite(bulkWrites);
+
+    response(
+      res,
+      200,
+      false,
+      { productsCount: products.length, updatedProductsCount: nModified },
+      products.map((product, i) => ({
+        id: product._doc._id,
+        locale: product._doc.locale,
+        [mpIdFieldName]: product.data[mpIdFieldName]?.value,
+        SC: {
+          ok: sellerData[i]?.sellersOk,
+          matches: sellerData[i]?.matches
+        }
+      }))
     );
   } catch (error) {
     console.warn("Error occurred in GET /api/1/sc/product-data route", error);

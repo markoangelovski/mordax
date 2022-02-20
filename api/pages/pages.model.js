@@ -38,7 +38,8 @@ const pageSchema = new mongoose.Schema(
           miniLogo: { type: String, maxlength: 2048 }
         }
       ]
-    }
+    },
+    test: String
   },
   { timestamps: true }
 );

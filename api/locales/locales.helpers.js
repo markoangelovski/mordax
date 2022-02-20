@@ -197,7 +197,7 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
     const updatedData = {};
     fields.forEach(field => {
       const pageDataValue = data && page.data[field]?.value;
-      const templateItem = `${item[field]}`;
+      const templateItem = item[field] && `${item[field]}`;
       if (templateItem) {
         // Create the data entry for specific key/column in the uploaded xlsx template file or reapply existing data
         updatedData[field] = {

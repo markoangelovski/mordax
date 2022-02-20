@@ -55,7 +55,7 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
         .logo,
       miniLogo: sellersInfo.filter(
         seller => seller.name === match.retailerName
-      )[0]["mini-logo"]
+      )[0].miniLogo
     })),
     sellersInfo
   };
