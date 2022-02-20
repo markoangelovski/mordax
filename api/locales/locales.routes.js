@@ -188,7 +188,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
         templateData,
         pagesData
       );
-
+      // TODO: napravi da ako se digne lokal bez xlsx templatea da se svejedno spreme pagevi iz sitemap.xml
       // If xml sitemap returned pages, update them with the data from the uploaded template
       if (pagesFound) {
         pagesData = pagesData

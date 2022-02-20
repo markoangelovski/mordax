@@ -156,7 +156,7 @@
 							]
 						},
 						"url": {
-							"raw": "{{host}}/api/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&thirdParties=Bazaarvoice,SmartCommerce,PriceSpider&capitol=Washington&scButtonKey=&scCarouselKey=",
+							"raw": "{{host}}/api/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&hrefLang=en-ca&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&thirdParties=Bazaarvoice,SmartCommerce,PriceSpider&capitol=Washington&scButtonKey=&scCarouselKey=",
 							"host": [
 								"{{host}}"
 							],
@@ -180,6 +180,11 @@
 									"key": "locale",
 									"value": "en-us",
 									"description": "Locale, for example en-us, required"
+								},
+								{
+									"key": "hrefLang",
+									"value": "en-ca",
+									"description": "Include if sitemap.xml does not have good URLs"
 								},
 								{
 									"key": "url",
@@ -380,6 +385,38 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET Inspect XML sitemap Copy",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/locales/sitemap.xml?key={{key}}&url=https://herbalessences.com/en-us",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"locales",
+								"sitemap.xml"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://herbalessences.com/en-us",
+									"description": "Locale URL"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
@@ -504,7 +541,363 @@
 		},
 		{
 			"name": "SmartCommerce",
-			"item": []
+			"item": [
+				{
+					"name": "GET Product data single",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/sc/product-data/single?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/aloe/potent-aloe-hemp-sulfate-free-shampoo/&mpIdFieldName=mpId",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"sc",
+								"product-data",
+								"single"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://herbalessences.ca/en-ca/our-products/aloe/potent-aloe-hemp-sulfate-free-shampoo/",
+									"description": "Product URL"
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Product ID",
+									"disabled": true
+								},
+								{
+									"key": "mpIdFieldName",
+									"value": "mpId",
+									"description": "Field name in xlsx template for SC MP ID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Product data",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/sc/product-data?key={{key}}&url=https://herbalessences.ca/en-ca&mpIdFieldName=mpId",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"sc",
+								"product-data"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://herbalessences.ca/en-ca",
+									"description": "Locale URL"
+								},
+								{
+									"key": "id",
+									"value": "62117a4f64ff2312bf870635",
+									"description": "Locale ID",
+									"disabled": true
+								},
+								{
+									"key": "mpIdFieldName",
+									"value": "mpId",
+									"description": "Field name in xlsx template for SC MP ID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Retailers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/sc/retailers?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/aloe/potent-aloe-hemp-sulfate-free-shampoo/&mpIdFieldName=mpId",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"sc",
+								"retailers"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://herbalessences.ca/en-ca/our-products/aloe/potent-aloe-hemp-sulfate-free-shampoo/",
+									"description": "Product page URL"
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Product page ID",
+									"disabled": true
+								},
+								{
+									"key": "SKU",
+									"value": "123",
+									"disabled": true
+								},
+								{
+									"key": "mpIdFieldName",
+									"value": "mpId",
+									"description": "Field name in xlsx template for SC MP ID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET SC Button data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/sc/button?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/coconut-milk/coconut-milk-conditioner/&mpIdFieldName=mpId",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"sc",
+								"button"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://herbalessences.ca/en-ca/our-products/coconut-milk/coconut-milk-conditioner/",
+									"description": "Product page URL"
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Product page ID",
+									"disabled": true
+								},
+								{
+									"key": "SKU",
+									"value": "123",
+									"disabled": true
+								},
+								{
+									"key": "mpIdFieldName",
+									"value": "mpId",
+									"description": "Field name in xlsx template for SC MP ID"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET SC Carousel data",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/sc/carousel?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/coconut-milk/coconut-milk-conditioner/&mpIdFieldName=mpId",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"sc",
+								"carousel"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://herbalessences.ca/en-ca/our-products/coconut-milk/coconut-milk-conditioner/",
+									"description": "Product page URL"
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Product page ID",
+									"disabled": true
+								},
+								{
+									"key": "SKU",
+									"value": "123",
+									"disabled": true
+								},
+								{
+									"key": "mpIdFieldName",
+									"value": "mpId",
+									"description": "Field name in xlsx template for SC MP ID"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "BIN Lite Copy",
+			"item": [
+				{
+					"name": "GET Product data single",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/binlite/product-data/single?key={{key}}&url=https://www.gillettevenus.ca/en-ca/choose-your-smooth/refillable-razors/deluxe-smooth-platinum-razor/&binliteIdFieldName=BINLiteSku",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"binlite",
+								"product-data",
+								"single"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://www.gillettevenus.ca/en-ca/choose-your-smooth/refillable-razors/deluxe-smooth-platinum-razor/",
+									"description": "Product URL"
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Product ID",
+									"disabled": true
+								},
+								{
+									"key": "binliteIdFieldName",
+									"value": "BINLiteSku",
+									"description": "Field name in xlsx template for BIN Lite SKU"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Product data",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/binlite/product-data?key={{key}}&url=https://gillettevenus.ca/en-ca&binliteIdFieldName=BINLiteSku",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"binlite",
+								"product-data"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://gillettevenus.ca/en-ca",
+									"description": "Locale URL"
+								},
+								{
+									"key": "id",
+									"value": "62117a4f64ff2312bf870635",
+									"description": "Locale ID",
+									"disabled": true
+								},
+								{
+									"key": "binliteIdFieldName",
+									"value": "BINLiteSku",
+									"description": "Field name in xlsx template for BIN Lite SKU"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Retailers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/binlite/retailers?key={{key}}&url=https://www.gillettevenus.ca/en-ca",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"binlite",
+								"retailers"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://www.gillettevenus.ca/en-ca",
+									"description": "Locale URL"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		},
 		{
 			"name": "PriceSpider",
