@@ -14,6 +14,7 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
     );
     sellersOk = true;
   } catch (error) {
+    error = error.isAxiosError ? error.toJSON() : error;
     console.warn(
       "Error occurred fetching SC Carousel data for scMpId: ",
       scMpId,
@@ -36,7 +37,7 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
     : [];
 
   const sellersInfo = carouselData
-    ? carouselData.data.included.retailers.map(retailer => ({
+    ? carouselData.data.included.retailers?.map(retailer => ({
         name: retailer.attributes.name,
         url: retailer.attributes.url,
         logo: retailer.attributes.logo,

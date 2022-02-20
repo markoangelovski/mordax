@@ -138,7 +138,7 @@ router.post("/product-data", async (req, res, next) => {
           .then(result => result)
           .catch(err =>
             console.warn(
-              "Error occurred while fetching SC data for product: ",
+              "Error occurred while fetching BIN Lite data for product: ",
               product.url,
               err
             )

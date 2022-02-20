@@ -129,7 +129,7 @@ router.post("/product-data", async (req, res, next) => {
           .catch(err =>
             console.warn(
               "Error occurred while fetching SC data for product: ",
-              product.url,
+              product.data.mpId,
               err
             )
           )
