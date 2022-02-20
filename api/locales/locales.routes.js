@@ -115,7 +115,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
 
         updateResult = await Page.bulkWrite(bulkWrites);
       }
-      console.log("updateResult", updateResult);
+
       response(
         res,
         200,
@@ -173,7 +173,12 @@ router.post("/", upload.single("template"), async (req, res, next) => {
     let pagesData = await getPageUrls(savedLocale._id, url);
 
     // Update pages if xlsx template is uploaded
-    let updatedPagesCount, updatedPages, pages;
+    let updatedPagesCount = 0,
+      insertedPagesCount = 0,
+      updatedPages,
+      pages,
+      pagesFound = pagesData.length;
+
     if (buffer) {
       updatedPages = mapTemplateDataToPage(
         req,
@@ -183,7 +188,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
       );
 
       // If xml sitemap returned pages, update them with the data from the uploaded template
-      if (pagesData.length) {
+      if (pagesFound) {
         pagesData = pagesData
           .map(page => {
             updatedPages.forEach(updatedPage => {
@@ -223,9 +228,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
           });
         pages = await Page.insertMany(pagesData);
 
-        updatedPagesCount = pages.length;
-
-        console.log("pages xml", pages.length);
+        updatedPagesCount = templateData.length;
       } else {
         // If xml sitemap does not contain URLs, create pages using the data from template
         pagesData = updatedPages
@@ -269,7 +272,8 @@ router.post("/", upload.single("template"), async (req, res, next) => {
           });
 
         pages = await Page.bulkWrite(pagesData);
-        console.log("pages no xml", pages.length);
+
+        insertedPagesCount = pages.nUpserted;
       }
     }
 
@@ -278,9 +282,9 @@ router.post("/", upload.single("template"), async (req, res, next) => {
       200,
       false,
       {
-        pages: pages?.length || 0,
-        updatedPages: updatedPagesCount || 0,
-        insertedPages: pages?.length || pages?.nUpserted || 0
+        pagesFound: pagesFound,
+        updatedPages: updatedPagesCount,
+        insertedPages: insertedPagesCount
       },
       makeLocaleForRes(savedLocale._doc)
     );
