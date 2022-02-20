@@ -1,5 +1,5 @@
-const { default: axios } = require("axios");
-const chalk = require("chalk");
+const axios = require("axios");
+const mongoose = require("mongoose");
 const xmlParser = require("xml2js").parseStringPromise;
 
 const { urlRgx, localeRgx } = require("../../lib/regex");
@@ -162,29 +162,29 @@ exports.getPageUrls = async (id, url) => {
 
   const { data: xmlSitemapData } = await axios(xmlUrl);
 
-  const {
-    urlset: { url: rawUrls }
-  } = await xmlParser(xmlSitemapData);
+  const xmlData = await xmlParser(xmlSitemapData);
 
-  return rawUrls
-    .map(rawUrl => ({
-      locale: id,
-      localeUrl: url,
-      url: /https:\/\//gi.test(rawUrl.loc[0])
-        ? rawUrl.loc[0]
-        : "https://" + rawUrl.loc[0]
-    }))
-    .sort((first, second) => {
-      var A = first;
-      var B = second;
-      if (A < B) {
-        return -1;
-      }
-      if (A > B) {
-        return 1;
-      }
-      return 0;
-    });
+  return xmlData.urlset?.url
+    ? xmlData.urlset?.url
+        .map(rawUrl => ({
+          locale: id,
+          localeUrl: url,
+          url: /https:\/\//gi.test(rawUrl.loc[0])
+            ? rawUrl.loc[0]
+            : "https://" + rawUrl.loc[0]
+        }))
+        .sort((first, second) => {
+          var A = first;
+          var B = second;
+          if (A < B) {
+            return -1;
+          }
+          if (A > B) {
+            return 1;
+          }
+          return 0;
+        })
+    : [];
 };
 
 exports.mapTemplateDataToPage = (req, fields, template, pages) =>
@@ -192,7 +192,8 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
   template.map(item => {
     // Find the corresponding page in the list of all pages
     const page = pages.find(page => page.url === item.url);
-    const { data } = page;
+    // const { data } = page;
+    const data = page?.data;
 
     const updatedData = {};
     fields.forEach(field => {
@@ -202,8 +203,8 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
         // Create the data entry for specific key/column in the uploaded xlsx template file or reapply existing data
         updatedData[field] = {
           value: pageDataValue || templateItem,
-          createdAt: page.data?.[field]?.createdAt || new Date().toISOString(),
-          history: page.data?.[field]?.history || []
+          createdAt: page?.data?.[field]?.createdAt || new Date().toISOString(),
+          history: page?.data?.[field]?.history || []
         };
       }
 
@@ -232,7 +233,7 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
     });
 
     return {
-      _id: page?._id,
+      _id: page?._id || new mongoose.Types.ObjectId(),
       url: page?.url || item.url,
       type: item.type,
       data: updatedData

@@ -99,7 +99,14 @@ router.post("/", upload.single("template"), async (req, res, next) => {
             updateOne: {
               filter,
               update: {
-                $set: { type: page.type, source: "feed", data: page.data }
+                $set: {
+                  locale: savedLocale._doc._id,
+                  localeUrl: savedLocale._doc.url.value,
+                  url: page.url,
+                  type: page.type,
+                  source: "feed",
+                  data: page.data
+                }
               },
               upsert: true
             }
@@ -108,12 +115,16 @@ router.post("/", upload.single("template"), async (req, res, next) => {
 
         updateResult = await Page.bulkWrite(bulkWrites);
       }
-
+      console.log("updateResult", updateResult);
       response(
         res,
         200,
         false,
-        { locale: 1, pages: pagesCount, updatedPages: updateResult?.nModified },
+        {
+          pages: pagesCount,
+          updatedPages: updateResult?.nModified,
+          insertedPages: updateResult?.nUpserted
+        },
         makeLocaleForRes(savedLocale._doc)
       );
 
@@ -162,7 +173,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
     let pagesData = await getPageUrls(savedLocale._id, url);
 
     // Update pages if xlsx template is uploaded
-    let updatedPagesCount;
+    let updatedPagesCount, updatedPages, pages;
     if (buffer) {
       updatedPages = mapTemplateDataToPage(
         req,
@@ -171,54 +182,106 @@ router.post("/", upload.single("template"), async (req, res, next) => {
         pagesData
       );
 
-      updatedPagesCount = updatedPages.length;
+      // If xml sitemap returned pages, update them with the data from the uploaded template
+      if (pagesData.length) {
+        pagesData = pagesData
+          .map(page => {
+            updatedPages.forEach(updatedPage => {
+              if (page.url === updatedPage.url)
+                page = {
+                  locale: page.locale,
+                  localeUrl: page.localeUrl,
+                  url: page.url,
+                  type: updatedPage.type,
+                  source: "feed",
+                  data: updatedPage.data
+                };
+            });
+            return page;
+          })
+          .sort((first, second) => {
+            var A = first;
+            var B = second;
 
-      pagesData = pagesData
-        .map(page => {
-          updatedPages.forEach(updatedPage => {
-            if (page.url === updatedPage.url)
-              page = {
-                locale: page.locale,
-                localeUrl: page.localeUrl,
-                url: page.url,
-                type: updatedPage.type,
-                source: "feed",
-                data: updatedPage.data
-              };
+            // Sort the pages with type first
+            if (A.type && !B.type) {
+              return -1;
+            }
+            if (!A.type && B.type) {
+              return 1;
+            }
+
+            // Sort the pages with type alphabetically?
+            if (A.type < B.type) {
+              return -1;
+            }
+            if (A.type > B.type) {
+              return 1;
+            }
+
+            return 0;
           });
-          return page;
-        })
-        .sort((first, second) => {
-          var A = first;
-          var B = second;
+        pages = await Page.insertMany(pagesData);
 
-          // Sort the pages with type first
-          if (A.type && !B.type) {
-            return -1;
-          }
-          if (!A.type && B.type) {
-            return 1;
-          }
+        updatedPagesCount = pages.length;
 
-          // Sort the pages with type alphabetically?
-          if (A.type < B.type) {
-            return -1;
-          }
-          if (A.type > B.type) {
-            return 1;
-          }
+        console.log("pages xml", pages.length);
+      } else {
+        // If xml sitemap does not contain URLs, create pages using the data from template
+        pagesData = updatedPages
+          .map(page => ({
+            updateOne: {
+              filter: { _id: page._id },
+              update: {
+                $set: {
+                  locale: savedLocale._doc._id,
+                  localeUrl: savedLocale._doc.url.value,
+                  url: page.url,
+                  type: page.type,
+                  source: "feed",
+                  data: page.data
+                }
+              },
+              upsert: true
+            }
+          }))
+          .sort((first, second) => {
+            var A = first.updateOne.update.$set;
+            var B = second.updateOne.update.$set;
 
-          return 0;
-        });
+            // Sort the pages with type first
+            if (A.type && !B.type) {
+              return -1;
+            }
+            if (!A.type && B.type) {
+              return 1;
+            }
+
+            // Sort the pages with type alphabetically?
+            if (A.type < B.type) {
+              return -1;
+            }
+            if (A.type > B.type) {
+              return 1;
+            }
+
+            return 0;
+          });
+
+        pages = await Page.bulkWrite(pagesData);
+        console.log("pages no xml", pages.length);
+      }
     }
-
-    const pages = await Page.insertMany(pagesData);
 
     response(
       res,
       200,
       false,
-      { locale: 1, pages: pages.length, updatedPages: updatedPagesCount },
+      {
+        pages: pages?.length || 0,
+        updatedPages: updatedPagesCount || 0,
+        insertedPages: pages?.length || pages?.nUpserted || 0
+      },
       makeLocaleForRes(savedLocale._doc)
     );
   } catch (error) {
