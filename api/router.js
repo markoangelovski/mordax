@@ -16,6 +16,9 @@ router.use("/pages", require("./pages/pages.routes.js"));
 // Smartcommerce routes
 router.use("/sc", require("./sc/sc.routes.js"));
 
+// BIN Lite routes
+router.use("/binlite", require("./BINLite/binlite.routes.js"));
+
 // Documentation route
 router.get("/docs", (req, res) => {
   res.download(

@@ -11,7 +11,7 @@ const { scButtonUrl, scCarouselUrl } = require("../../config");
 const { response } = require("../../lib/helpers.js");
 
 // Path: /api/1/sc/product-data/single?key=1234&url=https://herbalessences.com/en-us/&productUrl=https://&sku=1234
-// Desc: Fetches the Button SC data for a single product for single locale in one SKU List
+// Desc: Fetches and updates the SC data for a single product for single locale in one SKU List
 router.get("/product-data/single", async (req, res, next) => {
   const { url, id, SKU, mpIdFieldName } = req.query;
 
@@ -53,13 +53,14 @@ router.get("/product-data/single", async (req, res, next) => {
         $set: {
           SC: {
             ok: sellersOk,
+            lastScan: new Date().toISOString(),
             matches
           }
         }
       },
       { upsert: true }
     );
-
+    // TODO: handle SC API errors in the same way as BINLiteAPI
     product[0]._doc.id = product[0]._doc._id;
     delete product[0]._doc._id;
     delete product[0]._doc.locale;

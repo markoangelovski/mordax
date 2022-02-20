@@ -1,7 +1,9 @@
 const path = require("path");
 const router = require("express").Router();
+const axios = require("axios").default;
 const xlsx = require("xlsx");
 const multer = require("multer");
+const xmlParser = require("xml2js").parseStringPromise;
 const upload = multer();
 
 const Locale = require("./locales.model.js");
@@ -17,8 +19,9 @@ const {
   mapTemplateDataToPage
 } = require("./locales.helpers.js");
 
-const { response } = require("../../lib/helpers.js");
 const { makePagesForRes } = require("../pages/pages.helpers.js");
+const { response } = require("../../lib/helpers.js");
+const { localeRgx, urlRgx } = require("../../lib/regex.js");
 
 // Path: /api/1/locales
 // Desc: Fetches all brands and locales
@@ -70,19 +73,20 @@ router.post("/", upload.single("template"), async (req, res, next) => {
     const locales = await Locale.find({ "url.value": url });
 
     if (locales.length) {
-      const updatedLocale = new Locale(updateLocale(locales[0], req));
-
-      const savedLocale = await updatedLocale.save();
+      await Locale.findOneAndUpdate(
+        { _id: locales[0]._id },
+        { $set: updateLocale(locales[0], req) }
+      );
 
       // Update pages if template is uploaded
       let pagesCount, updateResult;
       if (buffer) {
-        const existingPages = await Page.find({ locale: savedLocale._id });
+        const existingPages = await Page.find({ locale: locales[0]._id });
         pagesCount = existingPages.length;
 
         const updatedPages = mapTemplateDataToPage(
           req,
-          savedLocale.fields,
+          locales[0].fields,
           templateData,
           existingPages
         );
@@ -100,8 +104,8 @@ router.post("/", upload.single("template"), async (req, res, next) => {
               filter,
               update: {
                 $set: {
-                  locale: savedLocale._doc._id,
-                  localeUrl: savedLocale._doc.url.value,
+                  locale: locales[0]._doc._id,
+                  localeUrl: locales[0]._doc.url.value,
                   url: page.url,
                   type: page.type,
                   source: "feed",
@@ -125,14 +129,14 @@ router.post("/", upload.single("template"), async (req, res, next) => {
           updatedPages: updateResult?.nModified,
           insertedPages: updateResult?.nUpserted
         },
-        makeLocaleForRes(savedLocale._doc)
+        makeLocaleForRes(locales[0]._doc)
       );
 
       // Update the URL in pages
       if (newUrl && newUrl !== url)
         Page.updateMany(
-          { locale: savedLocale._id },
-          { $set: { localeUrl: savedLocale.url.value } }
+          { locale: locales[0]._id },
+          { $set: { localeUrl: locales[0].url.value } }
         )
           .then(_ => _)
           .catch(err =>
@@ -154,7 +158,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
 // Path: /api/1/locales
 // Desc: Creates a new locale
 router.post("/", upload.single("template"), async (req, res, next) => {
-  const { url, newUrl } = req.query;
+  const { url, newUrl, hrefLang } = req.query;
   const buffer = req.file?.buffer;
 
   let templateData;
@@ -169,9 +173,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
     const newLocale = new Locale(makeLocaleForDb(req));
 
     const savedLocale = await newLocale.save();
-
-    let pagesData = await getPageUrls(savedLocale._id, url);
-
+    let pagesData = await getPageUrls(savedLocale._id, url, hrefLang);
     // Update pages if xlsx template is uploaded
     let updatedPagesCount = 0,
       insertedPagesCount = 0,
@@ -311,7 +313,7 @@ router.get("/single", locMw, async (req, res, next) => {
     ];
     if (includePages)
       queries.push(
-        Page.find({ localeUrl: url }).select("url type source data SC")
+        Page.find({ localeUrl: url }).select("url type source data SC BINLite")
       );
 
     const [existingLocale, existingLocalePages] = await Promise.all(queries);
@@ -468,5 +470,43 @@ router.delete("/single", locMw, async (req, res, next) => {
 router.get("/template", async (req, res, next) =>
   res.download(path.join(__dirname, "../../public/Example_Template.xlsx"))
 );
+
+// Path: /api/1/locales/sitemap.xml
+// Desc: Fetches xml sitemap
+router.get("/sitemap.xml", async (req, res, next) => {
+  const { url } = req.query;
+
+  try {
+    let robotsUrl = url.replace(localeRgx, "");
+    robotsUrl =
+      robotsUrl.charAt(robotsUrl.length - 1) === "/"
+        ? robotsUrl + "robots.txt"
+        : robotsUrl + "/robots.txt";
+
+    const { data: robotsData } = await axios(robotsUrl);
+
+    const xmlUrl = robotsData.match(urlRgx)[0];
+
+    const { data: xmlSitemapData } = await axios(xmlUrl);
+
+    const xmlData = await xmlParser(xmlSitemapData);
+
+    response(
+      res,
+      200,
+      false,
+      {
+        // pagesFound: pagesFound
+      },
+      { ...xmlData }
+    );
+  } catch (error) {
+    console.warn("Error occurred in POST (New) /api/1/locales route", error);
+    next({
+      message: error.message,
+      ...error
+    });
+  }
+});
 
 module.exports = router;

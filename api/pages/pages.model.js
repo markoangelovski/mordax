@@ -28,6 +28,7 @@ const pageSchema = new mongoose.Schema(
     data: {},
     SC: {
       ok: Boolean,
+      lastScan: Date,
       matches: [
         {
           productName: { type: String, max: 256 },
@@ -39,7 +40,17 @@ const pageSchema = new mongoose.Schema(
         }
       ]
     },
-    test: String
+    BINLite: {
+      ok: Boolean,
+      lastScan: Date,
+      matches: [
+        {
+          BuyNowUrl: { type: String, maxlength: 2048 },
+          RetailerName: { type: String, max: 256 },
+          Retailerlogo: { type: String }
+        }
+      ]
+    }
   },
   { timestamps: true }
 );

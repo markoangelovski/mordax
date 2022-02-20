@@ -82,4 +82,16 @@ const localeSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+localeSchema.pre("save", function (next) {
+  // Remove all empty fields before saving
+  if (!this.SC?.scButtonKey?.value) this.SC.scButtonKey = undefined;
+  if (!this.SC?.scCarouselKey?.value) this.SC.scCarouselKey = undefined;
+  if (!this.SC?.scEcEndpointKey?.value) this.SC.scEcEndpointKey = undefined;
+  if (!this.BINLite.BINLiteKey?.value) this.BINLite.BINLiteKey = undefined;
+  if (!this.PS.psType?.value) this.PS.psType = undefined;
+  if (!this.PS.psKey?.value) this.PS.psKey = undefined;
+  if (!this.capitol?.value) this.capitol = undefined;
+  next();
+});
+
 module.exports = mongoose.model("Locale", localeSchema);

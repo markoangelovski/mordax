@@ -46,27 +46,27 @@ exports.makeLocaleForRes = locale => ({
   url: locale.url.value,
   fields: locale.fields,
   thirdParties: locale.thirdParties,
-  capitol: locale.capitol.value,
-  scButtonKey: locale.SC.scButtonKey.value,
-  scCarouselKey: locale.SC.scCarouselKey.value,
-  scEcEndpointKey: locale.SC.scEcEndpointKey.value,
-  BINLiteKey: locale.BINLite.BINLiteKey.value,
-  psType: locale.PS.psType.value,
-  psKey: locale.PS.psKey.value,
-  psType: locale.PS.psType.value
+  capitol: locale.capitol?.value,
+  scButtonKey: locale.SC.scButtonKey?.value,
+  scCarouselKey: locale.SC.scCarouselKey?.value,
+  scEcEndpointKey: locale.SC.scEcEndpointKey?.value,
+  BINLiteKey: locale.BINLite.BINLiteKey?.value,
+  psType: locale.PS.psType?.value,
+  psKey: locale.PS.psKey?.value,
+  psType: locale.PS.psType?.value
 });
 
 exports.updateLocale = (locale, req) => {
   const updateAttr = (prevAttr, newAttr, key) => {
     if (newAttr && prevAttr.value !== `${newAttr}`) {
       prevAttr.history.push({
-        previousValue: prevAttr.value,
+        previousValue: prevAttr.value || "",
         updatedValue: `${newAttr}`,
         updatedAt: new Date().toISOString(),
         updatedBy: req.admin ? "admin" : key
       });
-      prevAttr["value"] = `${newAttr}`;
-      return prevAttr;
+      prevAttr.value = `${newAttr}`;
+      prevAttr.createdAt = prevAttr.createdAt || new Date().toISOString();
     }
 
     return prevAttr;
@@ -125,14 +125,21 @@ exports.updateLocale = (locale, req) => {
     key
   );
   locale.BINLite.BINLiteKey = updateAttr(
-    locale.BINLite.bnlKey,
+    locale.BINLite.BINLiteKey,
     req.query.BINLiteKey,
     key
   );
   locale.PS.psType = updateAttr(locale.PS.psType, req.query.psType, key);
   locale.PS.psKey = updateAttr(locale.PS.psKey, req.query.psKey, key);
 
-  // console.log("locale after: ", locale);
+  if (!locale.SC?.scButtonKey?.value) locale.SC.scButtonKey = undefined;
+  if (!locale.SC?.scCarouselKey?.value) locale.SC.scCarouselKey = undefined;
+  if (!locale.SC?.scEcEndpointKey?.value) locale.SC.scEcEndpointKey = undefined;
+  if (!locale.BINLite.BINLiteKey?.value) locale.BINLite.BINLiteKey = undefined;
+  if (!locale.PS.psType?.value) locale.PS.psType = undefined;
+  if (!locale.PS.psKey?.value) locale.PS.psKey = undefined;
+  if (!locale.capitol?.value) locale.capitol = undefined;
+
   return locale;
 };
 
@@ -149,7 +156,7 @@ exports.sortItems = (items, attr) =>
     return 0;
   });
 
-exports.getPageUrls = async (id, url) => {
+exports.getPageUrls = async (id, url, hrefLang) => {
   let robotsUrl = url.replace(localeRgx, "");
   robotsUrl =
     robotsUrl.charAt(robotsUrl.length - 1) === "/"
@@ -162,17 +169,28 @@ exports.getPageUrls = async (id, url) => {
 
   const { data: xmlSitemapData } = await axios(xmlUrl);
 
-  const xmlData = await xmlParser(xmlSitemapData);
+  let xmlData = await xmlParser(xmlSitemapData);
 
   return xmlData.urlset?.url
     ? xmlData.urlset?.url
-        .map(rawUrl => ({
-          locale: id,
-          localeUrl: url,
-          url: /https:\/\//gi.test(rawUrl.loc[0])
-            ? rawUrl.loc[0]
-            : "https://" + rawUrl.loc[0]
-        }))
+        .map(rawUrl => {
+          let pageUrl;
+
+          if (hrefLang) {
+            // If hreflang arg is passed, get the link corresponding to that hreflang
+            pageUrl = rawUrl["xhtml:link"]
+              .filter(link => link.$.hreflang === hrefLang)
+              .map(lang => lang.$.href)[0];
+          } else {
+            pageUrl = rawUrl.loc[0];
+          }
+
+          return {
+            locale: id,
+            localeUrl: url,
+            url: /https:\/\//gi.test(pageUrl) ? pageUrl : "https://" + pageUrl
+          };
+        })
         .sort((first, second) => {
           var A = first;
           var B = second;

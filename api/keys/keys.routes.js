@@ -17,7 +17,7 @@ router.post("/create-key", async (req, res, next) => {
 
     // Handle roles creation
     let availableRoles = new Set();
-    const { roleMap } = require("../../lib/userRoles.json");
+    const { roleMap } = require("../../config/userRoles.json");
 
     // Check if requester has the correct role needed to create the key
     if (!req.admin)
@@ -97,7 +97,10 @@ router.get("/key-info", async (req, res, next) => {
 
   try {
     if (checkKey) {
-      const key = await Keys.find({ key: checkKey }).select("-_id -__v");
+      // const key = await Keys.find({ key: checkKey }).select("-_id -__v");
+      const key = await Keys.find({
+        $or: [{ key: checkKey }, { issuer: checkKey }]
+      }).select("-_id -__v");
 
       if (key) {
         response(res, 200, false, { keys: key.length }, key);
