@@ -37,6 +37,9 @@ exports.checkKey = savedKeys => async (req, res, next) => {
       );
 
     if (key && existingKey.length > 0) {
+      // Allow access to all keys to PriceSpider interface endpoints
+      if (req.method === "GET" && /ps\/int/gi.test(path)) return next();
+
       let authorized = false;
       // Handle endpoints access
       existingKey[0].roles.every(userRole => {

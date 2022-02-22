@@ -12,6 +12,7 @@ router.use("/locales", require("./locales/locales.routes.js"));
 router.use("/pages", require("./pages/pages.routes.js"));
 
 // PriceSpider routes
+router.use("/ps", require("./ps/ps.routes.js"));
 
 // Smartcommerce routes
 router.use("/sc", require("./sc/sc.routes.js"));

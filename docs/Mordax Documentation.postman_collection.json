@@ -901,7 +901,50 @@
 		},
 		{
 			"name": "PriceSpider",
-			"item": []
+			"item": [
+				{
+					"name": "Interfaces",
+					"item": [
+						{
+							"name": "/1/:accountId/config.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/config.js?key={{key}}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										"config.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "PS account id"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				}
+			]
 		},
 		{
 			"name": "Docs",

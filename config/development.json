@@ -4,5 +4,11 @@
   "hostHeroku": "https://mordax.herokuapp.com",
   "scButtonUrl": "https://api.smartcommerce.co/api/v1/smartbutton/{{scButtonKey}}?globalCatalog=true&sepmId={{scMpId}}",
   "scCarouselUrl": "https://api.smartcommerce.co/api/v1/widget/{{scCarouselKey}}?sepmId={{scMpId}}",
-  "BINLiteUrl": "https://az-apigateway-cs-prod-20180702.azure-api.net/buynowlite/api/retailers/{{binliteUpc}}/random/desired"
+  "BINLiteUrl": "https://az-apigateway-cs-prod-20180702.azure-api.net/buynowlite/api/retailers/{{binliteUpc}}/random/desired",
+  "psCdnUrl": "https://cdn.pricespider.com/1/",
+  "psLocateUrl": "https://locate.pricespider.com/",
+  "psCheckUrl": "https://check.pricespider.com/",
+  "psRedirUrl": "https://redir.pricespider.com/",
+  "psWwwassetsUrl": "https://wwwassets.pricespider.com/",
+  "psEmbeddedcloudUrl": "https://embeddedcloud.pricespider.com/"
 }
