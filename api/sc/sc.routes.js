@@ -108,7 +108,7 @@ router.post("/product-data", async (req, res, next) => {
 
   try {
     const [products, locale] = await Promise.all([
-      Page.find(productsQuery).select(`locale data.${mpIdFieldName}.value`),
+      Page.find(productsQuery).select(`url data.${mpIdFieldName}.value`),
       Locale.find(localeQuery).select("SC.scCarouselKey.value")
     ]);
 
@@ -126,10 +126,7 @@ router.post("/product-data", async (req, res, next) => {
           locale[0].SC.scCarouselKey.value,
           product.data[mpIdFieldName].value
         )
-          .then(({ sellersOk, matches }) => ({
-            sellersOk,
-            matches
-          }))
+          .then(result => result)
           .catch(err =>
             console.warn(
               "Error occurred while fetching SC data for product: ",
@@ -140,11 +137,27 @@ router.post("/product-data", async (req, res, next) => {
       );
     const sellerData = await Promise.all(sellerDataQueries);
 
-    const bulkWrites = sellerData.map(({ sellersOk, matches }, i) => ({
+    const successAttempts = sellerData.filter(
+      ({ sellersOk, matches }) => sellersOk === true && matches.length
+    );
+    const failedAttempts = sellerData.filter(
+      ({ status }) => status !== undefined
+    );
+    const noSellersAttempts = sellerData.filter(
+      ({ matches }) => !matches.length
+    );
+
+    const bulkWrites = [
+      ...successAttempts,
+      ...failedAttempts,
+      ...noSellersAttempts
+    ].map(({ scMpId, sellersOk, matches }) => ({
       updateOne: {
-        filter: { _id: products[i]._id },
+        filter: { [`data.${mpIdFieldName}.value`]: scMpId },
         update: {
-          $set: { SC: { ok: sellersOk, matches } }
+          $set: {
+            SC: { ok: sellersOk, lastScan: new Date().toISOString(), matches }
+          }
         },
         upsert: true
       }
@@ -152,20 +165,41 @@ router.post("/product-data", async (req, res, next) => {
 
     const { nModified } = await Page.bulkWrite(bulkWrites);
 
+    const mapResult = result => {
+      const product = products.find(
+        product => product.data[mpIdFieldName]?.value === result.scMpId
+      );
+
+      return {
+        id: product._id,
+        url: product.url,
+        [mpIdFieldName]: product.data[mpIdFieldName]?.value,
+        SC: {
+          ok: result.sellersOk,
+          matchesCount: result.matches?.length,
+          matches: result.matches,
+          status: result.status,
+          message: result.message
+        }
+      };
+    };
+
+    const successPayload = successAttempts.map(mapResult);
+    const failsPayload = failedAttempts.map(mapResult);
+    const noSellersPayload = failedAttempts.map(mapResult);
+
     response(
       res,
       200,
       false,
-      { productsCount: products.length, updatedProductsCount: nModified },
-      products.map((product, i) => ({
-        id: product._doc._id,
-        locale: product._doc.locale,
-        [mpIdFieldName]: product.data[mpIdFieldName]?.value,
-        SC: {
-          ok: sellerData[i]?.sellersOk,
-          matches: sellerData[i]?.matches
-        }
-      }))
+      {
+        productsCount: products.length,
+        updatedProductsCount: nModified,
+        successAttemptsCount: successAttempts.length,
+        failedAttemptsCount: failedAttempts.length,
+        noSellersAttemptsCount: noSellersAttempts.length
+      },
+      [...successPayload, ...failsPayload, ...noSellersPayload]
     );
   } catch (error) {
     console.warn("Error occurred in GET /api/1/sc/product-data route", error);

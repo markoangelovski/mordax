@@ -4,7 +4,9 @@ const { scCarouselUrl } = require("../../config");
 
 exports.getSellerData = async (scCarouselKey, scMpId) => {
   let carouselData,
-    sellersOk = false;
+    sellersOk = false,
+    status,
+    message;
 
   try {
     carouselData = await axios(
@@ -21,11 +23,14 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
       error
     );
     console.warn(error.message);
+    status = error.status;
+    message = error.message;
   }
 
   const master_product_id = carouselData
-    ? carouselData.data.included.products.find(product => product.id === scMpId)
-        .attributes.master_product_id
+    ? carouselData.data.included.products?.find(
+        product => product.id === scMpId
+      ).attributes.master_product_id
     : "";
 
   const matches = carouselData
@@ -60,6 +65,7 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
 
   return {
     sellersOk,
+    scMpId,
     matches: matches.map(match => ({
       productName: match.productName,
       retailerName: match.retailerName,
@@ -71,6 +77,8 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
         seller => seller.name === match.retailerName
       )[0].miniLogo
     })),
+    status,
+    message,
     sellersInfo
   };
 };

@@ -117,7 +117,7 @@ router.post("/product-data", async (req, res, next) => {
 
   try {
     const [products, locale] = await Promise.all([
-      Page.find(productsQuery).select(`data.${binliteIdFieldName}.value`),
+      Page.find(productsQuery).select(`url data.${binliteIdFieldName}.value`),
       Locale.find(localeQuery).select("BINLite.BINLiteKey.value")
     ]);
 
@@ -154,7 +154,7 @@ router.post("/product-data", async (req, res, next) => {
     );
 
     const bulkWrites = [...successAttempts, ...failedAttempts].map(
-      ({ binliteId, sellersOk, matches }, i) => {
+      ({ binliteId, sellersOk, matches }) => {
         const filter = `data.${binliteIdFieldName}.value`;
 
         return {
@@ -184,6 +184,7 @@ router.post("/product-data", async (req, res, next) => {
 
       return {
         id: product._doc._id,
+        url: product.url,
         [binliteIdFieldName]: product.data[binliteIdFieldName]?.value,
         BINLite: {
           ok: result.sellersOk,
