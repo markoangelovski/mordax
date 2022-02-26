@@ -48,6 +48,8 @@ const localeSchema = new mongoose.Schema(
     },
     fields: [stringProps],
     thirdParties: [stringProps],
+    xmlSitemap: stringProps,
+    capitol: objProps,
     SC: {
       scButtonKey: objProps,
       scCarouselKey: objProps,
@@ -76,8 +78,7 @@ const localeSchema = new mongoose.Schema(
         }
       },
       overlayId: objProps
-    },
-    capitol: objProps
+    }
   },
   { timestamps: true }
 );

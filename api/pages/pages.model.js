@@ -25,6 +25,7 @@ const pageSchema = new mongoose.Schema(
       type: String,
       enum: ["feed", "single"]
     },
+    inXmlSitemap: Boolean,
     data: {},
     SC: {
       ok: Boolean,

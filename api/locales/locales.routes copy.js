@@ -16,8 +16,7 @@ const {
   updateLocale,
   sortItems,
   getPageUrls,
-  getXmlSitemapUrl,
-  updatePages
+  mapTemplateDataToPage
 } = require("./locales.helpers.js");
 
 const { makePagesForRes } = require("../pages/pages.helpers.js");
@@ -57,47 +56,98 @@ router.get("/", async (req, res, next) => {
 });
 
 // Path: /api/1/locales
-// Desc: Creates a new locale
+// Desc: Updates a locale
 router.post("/", upload.single("template"), async (req, res, next) => {
-  const { url, hrefLang } = req.query;
+  const { url, newUrl } = req.query;
+  const buffer = req.file?.buffer;
+
+  let templateData;
+  if (buffer) {
+    const workbook = xlsx.read(buffer, { type: "buffer" });
+    templateData = xlsx.utils.sheet_to_json(
+      workbook.Sheets[workbook.SheetNames[0]]
+    );
+  }
 
   try {
     const locales = await Locale.find({ "url.value": url });
 
-    // If locale exists, forward the request to the next route handler
-    req.newLocale = false;
-    req.locale = locales[0];
-    if (locales.length) return next();
+    if (locales.length) {
+      await Locale.findOneAndUpdate(
+        { _id: locales[0]._id },
+        { $set: updateLocale(locales[0], req) }
+      );
 
-    const xmlSitemap = await getXmlSitemapUrl(url);
+      // Update pages if template is uploaded
+      let pagesCount, updateResult;
+      if (buffer) {
+        const existingPages = await Page.find({ locale: locales[0]._id });
+        pagesCount = existingPages.length;
 
-    const newLocale = new Locale(makeLocaleForDb(req, xmlSitemap));
+        const updatedPages = mapTemplateDataToPage(
+          req,
+          locales[0].fields,
+          templateData,
+          existingPages
+        );
 
-    const [savedLocale, xmlPages] = await Promise.all([
-      newLocale.save(),
-      getPageUrls(newLocale._id, url, hrefLang)
-    ]);
+        const bulkWrites = updatedPages.map(page => {
+          const filter = {};
+          if (page._id) {
+            filter._id = page._id;
+          } else {
+            filter.url = page.url;
+          }
 
-    const pages = xmlPages.length && (await Page.insertMany(xmlPages));
+          return {
+            updateOne: {
+              filter,
+              update: {
+                $set: {
+                  locale: locales[0]._doc._id,
+                  localeUrl: locales[0]._doc.url.value,
+                  url: page.url,
+                  type: page.type,
+                  source: "feed",
+                  data: page.data
+                }
+              },
+              upsert: true
+            }
+          };
+        });
 
-    // If template is uploaded, forward the request to the next route handler
-    req.newLocale = true;
-    req.locale = savedLocale._doc;
-    req.pages = pages;
-    if (req.file) return next();
+        updateResult = await Page.bulkWrite(bulkWrites);
+      }
 
-    response(
-      res,
-      200,
-      false,
-      { newLocale: true, pagesFound: pages.length || 0 },
-      makeLocaleForRes(savedLocale._doc)
-    );
+      response(
+        res,
+        200,
+        false,
+        {
+          pages: pagesCount,
+          updatedPages: updateResult?.nModified,
+          insertedPages: updateResult?.nUpserted
+        },
+        makeLocaleForRes(locales[0]._doc)
+      );
+
+      // Update the URL in pages
+      if (newUrl && newUrl !== url)
+        Page.updateMany(
+          { locale: locales[0]._id },
+          { $set: { localeUrl: locales[0].url.value } }
+        )
+          .then(_ => _)
+          .catch(err =>
+            console.warn("Error updating new locale URL in pages for ", url)
+          );
+    } else {
+      // If locale is not found execute next POST /api/1/locales endpoint handler
+      next();
+    }
   } catch (error) {
-    console.warn(
-      "Error occurred in POST (New, without template) /api/1/locales route",
-      error
-    );
+    console.warn("Error occurred in POST (Update) /api/1/locales route", error);
     next({
       message: error.message,
       ...error
@@ -106,40 +156,142 @@ router.post("/", upload.single("template"), async (req, res, next) => {
 });
 
 // Path: /api/1/locales
-// Desc: Updates a locale
-router.post("/", async (req, res, next) => {
+// Desc: Creates a new locale
+router.post("/", upload.single("template"), async (req, res, next) => {
+  const { url, newUrl, hrefLang } = req.query;
+  const buffer = req.file?.buffer;
+
+  let templateData;
+  if (buffer) {
+    const workbook = xlsx.read(buffer, { type: "buffer" });
+    templateData = xlsx.utils.sheet_to_json(
+      workbook.Sheets[workbook.SheetNames[0]]
+    );
+  }
+
   try {
-    if (!req.newLocale) {
-      const [existingPages, _] = await Promise.all([
-        Page.find({ locale: req.locale._id }),
-        Locale.updateOne({ _id: req.locale._id }, { $set: updateLocale(req) })
-      ]);
+    const newLocale = new Locale(makeLocaleForDb(req));
 
-      req.pages = existingPages;
+    const savedLocale = await newLocale.save();
+    let pagesData = await getPageUrls(savedLocale._id, url, hrefLang);
+    // Update pages if xlsx template is uploaded
+    let updatedPagesCount = 0,
+      insertedPagesCount = 0,
+      updatedPages,
+      pages,
+      pagesFound = pagesData.length;
+
+    if (buffer) {
+      updatedPages = mapTemplateDataToPage(
+        req,
+        savedLocale.fields,
+        templateData,
+        pagesData
+      );
+      // TODO: napravi da ako se digne lokal bez xlsx templatea da se svejedno spreme pagevi iz sitemap.xml
+      // If xml sitemap returned pages, update them with the data from the uploaded template
+      if (pagesFound) {
+        pagesData = pagesData
+          .map(page => {
+            updatedPages.forEach(updatedPage => {
+              if (page.url === updatedPage.url)
+                page = {
+                  locale: page.locale,
+                  localeUrl: page.localeUrl,
+                  url: page.url,
+                  type: updatedPage.type,
+                  source: "feed",
+                  data: updatedPage.data
+                };
+            });
+            return page;
+          })
+          .sort((first, second) => {
+            var A = first;
+            var B = second;
+
+            // Sort the pages with type first
+            if (A.type && !B.type) {
+              return -1;
+            }
+            if (!A.type && B.type) {
+              return 1;
+            }
+
+            // Sort the pages with type alphabetically?
+            if (A.type < B.type) {
+              return -1;
+            }
+            if (A.type > B.type) {
+              return 1;
+            }
+
+            return 0;
+          });
+        pages = await Page.insertMany(pagesData);
+
+        updatedPagesCount = templateData.length;
+      } else {
+        // If xml sitemap does not contain URLs, create pages using the data from template
+        pagesData = updatedPages
+          .map(page => ({
+            updateOne: {
+              filter: { _id: page._id },
+              update: {
+                $set: {
+                  locale: savedLocale._doc._id,
+                  localeUrl: savedLocale._doc.url.value,
+                  url: page.url,
+                  type: page.type,
+                  source: "feed",
+                  data: page.data
+                }
+              },
+              upsert: true
+            }
+          }))
+          .sort((first, second) => {
+            var A = first.updateOne.update.$set;
+            var B = second.updateOne.update.$set;
+
+            // Sort the pages with type first
+            if (A.type && !B.type) {
+              return -1;
+            }
+            if (!A.type && B.type) {
+              return 1;
+            }
+
+            // Sort the pages with type alphabetically?
+            if (A.type < B.type) {
+              return -1;
+            }
+            if (A.type > B.type) {
+              return 1;
+            }
+
+            return 0;
+          });
+
+        pages = await Page.bulkWrite(pagesData);
+
+        insertedPagesCount = pages.nUpserted;
+      }
     }
-
-    const updatedPagesRes = await updatePages(req);
 
     response(
       res,
       200,
       false,
       {
-        newLocale: req.newLocale,
-        pagesFound: req.pages.length || 0,
-        pagesSubmitted: updatedPagesRes?.pagesSubmitted,
-        pagesUpdated: updatedPagesRes?.pagesUpdated,
-        pagesCreated: updatedPagesRes?.pagesCreated
+        pagesFound: pagesFound,
+        updatedPages: updatedPagesCount,
+        insertedPages: insertedPagesCount
       },
-      makeLocaleForRes(updateLocale(req))
+      makeLocaleForRes(savedLocale._doc)
     );
-
-    // TODO: napravi funkciju koja uzima newUrl i updatea url u lokalu i pagevima. Zovi je u svakom post /locales endpointu.
   } catch (error) {
-    console.warn(
-      "Error occurred in POST (New, with template) /api/1/locales route",
-      error
-    );
+    console.warn("Error occurred in POST (New) /api/1/locales route", error);
     next({
       message: error.message,
       ...error

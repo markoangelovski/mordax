@@ -1,10 +1,13 @@
 const axios = require("axios");
 const mongoose = require("mongoose");
 const xmlParser = require("xml2js").parseStringPromise;
+const xlsx = require("xlsx");
 
 const { urlRgx, localeRgx } = require("../../lib/regex");
 
-exports.makeLocaleForDb = req => {
+const Page = require("../pages/pages.model.js");
+
+exports.makeLocaleForDb = (req, xmlSitemap) => {
   const makeAttr = attribute => ({
     value: attribute ? `${attribute}` : undefined,
     createdAt: new Date().toISOString()
@@ -23,6 +26,7 @@ exports.makeLocaleForDb = req => {
     url: makeAttr(req.query.url),
     fields: processList(req.query.fields),
     thirdParties: processList(req.query.thirdParties),
+    xmlSitemap,
     capitol: makeAttr(req.query.capitol),
     SC: {
       scButtonKey: makeAttr(req.query.scButtonKey),
@@ -56,7 +60,9 @@ exports.makeLocaleForRes = locale => ({
   psType: locale.PS.psType?.value
 });
 
-exports.updateLocale = (locale, req) => {
+exports.updateLocale = req => {
+  const locale = req.locale;
+
   const updateAttr = (prevAttr, newAttr, key) => {
     if (newAttr && prevAttr.value !== `${newAttr}`) {
       prevAttr.history.push({
@@ -143,6 +149,48 @@ exports.updateLocale = (locale, req) => {
   return locale;
 };
 
+exports.updatePages = async req => {
+  if (!req.file) return;
+
+  const { Sheets, SheetNames } = xlsx.read(req.file.buffer, {
+    type: "buffer"
+  });
+  const templateData = xlsx.utils.sheet_to_json(Sheets[SheetNames[0]]);
+
+  const updatedPages = mapTemplateDataToPage(
+    req,
+    req.locale.fields,
+    templateData,
+    req.pages
+  );
+
+  const bulkWrites = updatedPages.map(page => ({
+    updateOne: {
+      filter: { _id: page._id },
+      update: {
+        $set: {
+          locale: req.locale._id,
+          localeUrl: req.locale.url.value,
+          url: page.url,
+          type: page.type,
+          source: "feed",
+          inXmlSitemap: page.inXmlSitemap,
+          data: page.data
+        }
+      },
+      upsert: true
+    }
+  }));
+
+  const { nModified, nUpserted } = await Page.bulkWrite(bulkWrites);
+
+  return {
+    pagesSubmitted: templateData.length || 0,
+    pagesUpdated: nModified,
+    pagesCreated: nUpserted
+  };
+};
+
 exports.sortItems = (items, attr) =>
   items.sort((first, second) => {
     var A = first[attr].toUpperCase();
@@ -156,18 +204,21 @@ exports.sortItems = (items, attr) =>
     return 0;
   });
 
-exports.getPageUrls = async (id, url, hrefLang) => {
+const getXmlSitemapUrl = async url => {
   let robotsUrl = url.replace(localeRgx, "");
   robotsUrl =
     robotsUrl.charAt(robotsUrl.length - 1) === "/"
       ? robotsUrl + "robots.txt"
       : robotsUrl + "/robots.txt";
 
-  const { data: robotsData } = await axios(robotsUrl);
+  const { data } = await axios(robotsUrl);
 
-  const xmlUrl = robotsData.match(urlRgx)[0];
+  return data.match(urlRgx)[0];
+};
+exports.getXmlSitemapUrl = getXmlSitemapUrl;
 
-  const { data: xmlSitemapData } = await axios(xmlUrl);
+exports.getPageUrls = async (id, url, hrefLang) => {
+  const { data: xmlSitemapData } = await axios(await getXmlSitemapUrl(url));
 
   let xmlData = await xmlParser(xmlSitemapData);
 
@@ -176,7 +227,7 @@ exports.getPageUrls = async (id, url, hrefLang) => {
         .map(rawUrl => {
           let pageUrl;
 
-          if (hrefLang) {
+          if (hrefLang && rawUrl["xhtml:link"]) {
             // If hreflang arg is passed, get the link corresponding to that hreflang
             pageUrl = rawUrl["xhtml:link"]
               .filter(link => link.$.hreflang === hrefLang)
@@ -188,7 +239,8 @@ exports.getPageUrls = async (id, url, hrefLang) => {
           return {
             locale: id,
             localeUrl: url,
-            url: /https:\/\//gi.test(pageUrl) ? pageUrl : "https://" + pageUrl
+            url: /https:\/\//gi.test(pageUrl) ? pageUrl : "https://" + pageUrl,
+            inXmlSitemap: true
           };
         })
         .sort((first, second) => {
@@ -205,43 +257,42 @@ exports.getPageUrls = async (id, url, hrefLang) => {
     : [];
 };
 
-exports.mapTemplateDataToPage = (req, fields, template, pages) =>
-  // Iterate over items in uploaded xlsx template file {Title: "page title", SKU: "product sku",etc}
-  template.map(item => {
-    // Find the corresponding page in the list of all pages
-    const page = pages.find(page => page.url === item.url);
-    // const { data } = page;
-    const data = page?.data;
+const mapTemplateDataToPage = (req, fields, template, xmlPages) =>
+  // Iterate over items in uploaded xlsx template file {url: "https://...", Title: "page title", SKU: "product sku",etc}
+  template.map(templatePage => {
+    // Find the corresponding page in the list of all xmlPages
+    const page = xmlPages.find(xmlPage => xmlPage.url === templatePage.url);
+    const pageData = page?.data;
 
     const updatedData = {};
     fields.forEach(field => {
-      const pageDataValue = data && page.data[field]?.value;
-      const templateItem = item[field] && `${item[field]}`;
-      if (templateItem) {
+      const pageField = pageData && page.data[field]?.value;
+      const templateField = templatePage[field] && `${templatePage[field]}`;
+      if (templateField) {
         // Create the data entry for specific key/column in the uploaded xlsx template file or reapply existing data
         updatedData[field] = {
-          value: pageDataValue || templateItem,
+          value: pageField || templateField,
           createdAt: page?.data?.[field]?.createdAt || new Date().toISOString(),
           history: page?.data?.[field]?.history || []
         };
       }
 
-      // If page exists and it has the data for the specific key/column, check if they are different and store the difference in history array
+      // If page exists in XML Sitemap and it has the data for the specific key/column, check if they are different and store the difference in history array
       if (
         page &&
-        data &&
-        pageDataValue &&
-        templateItem &&
-        pageDataValue !== templateItem
+        pageData &&
+        pageField &&
+        templateField &&
+        pageField !== templateField
       ) {
         updatedData[field] = {
-          value: templateItem,
+          value: templateField,
           createdAt: page.data[field].createdAt,
           history: [
             ...page.data[field].history,
             {
               previousValue: page.data[field].value,
-              updatedValue: `${templateItem}`,
+              updatedValue: `${templateField}`,
               updatedAt: new Date().toISOString(),
               updatedBy: req.admin ? "admin" : req.query.key
             }
@@ -252,8 +303,9 @@ exports.mapTemplateDataToPage = (req, fields, template, pages) =>
 
     return {
       _id: page?._id || new mongoose.Types.ObjectId(),
-      url: page?.url || item.url,
-      type: item.type,
+      url: page?.url || templatePage.url,
+      type: templatePage.type,
+      inXmlSitemap: page?.inXmlSitemap || false,
       data: updatedData
     };
   });

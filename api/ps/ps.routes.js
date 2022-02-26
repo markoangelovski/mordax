@@ -1,11 +1,12 @@
 const router = require("express").Router();
 
 const { response } = require("../../lib/helpers.js");
+
+const { psIntAccountConfig } = require("./ps.interfaces.js");
+
 /**
  * PS interface endpoints
  */
-
-const { psIntAccountConfig } = require("./ps.interfaces.js");
 
 // Path: /api/1/ps/1/:accountId/config.js
 // Desc: Interface to
