@@ -17,7 +17,27 @@ exports.parsePageData = pageData => {
 
 exports.makePagesForRes = pages =>
   pages.map(page => {
-    page = { id: page._id, ...page._doc };
+    page = {
+      id: page._id,
+      url: page.url,
+      source: page.source,
+      type: page.type,
+      data: page.data,
+      BINLite: {
+        ...page.BINLite,
+        matches: page.BINLite.matches.map(match => ({
+          BuyNowUrl: match.BuyNowUrl,
+          RetailerName: match.RetailerName
+        }))
+      },
+      SC: page.SC,
+      PS: page.PS
+    };
+
+    if (!page.BINLite?.lastScan) delete page.BINLite;
+    if (!page.SC?.lastScan) delete page.SC;
+    if (!page.PS?.lastScan) delete page.PS;
+
     delete page._id;
     delete page.__v;
     delete page.locale;

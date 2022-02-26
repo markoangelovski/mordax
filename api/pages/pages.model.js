@@ -47,8 +47,7 @@ const pageSchema = new mongoose.Schema(
       matches: [
         {
           BuyNowUrl: { type: String, maxlength: 2048 },
-          RetailerName: { type: String, max: 256 },
-          Retailerlogo: { type: String }
+          RetailerName: { type: String, max: 256 }
         }
       ]
     }

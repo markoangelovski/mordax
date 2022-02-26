@@ -222,7 +222,7 @@ router.post("/product-data", async (req, res, next) => {
 // Path: /api/1/binlite/retailers
 // Desc: Fetch all BIN Lite sellers
 router.get("/retailers", async (req, res, next) => {
-  const { url } = req.query;
+  const { url, RetailerName } = req.query;
 
   try {
     const locale = await Locale.find({ "url.value": url }).select(
@@ -243,9 +243,9 @@ router.get("/retailers", async (req, res, next) => {
       });
     }
 
-    let BINLiteResult, status, message;
+    let result, status, message;
     try {
-      const result = await axios(
+      const { data } = await axios(
         BINLiteUrl.replace("{{binliteUpc}}", 1).replace("desired", "all"),
         {
           headers: {
@@ -256,7 +256,7 @@ router.get("/retailers", async (req, res, next) => {
         }
       );
 
-      BINLiteResult = result.data;
+      result = data;
     } catch (error) {
       error = error.isAxiosError ? error.toJSON() : error;
       console.warn(
@@ -267,15 +267,21 @@ router.get("/retailers", async (req, res, next) => {
       message = error.message;
     }
 
+    // If RetailerName is passed, filter it out from the results
+    if (RetailerName)
+      result = result.filter(
+        retailer => retailer.RetailerName === RetailerName
+      );
+
     response(
       res,
       200,
       false,
       {
-        sellersCount: BINLiteResult?.length,
+        sellersCount: result?.length,
         BINLiteAPI: status && { status, message }
       },
-      BINLiteResult
+      result
     );
   } catch (error) {
     console.warn("Error occurred in GET /api/1/binlite/retailers route", error);

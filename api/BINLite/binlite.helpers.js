@@ -35,7 +35,10 @@ exports.getSellerData = async (binliteId, BINLiteKey) => {
   return {
     binliteId,
     sellersOk,
-    matches,
+    matches: matches.map(match => {
+      delete match.Retailerlogo;
+      return match;
+    }),
     status,
     message
   };
