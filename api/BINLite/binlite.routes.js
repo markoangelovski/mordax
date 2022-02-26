@@ -291,4 +291,5 @@ router.get("/retailers", async (req, res, next) => {
     });
   }
 });
+
 module.exports = router;

@@ -9,17 +9,17 @@ const { getSellerData } = require("./sc.helpers.js");
 const { scButtonUrl, scCarouselUrl } = require("../../config");
 
 const { response } = require("../../lib/helpers.js");
+const { makePagesForRes } = require("../pages/pages.helpers.js");
 
 // Path: /api/1/sc/product-data/single?key=1234&url=https://herbalessences.com/en-us/&productUrl=https://&sku=1234
 // Desc: Fetches and updates the SC data for a single product for single locale in one SKU List
 router.get("/product-data/single", async (req, res, next) => {
-  const { url, id, SKU, mpIdFieldName } = req.query;
+  const { url, id, mpIdFieldName } = req.query;
 
   const query = {};
 
   if (id) query._id = id;
   if (url) query.url = url;
-  if (SKU) query["data.SKU.value"] = SKU;
 
   try {
     let product = await Page.find(query).select(`-__v`);
@@ -32,6 +32,7 @@ router.get("/product-data/single", async (req, res, next) => {
         products: product
       });
     } else if (!product.length) {
+      res.status(404);
       return next({
         message: "No products found that match the search query.",
         query
@@ -47,13 +48,15 @@ router.get("/product-data/single", async (req, res, next) => {
       product[0].data[mpIdFieldName].value
     );
 
+    const lastScan = new Date().toISOString();
+
     await Page.updateOne(
       { _id: product[0]._id },
       {
         $set: {
           SC: {
             ok: sellersOk,
-            lastScan: new Date().toISOString(),
+            lastScan,
             matches
           }
         }
@@ -70,13 +73,14 @@ router.get("/product-data/single", async (req, res, next) => {
       200,
       false,
       { sellersOk, matchesCount: matches.length },
-      {
+      makePagesForRes({
         ...product[0]._doc,
         SC: {
           ok: sellersOk,
+          lastScan,
           matches
         }
-      }
+      })
     );
   } catch (error) {
     console.warn("Error occurred in GET /api/1/sc/product-data route", error);

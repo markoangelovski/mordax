@@ -23,17 +23,30 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
     console.warn(error.message);
   }
 
+  const master_product_id = carouselData
+    ? carouselData.data.included.products.find(product => product.id === scMpId)
+        .attributes.master_product_id
+    : "";
+
   const matches = carouselData
-    ? carouselData.data.included["product-retailers"].map(retailer => ({
-        productName: retailer.attributes.name,
-        retailerName: retailer.attributes["action-attributes"].filter(item => {
-          if (item.attribute === "data-action-retailer") {
-            return item;
-          }
-        })[0].values[0],
-        url: retailer.attributes.link,
-        price: retailer.attributes["price-string"]
-      }))
+    ? carouselData.data.included["product-retailers"]
+        .filter(
+          retailer =>
+            retailer.relationships["master-product"].data.id ===
+            master_product_id.toString()
+        )
+        .map(retailer => ({
+          productName: retailer.attributes.name,
+          retailerName: retailer.attributes["action-attributes"].filter(
+            item => {
+              if (item.attribute === "data-action-retailer") {
+                return item;
+              }
+            }
+          )[0].values[0],
+          url: retailer.attributes.link,
+          price: retailer.attributes["price-string"]
+        }))
     : [];
 
   const sellersInfo = carouselData

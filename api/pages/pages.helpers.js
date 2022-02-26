@@ -15,8 +15,10 @@ exports.parsePageData = pageData => {
   return;
 };
 
-exports.makePagesForRes = pages =>
-  pages.map(page => {
+exports.makePagesForRes = pages => {
+  pages = Array.isArray(pages) ? pages : [pages];
+
+  return pages.map(page => {
     page = {
       id: page._id,
       url: page.url,
@@ -30,7 +32,17 @@ exports.makePagesForRes = pages =>
           RetailerName: match.RetailerName
         }))
       },
-      SC: page.SC,
+      SC: {
+        ...page.SC,
+        matches: page.SC.matches.map(match => ({
+          productName: match.productName,
+          retailerName: match.retailerName,
+          url: match.url,
+          price: match.price,
+          logo: match.logo,
+          miniLogo: match.miniLogo
+        }))
+      },
       PS: page.PS
     };
 
@@ -43,3 +55,4 @@ exports.makePagesForRes = pages =>
     delete page.locale;
     return page;
   });
+};
