@@ -12,7 +12,7 @@ const {
   psWwwassetsUrl,
   // @ts-ignore
   psEmbeddedcloudUrl
-} = require("../../config");
+} = require("./ps.config.json");
 
 const { fetchPs, censorKey } = require("./ps.helpers.js");
 

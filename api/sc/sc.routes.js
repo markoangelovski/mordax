@@ -6,7 +6,7 @@ const Locale = require("../locales/locales.model.js");
 
 const { getSellerData } = require("./sc.helpers.js");
 
-const { scButtonUrl, scCarouselUrl } = require("../../config");
+const { scButtonUrl, scCarouselUrl } = require("./sc.config.json");
 
 const { response } = require("../../lib/helpers.js");
 const { makePagesForRes } = require("../pages/pages.helpers.js");

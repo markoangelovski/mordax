@@ -1,4 +1,10 @@
 {
+  "psCdnUrl": "https://cdn.pricespider.com/1/",
+  "psLocateUrl": "https://locate.pricespider.com/",
+  "psCheckUrl": "https://check.pricespider.com/",
+  "psRedirUrl": "https://redir.pricespider.com/",
+  "psWwwassetsUrl": "https://wwwassets.pricespider.com/",
+  "psEmbeddedcloudUrl": "https://embeddedcloud.pricespider.com/",
   "errMsgs": {
     "generalApiErrMsg": "An error occurred with the request.",
     "catchEndpointErrMsg": "An error occurred in {{endpointName}} endpoint: ",

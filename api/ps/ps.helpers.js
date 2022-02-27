@@ -1,14 +1,7 @@
 // @ts-check
 const axios = require("axios").default;
 
-const { errMsgs } = require("./ps.config.json");
-
-// const { errMsg } = require("./ps.helpers.js");
-
-const {
-  // @ts-ignore
-  psRedirUrl
-} = require("../../config");
+const { errMsgs, psRedirUrl } = require("./ps.config.json");
 
 const { numbersOnlyRgx, mongoIdRgx } = require("../../lib/regex");
 

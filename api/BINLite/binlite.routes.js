@@ -5,7 +5,7 @@ const { getSellerData } = require("./binlite.helpers.js");
 
 const { response } = require("../../lib/helpers.js");
 
-const { BINLiteUrl } = require("../../config");
+const { BINLiteUrl } = require("./binlite.config.json");
 
 const Locale = require("../locales/locales.model.js");
 const Page = require("../pages/pages.model.js");

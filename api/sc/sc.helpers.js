@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const { scCarouselUrl } = require("../../config");
+const { scCarouselUrl } = require("./sc.config.json");
 
 exports.getSellerData = async (scCarouselKey, scMpId) => {
   let carouselData,

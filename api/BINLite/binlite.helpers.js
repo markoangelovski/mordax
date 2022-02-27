@@ -1,6 +1,6 @@
 const axios = require("axios").default;
 
-const { BINLiteUrl } = require("../../config");
+const { BINLiteUrl } = require("./binlite.config.json");
 
 exports.getSellerData = async (binliteId, BINLiteKey) => {
   let matches,

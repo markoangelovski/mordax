@@ -1,7 +1,7 @@
 // @ts-check
 const path = require("path");
 const fs = require("fs");
-const { Request, Response, NextFunction } = require("express");
+const { Request } = require("express");
 
 const {
   getAccountConfig,

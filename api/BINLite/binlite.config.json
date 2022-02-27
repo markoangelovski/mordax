@@ -1,0 +1,3 @@
+{
+  "BINLiteUrl": "https://az-apigateway-cs-prod-20180702.azure-api.net/buynowlite/api/retailers/{{binliteUpc}}/random/desired"
+}

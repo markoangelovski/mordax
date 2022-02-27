@@ -1,4 +1,8 @@
 node_modules
+
 public/*
 !public/Example_Template.xlsx
+
+api/ps/data/*
+
 .env
