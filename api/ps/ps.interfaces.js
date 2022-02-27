@@ -365,7 +365,7 @@ exports.psIntAccountDataFamiliesCountryLocale = async req => {
 
   const data = path.join(
     __dirname,
-    "../data/skus/",
+    "./data/skus/",
     countryCode.toUpperCase(),
     locale + ".json"
   );
@@ -386,10 +386,7 @@ exports.psIntAccountDataFamiliesCountryLocale = async req => {
 
     return {
       status: 422,
-      error: {
-        message: errMsgs.generalApiErrMsg,
-        errors: errMsg.create()
-      }
+      error: errMsg.create()
     };
   }
 
@@ -405,18 +402,19 @@ exports.psIntAccountDataFamiliesCountryLocale = async req => {
      */
     return { result };
   } catch (error) {
+    error = error.isAxiosError ? error.toJSON() : error;
     console.warn(
       errMsgs.catchEndpointErrMsg.replace(
         "{{endpointName}}",
         "psAccountDataRegionalPricingCountryPid"
       ),
-      error.isAxiosError ? error.toJSON() : error
+      error
     );
 
     /**
      * @type {Result}
      */
-    return { error };
+    return { status: error.status || error.config.status, error };
   }
 };
 

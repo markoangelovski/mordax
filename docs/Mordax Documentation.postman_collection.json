@@ -901,9 +901,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/config.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/config.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -938,9 +938,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/:cid/config.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/:cid/config.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -981,9 +981,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/skus/map.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/skus/map.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -1020,9 +1020,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/:cid/res/:lang.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/:cid/res/:lang.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -1069,9 +1069,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/locate?key={{key}}&ip=0&callback=PriceSpider.jsonp&_={{$timestamp}}",
+									"raw": "{{host}}/api/1/ps/int/locate?key={{key}}&ip=0&callback=PriceSpider.jsonp&_={{$timestamp}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -1109,9 +1109,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/skus/:countryCode/:sku.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/skus/:countryCode/:sku.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -1159,9 +1159,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/products/:pid.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/products/:pid.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -1198,14 +1198,64 @@
 							"response": []
 						},
 						{
+							"name": "/1/:accountId/data/families/:countryCode/:locale.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/families/:countryCode/:locale.js?key={{key}}",
+									"host": [
+										"{{host}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										"data",
+										"families",
+										":countryCode",
+										":locale.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "Account ID"
+										},
+										{
+											"key": "countryCode",
+											"value": "GB",
+											"description": "Country code"
+										},
+										{
+											"key": "locale.js",
+											"value": "UK_GilletteVenus.js",
+											"description": "Locale code"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
 							"name": "/1/postal-map/:countryCode.js",
 							"request": {
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/postal-map/:countryCode.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/postal-map/:countryCode.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -1240,9 +1290,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/stores/:countryCode/:areaCode/:pid.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/stores/:countryCode/:areaCode/:pid.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -1296,9 +1346,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/stock/:countryCode/:areaCode/:pid.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/stock/:countryCode/:areaCode/:pid.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -1352,9 +1402,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/regionalPricing/:countryCode/:areaCode/:pid.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/regionalPricing/:countryCode/:areaCode/:pid.js?key={{key}}",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",
@@ -1408,9 +1458,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{hostDev}}/api/1/ps/int/redirect?key={{key}}&cid=599cc3ce1a208d06c0fd2caa&iid=0522e76d-2597-4379-bf1b-9c9f95ee3146&v=2.4.15&pmid=91800296&price=9&stockStatus=1&widgetType=lightbox&t=2832840&postalCode=WC2&_={{$timestamp}}&includeSellerUrl",
+									"raw": "{{host}}/api/1/ps/int/redirect?key={{key}}&cid=599cc3ce1a208d06c0fd2caa&iid=0522e76d-2597-4379-bf1b-9c9f95ee3146&v=2.4.15&pmid=91800296&price=9&stockStatus=1&widgetType=lightbox&t=2832840&postalCode=WC2&_={{$timestamp}}&includeSellerUrl",
 									"host": [
-										"{{hostDev}}"
+										"{{host}}"
 									],
 									"path": [
 										"api",

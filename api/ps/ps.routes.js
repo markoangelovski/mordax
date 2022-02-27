@@ -114,14 +114,20 @@ router.get(
   }
 );
 
-// TODO: napravi heroku post-build da se buildaju PS locale data
-// // https://cdn.pricespider.com/1/:accountId/data/families/:countryCode/:locale.js
-// router.get(
-//   "/1/:accountId/data/families/:countryCode/:locale.js",
-//   async(req,res,next)=>{
-//     psIntAccountDataFamiliesCountryLocale
-//   }
-// );
+// https://cdn.pricespider.com/1/:accountId/data/families/:countryCode/:locale.js
+router.get(
+  "/int/1/:accountId/data/families/:countryCode/:locale.js",
+  async (req, res, next) => {
+    const int = await psIntAccountDataFamiliesCountryLocale(req);
+
+    if (int.error) {
+      res.status(int.status);
+      return next(int.error);
+    }
+
+    response(res, 200, false, {}, int.result);
+  }
+);
 
 // https://cdn.pricespider.com/1/postal-map/:countryCode.js
 router.get("/int/1/postal-map/:countryCode.js", async (req, res, next) => {
