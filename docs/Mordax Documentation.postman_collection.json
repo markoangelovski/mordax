@@ -663,11 +663,6 @@
 									"disabled": true
 								},
 								{
-									"key": "SKU",
-									"value": "123",
-									"disabled": true
-								},
-								{
 									"key": "mpIdFieldName",
 									"value": "mpId",
 									"description": "Field name in xlsx template for SC MP ID"
@@ -708,11 +703,6 @@
 									"key": "id",
 									"value": "1",
 									"description": "Product page ID",
-									"disabled": true
-								},
-								{
-									"key": "SKU",
-									"value": "123",
 									"disabled": true
 								},
 								{
@@ -759,11 +749,6 @@
 									"disabled": true
 								},
 								{
-									"key": "SKU",
-									"value": "123",
-									"disabled": true
-								},
-								{
 									"key": "mpIdFieldName",
 									"value": "mpId",
 									"description": "Field name in xlsx template for SC MP ID"
@@ -776,7 +761,7 @@
 			]
 		},
 		{
-			"name": "BIN Lite Copy",
+			"name": "BIN Lite",
 			"item": [
 				{
 					"name": "GET Product data single",
@@ -871,7 +856,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/binlite/retailers?key={{key}}&url=https://www.gillettevenus.ca/en-ca",
+							"raw": "{{host}}/api/1/binlite/retailers?key={{key}}&url=https://www.gillettevenus.ca/en-ca&RetailerName=Amazon",
 							"host": [
 								"{{host}}"
 							],
@@ -891,6 +876,11 @@
 									"key": "url",
 									"value": "https://www.gillettevenus.ca/en-ca",
 									"description": "Locale URL"
+								},
+								{
+									"key": "RetailerName",
+									"value": "Amazon",
+									"description": "Get single Retailer data by Retailer name"
 								}
 							]
 						}
@@ -911,9 +901,9 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/config.js?key={{key}}",
+									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/config.js?key={{key}}",
 									"host": [
-										"{{host}}"
+										"{{hostDev}}"
 									],
 									"path": [
 										"api",
@@ -935,7 +925,551 @@
 										{
 											"key": "accountId",
 											"value": "1766",
-											"description": "PS account id"
+											"description": "Account ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/1/:accountId/:cid/config.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/:cid/config.js?key={{key}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										":cid",
+										"config.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "Account ID"
+										},
+										{
+											"key": "cid",
+											"value": "599cc3ce1a208d06c0fd2caa",
+											"description": "Confing ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/1/:accountId/data/skus/map.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/skus/map.js?key={{key}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										"data",
+										"skus",
+										"map.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "Account ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/1/:accountId/:cid/res/:lang.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/:cid/res/:lang.js?key={{key}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										":cid",
+										"res",
+										":lang.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "Account ID"
+										},
+										{
+											"key": "cid",
+											"value": "599cc3ce1a208d06c0fd2caa",
+											"description": "Confing ID"
+										},
+										{
+											"key": "lang.js",
+											"value": "en.js",
+											"description": "Language code"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "locate",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/locate?key={{key}}&ip=0&callback=PriceSpider.jsonp&_={{$timestamp}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"locate"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "ip",
+											"value": "0"
+										},
+										{
+											"key": "callback",
+											"value": "PriceSpider.jsonp"
+										},
+										{
+											"key": "_",
+											"value": "{{$timestamp}}"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/1/:accountId/data/skus/:countryCode/:sku.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/skus/:countryCode/:sku.js?key={{key}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										"data",
+										"skus",
+										":countryCode",
+										":sku.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "Account ID"
+										},
+										{
+											"key": "countryCode",
+											"value": "GB",
+											"description": "Country code"
+										},
+										{
+											"key": "sku.js",
+											"value": "7702018401055.js",
+											"description": "Product SKU"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/1/:accountId/data/products/:pid.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/products/:pid.js?key={{key}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										"data",
+										"products",
+										":pid.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "Account ID"
+										},
+										{
+											"key": "pid.js",
+											"value": "10453778.js",
+											"description": "Product ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/1/postal-map/:countryCode.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/1/postal-map/:countryCode.js?key={{key}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										"postal-map",
+										":countryCode.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "countryCode.js",
+											"value": "gb.js",
+											"description": "Country code"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/1/:accountId/data/stores/:countryCode/(:areaCode/)?:pid.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/stores/:countryCode/:areaCode/:pid.js?key={{key}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										"data",
+										"stores",
+										":countryCode",
+										":areaCode",
+										":pid.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "Account ID"
+										},
+										{
+											"key": "countryCode",
+											"value": "GB",
+											"description": "Country code"
+										},
+										{
+											"key": "areaCode",
+											"value": "GL",
+											"description": "Area code"
+										},
+										{
+											"key": "pid.js",
+											"value": "10453778.js",
+											"description": "Product ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/1/:accountId/data/stock/:countryCode/(:areaCode/)?:pid.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/stock/:countryCode/:areaCode/:pid.js?key={{key}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										"data",
+										"stock",
+										":countryCode",
+										":areaCode",
+										":pid.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "Account ID"
+										},
+										{
+											"key": "countryCode",
+											"value": "GB",
+											"description": "Country code"
+										},
+										{
+											"key": "areaCode",
+											"value": "GL",
+											"description": "Area code"
+										},
+										{
+											"key": "pid.js",
+											"value": "10453778.js",
+											"description": "Product ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "/1/:accountId/data/regionalPricing/:countryCode/(:areaCode/)?:pid.js",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/1/:accountId/data/regionalPricing/:countryCode/:areaCode/:pid.js?key={{key}}",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"1",
+										":accountId",
+										"data",
+										"regionalPricing",
+										":countryCode",
+										":areaCode",
+										":pid.js"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										}
+									],
+									"variable": [
+										{
+											"key": "accountId",
+											"value": "1766",
+											"description": "Account ID"
+										},
+										{
+											"key": "countryCode",
+											"value": "GB",
+											"description": "Country code"
+										},
+										{
+											"key": "areaCode",
+											"value": "GL",
+											"description": "Area code"
+										},
+										{
+											"key": "pid.js",
+											"value": "10453778.js",
+											"description": "Product ID"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "redirect",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{hostDev}}/api/1/ps/int/redirect?key={{key}}&cid=599cc3ce1a208d06c0fd2caa&iid=0522e76d-2597-4379-bf1b-9c9f95ee3146&v=2.4.15&pmid=91800296&price=9&stockStatus=1&widgetType=lightbox&t=2832840&postalCode=WC2&_={{$timestamp}}&includeSellerUrl",
+									"host": [
+										"{{hostDev}}"
+									],
+									"path": [
+										"api",
+										"1",
+										"ps",
+										"int",
+										"redirect"
+									],
+									"query": [
+										{
+											"key": "key",
+											"value": "{{key}}",
+											"description": "API key, required"
+										},
+										{
+											"key": "cid",
+											"value": "599cc3ce1a208d06c0fd2caa",
+											"description": "Confing ID"
+										},
+										{
+											"key": "iid",
+											"value": "0522e76d-2597-4379-bf1b-9c9f95ee3146"
+										},
+										{
+											"key": "v",
+											"value": "2.4.15"
+										},
+										{
+											"key": "pmid",
+											"value": "91800296"
+										},
+										{
+											"key": "price",
+											"value": "9"
+										},
+										{
+											"key": "stockStatus",
+											"value": "1"
+										},
+										{
+											"key": "widgetType",
+											"value": "lightbox"
+										},
+										{
+											"key": "t",
+											"value": "2832840"
+										},
+										{
+											"key": "postalCode",
+											"value": "WC2"
+										},
+										{
+											"key": "_",
+											"value": "{{$timestamp}}"
+										},
+										{
+											"key": "includeSellerUrl",
+											"value": null,
+											"description": "Add to include Seller URL in response"
 										}
 									]
 								}

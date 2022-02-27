@@ -3,7 +3,7 @@ const axios = require("axios").default;
 
 const { errMsgs } = require("./ps.config.json");
 
-const { errMsg } = require("./ps.helpers.js");
+// const { errMsg } = require("./ps.helpers.js");
 
 const {
   // @ts-ignore
@@ -78,7 +78,7 @@ exports.censorKey = key => {
 /**
  * @type {ErrorMessageGenerator}
  */
-exports.errMsg = {
+const errMsg = {
   messages: [],
   _messages: [],
   /**
@@ -112,6 +112,7 @@ exports.errMsg = {
     return this._messages;
   }
 };
+exports.errMsg = errMsg;
 
 /**
  * Creates redirect URL
@@ -204,9 +205,6 @@ exports.validateRedirectUrlParams = reqQuery => {
 
   if (reqQuery.hasOwnProperty("widgetType") && !widgetType)
     errMsg.add("widgetType", reqQuery.widgetType, errMsgs.malWidgetType);
-
-  if (reqQuery.hasOwnProperty("postalCode") && !postalCode)
-    errMsg.add("postalCode", reqQuery.postalCode, errMsgs.malPostalCode);
 
   if (errMsg.messages.length) {
     return { errMsg };

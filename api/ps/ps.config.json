@@ -18,8 +18,7 @@
     "malPmidMissing": "PMID value missing or is malformed (required format: only numbers).",
     "malPrice": "Price value is malformed (required format: only numbers).",
     "malStock": "Stock status value is malformed (required format: only numbers, 0 or 1).",
-    "malWidgetType": "Widget type value is malformed.",
-    "malPostalCode": "Postal code value is malformed (required format: only numbers)."
+    "malWidgetType": "Widget type value is malformed."
   },
   "apiDescriptionMsg": "Welcome to GimmePrices, REST API for fetching PriceSpider data!",
   "countryCodes": [

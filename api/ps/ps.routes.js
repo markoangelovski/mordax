@@ -2,7 +2,21 @@ const router = require("express").Router();
 
 const { response } = require("../../lib/helpers.js");
 
-const { psIntAccountConfig } = require("./ps.interfaces.js");
+const {
+  psIntAccountConfig,
+  psAccountCidConfig,
+  psAccountDataSkusMap,
+  psAccountCidResLang,
+  psUserLocation,
+  psAccountDataSkusCountrySku,
+  psAccountDataProductsPid,
+  psIntAccountDataFamiliesCountryLocale,
+  psPostalMapCountry,
+  psIntAccountDataStoresCountryPid,
+  psAccountDataStockCountryPid,
+  psAccountDataRegionalPricingCountryPid,
+  psRedirect
+} = require("./ps.interfaces.js");
 
 /**
  * PS interface endpoints
@@ -23,54 +37,159 @@ router.get("/int/1/:accountId/config.js", async (req, res, next) => {
 });
 
 // // https://cdn.pricespider.com/1/:accountId/:cid/config.js
-// router.get("/1/:accountId/:cid/config.js", psAccountCidConfig);
+router.get("/int/1/:accountId/:cid/config.js", async (req, res, next) => {
+  const int = await psAccountCidConfig(req);
 
-// // https://cdn.pricespider.com/1/:accountId/data/skus/map.js DO NOT CREATE FRONTEND FOR THIS OR ADD IN DOCS!!! Response is over 1MB
-// router.get("/1/:accountId/data/skus/map.js", psAccountDataSkusMap);
+  if (int.error) {
+    res.status(int.status);
+    return next(int.error);
+  }
 
-// // https://cdn.pricespider.com/1/:accountId/:cid/res/:lang.js
-// router.get("/1/:accountId/:cid/res/:lang.js", psAccountCidResLang);
+  response(res, 200, false, {}, int.result);
+});
 
-// // https://locate.pricespider.com/?ip=0&callback=PriceSpider.jsonp&_={{$timestamp}}
-// router.get("/locate", psUserLocation);
+// https://cdn.pricespider.com/1/:accountId/data/skus/map.js DO NOT CREATE FRONTEND FOR THIS OR ADD IN DOCS!!! Response is over 1MB
+router.get("/int/1/:accountId/data/skus/map.js", async (req, res, next) => {
+  const int = await psAccountDataSkusMap(req);
 
-// // https://cdn.pricespider.com/1/:accountId/data/skus/:countryCode/:sku.js
-// router.get(
-//   "/1/:accountId/data/skus/:countryCode/:sku.js",
-//   psAccountDataSkusCountrySku
-// );
+  if (int.error) {
+    res.status(int.status);
+    return next(int.error);
+  }
 
-// // https://cdn.pricespider.com/1/:accountId/data/products/:pid.js
-// router.get("/1/:accountId/data/products/:pid.js", psAccountDataProductsPid);
+  response(res, 200, false, {}, int.result);
+});
 
+// https://cdn.pricespider.com/1/:accountId/:cid/res/:lang.js
+router.get("/int/1/:accountId/:cid/res/:lang.js", async (req, res, next) => {
+  const int = await psAccountCidResLang(req);
+
+  if (int.error) {
+    res.status(int.status);
+    return next(int.error);
+  }
+
+  response(res, 200, false, {}, int.result);
+});
+
+// https://locate.pricespider.com/?ip=0&callback=PriceSpider.jsonp&_={{$timestamp}}
+router.get("/int/locate", async (req, res, next) => {
+  const int = await psUserLocation(req);
+
+  if (int.error) {
+    res.status(int.status);
+    return next(int.error);
+  }
+
+  response(res, 200, false, {}, int.result);
+});
+
+// https://cdn.pricespider.com/1/:accountId/data/skus/:countryCode/:sku.js
+router.get(
+  "/int/1/:accountId/data/skus/:countryCode/:sku.js",
+  async (req, res, next) => {
+    const int = await psAccountDataSkusCountrySku(req);
+
+    if (int.error) {
+      res.status(int.status);
+      return next(int.error);
+    }
+
+    response(res, 200, false, {}, int.result);
+  }
+);
+
+// https://cdn.pricespider.com/1/:accountId/data/products/:pid.js
+router.get(
+  "/int/1/:accountId/data/products/:pid.js",
+  async (req, res, next) => {
+    const int = await psAccountDataProductsPid(req);
+
+    if (int.error) {
+      res.status(int.status);
+      return next(int.error);
+    }
+
+    response(res, 200, false, {}, int.result);
+  }
+);
+
+// TODO: napravi heroku post-build da se buildaju PS locale data
 // // https://cdn.pricespider.com/1/:accountId/data/families/:countryCode/:locale.js
 // router.get(
 //   "/1/:accountId/data/families/:countryCode/:locale.js",
-//   psAccountDataFamiliesCountryLocale
+//   async(req,res,next)=>{
+//     psIntAccountDataFamiliesCountryLocale
+//   }
 // );
 
-// // https://cdn.pricespider.com/1/postal-map/:countryCode.js
-// router.get("/1/postal-map/:countryCode.js", psPostalMapCountry);
+// https://cdn.pricespider.com/1/postal-map/:countryCode.js
+router.get("/int/1/postal-map/:countryCode.js", async (req, res, next) => {
+  const int = await psPostalMapCountry(req);
 
-// // https://cdn.pricespider.com/1/:accountId/data/stores/:countryCode/:areaCode/:pid.js
-// router.get(
-//   "/1/:accountId/data/stores/:countryCode/(:areaCode/)?:pid.js",
-//   psAccountDataStoresCountryPid
-// );
+  if (int.error) {
+    res.status(int.status);
+    return next(int.error);
+  }
 
-// // https://cdn.pricespider.com/1/:accountId/data/stock/:countryCode/:areaCode/:pid.js
-// router.get(
-//   "/1/:accountId/data/stock/:countryCode/(:areaCode/)?:pid.js",
-//   psAccountDataStockCountryPid
-// );
+  response(res, 200, false, {}, int.result);
+});
 
-// // https://cdn.pricespider.com/1/:accountId/data/regionalPricing/:countryCode/:areaCode/:pid.js
-// router.get(
-//   "/1/:accountId/data/regionalPricing/:countryCode/(:areaCode/)?:pid.js",
-//   psAccountDataRegionalPricingCountryPid
-// );
+// https://cdn.pricespider.com/1/:accountId/data/stores/:countryCode/:areaCode/:pid.js
+router.get(
+  "/int/1/:accountId/data/stores/:countryCode/(:areaCode/)?:pid.js",
+  async (req, res, next) => {
+    const int = await psIntAccountDataStoresCountryPid(req);
 
-// // https://redir.pricespider.com/redirect/?cid=5eeceefdab088c00340ef470&iid=f81a76a8-3d9c-46c6-aca7-efd8adee2a49&v=2.4.15&pmid=126222899&price=26.99&stockStatus=1&widgetType=lightbox&t=7500&postalCode=52220&n=0&_=1640662557019
-// router.get("/redirect", psRedirect);
+    if (int.error) {
+      res.status(int.status);
+      return next(int.error);
+    }
+
+    response(res, 200, false, {}, int.result);
+  }
+);
+
+// https://cdn.pricespider.com/1/:accountId/data/stock/:countryCode/:areaCode/:pid.js
+router.get(
+  "/int/1/:accountId/data/stock/:countryCode/(:areaCode/)?:pid.js",
+  async (req, res, next) => {
+    const int = await psAccountDataStockCountryPid(req);
+
+    if (int.error) {
+      res.status(int.status);
+      return next(int.error);
+    }
+
+    response(res, 200, false, {}, int.result);
+  }
+);
+
+// https://cdn.pricespider.com/1/:accountId/data/regionalPricing/:countryCode/:areaCode/:pid.js
+router.get(
+  "/int/1/:accountId/data/regionalPricing/:countryCode/(:areaCode/)?:pid.js",
+  async (req, res, next) => {
+    const int = await psAccountDataRegionalPricingCountryPid(req);
+
+    if (int.error) {
+      res.status(int.status);
+      return next(int.error);
+    }
+
+    response(res, 200, false, {}, int.result);
+  }
+);
+
+// https://redir.pricespider.com/redirect/?cid=5eeceefdab088c00340ef470&iid=f81a76a8-3d9c-46c6-aca7-efd8adee2a49&v=2.4.15&pmid=126222899&price=26.99&stockStatus=1&widgetType=lightbox&t=7500&postalCode=52220&n=0&_=1640662557019
+router.get("/int/redirect", async (req, res, next) => {
+  const int = await psRedirect(req);
+
+  if (int.error) {
+    res.status(int.status);
+    return next(int.error);
+  }
+
+  response(res, 200, false, {}, int.result);
+});
 
 module.exports = router;
