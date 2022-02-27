@@ -161,10 +161,28 @@ router.get("/single", locMw, async (req, res, next) => {
     ];
     if (includePages)
       queries.push(
-        Page.find({ localeUrl: url }).select("url type source data SC BINLite")
+        Page.find({ localeUrl: url }).select(
+          "url type source inXmlSitemap data SC BINLite"
+        )
       );
 
     const [existingLocale, existingLocalePages] = await Promise.all(queries);
+
+    let products = 0,
+      productsWithSellers = 0,
+      pagesNotInSitemap = 0;
+    otherPages = 0;
+
+    existingLocalePages.forEach(page => {
+      if (page.type === "product") products++;
+
+      if (!page.inXmlSitemap) pagesNotInSitemap++;
+
+      if (page.SC.matches.length) productsWithSellers++;
+      if (page.BINLite.matches.length) productsWithSellers++;
+
+      if (!page.type) otherPages++;
+    });
 
     if (existingLocale) {
       // TODO: napravi da se može downloadat ili cijela SKU lista kao exelica, ili samo proizvodi bez sellera
@@ -172,7 +190,13 @@ router.get("/single", locMw, async (req, res, next) => {
         res,
         200,
         false,
-        { locale: 1, pages: existingLocalePages.length },
+        {
+          pages: existingLocalePages.length,
+          pagesNotInSitemap,
+          products,
+          productsWithSellers,
+          otherPages
+        },
         {
           ...existingLocale._doc,
           pages: makePagesForRes(existingLocalePages).sort((first, second) => {
