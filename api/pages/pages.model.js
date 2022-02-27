@@ -46,10 +46,23 @@ const pageSchema = new mongoose.Schema(
       lastScan: Date,
       matches: [
         {
-          BuyNowUrl: { type: String, maxlength: 2048 },
-          RetailerName: { type: String, max: 256 }
+          buyNowUrl: { type: String, maxlength: 2048 },
+          retailerName: { type: String, max: 256 }
         }
       ]
+    },
+    PS: {
+      ok: Boolean,
+      lastScan: Date,
+      matches: [
+        {
+          pmid: { type: String, maxlength: 64 },
+          sid: { type: String, maxlength: 64 },
+          retailerName: { type: String, max: 256 },
+          price: { type: String, maxlength: 64 }
+        }
+      ],
+      offlineMatches: []
     }
   },
   { timestamps: true }

@@ -43,7 +43,14 @@ router.get("/product-data/single", async (req, res, next) => {
       "SC.scCarouselKey.value"
     );
 
-    const { sellersOk, matches } = await getSellerData(
+    if (!locale.SC?.scCarouselKey?.value) {
+      res.status(400);
+      return next({
+        message: `Locale ${locale.url.value} does not have SC related data.`
+      });
+    }
+
+    const { sellersOk, matches, status, message } = await getSellerData(
       locale.SC.scCarouselKey.value,
       product[0].data[mpIdFieldName].value
     );
@@ -72,7 +79,11 @@ router.get("/product-data/single", async (req, res, next) => {
       res,
       200,
       false,
-      { sellersOk, matchesCount: matches.length },
+      {
+        sellersOk,
+        matchesCount: matches.length,
+        SCAPI: status && { status, message }
+      },
       makePagesForRes({
         ...product[0]._doc,
         SC: {
@@ -116,6 +127,13 @@ router.post("/product-data", async (req, res, next) => {
       return next({
         message: "No products or locales found that match the search query.",
         queries: { productsQuery, localeQuery }
+      });
+    }
+
+    if (!locale[0].SC?.scCarouselKey?.value) {
+      res.status(400);
+      return next({
+        message: `Locale ${locale.url.value} does not have SC related data.`
       });
     }
 

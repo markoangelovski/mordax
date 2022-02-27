@@ -53,13 +53,15 @@ router.get("/product-data/single", async (req, res, next) => {
       locale.BINLite.BINLiteKey.value
     );
 
+    const lastScan = new Date().toISOString();
+
     await Page.updateOne(
       { _id: product[0]._id },
       {
         $set: {
           BINLite: {
             ok: sellersOk,
-            lastScan: new Date().toISOString(),
+            lastScan,
             matches
           }
         }
@@ -84,6 +86,7 @@ router.get("/product-data/single", async (req, res, next) => {
         ...product[0]._doc,
         BINLite: {
           ok: sellersOk,
+          lastScan,
           matches
         }
       }
@@ -125,6 +128,13 @@ router.post("/product-data", async (req, res, next) => {
       return next({
         message: "No products or locales found that match the search query.",
         queries: { productsQuery, localeQuery }
+      });
+    }
+
+    if (!locale[0].BINLite?.BINLiteKey?.value) {
+      res.status(400);
+      return next({
+        message: `Locale ${locale.url.value} does not have BIN Lite related data.`
       });
     }
 
@@ -223,7 +233,7 @@ router.post("/product-data", async (req, res, next) => {
 // Path: /api/1/binlite/retailers
 // Desc: Fetch all BIN Lite sellers
 router.get("/retailers", async (req, res, next) => {
-  const { url, RetailerName } = req.query;
+  const { url, retailerName } = req.query;
 
   try {
     const locale = await Locale.find({ "url.value": url }).select(
@@ -268,10 +278,10 @@ router.get("/retailers", async (req, res, next) => {
       message = error.message;
     }
 
-    // If RetailerName is passed, filter it out from the results
-    if (RetailerName)
+    // If retailerName is passed, filter it out from the results
+    if (retailerName)
       result = result.filter(
-        retailer => retailer.RetailerName === RetailerName
+        retailer => retailer.RetailerName === retailerName
       );
 
     response(

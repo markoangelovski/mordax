@@ -28,8 +28,8 @@ exports.makePagesForRes = pages => {
       BINLite: {
         ...page.BINLite,
         matches: page.BINLite.matches.map(match => ({
-          BuyNowUrl: match.BuyNowUrl,
-          RetailerName: match.RetailerName
+          buyNowUrl: match.buyNowUrl,
+          retailerName: match.retailerName
         }))
       },
       SC: {
@@ -43,7 +43,21 @@ exports.makePagesForRes = pages => {
           miniLogo: match.miniLogo
         }))
       },
-      PS: page.PS
+      PS: {
+        ...page.PS,
+        matches: page.PS.matches.map(match => ({
+          pmid: match.pmid,
+          sid: match.sid,
+          retailerName: match.retailerName,
+          price: match.price
+        })),
+        offlineMatches: page.PS.offlineMatches.map(match => ({
+          pmid: match.pmid,
+          sid: match.sid,
+          retailerName: match.retailerName,
+          price: match.price
+        }))
+      }
     };
 
     if (!page.BINLite?.lastScan) delete page.BINLite;

@@ -3,7 +3,7 @@ const axios = require("axios").default;
 
 const { errMsgs, psRedirUrl } = require("./ps.config.json");
 
-const { numbersOnlyRgx, mongoIdRgx } = require("../../lib/regex");
+const { numbersOnlyRgx, mongoIdRgx } = require("../../lib/regex.js");
 
 /**
  * Fetches data from URL and parses it to proper json.
@@ -256,3 +256,76 @@ function createGuid() {
     return ("x" == c ? r : (3 & r) | 8).toString(16);
   });
 }
+
+/**
+ * Seller data result
+ * @typedef {Object} SellerDataResult
+ * @property {string} psSku - Product's PS SKU value
+ * @property {boolean} sellersOk - Indicates whether API response is ok
+ * @property {Array<object>} matches - Matches array
+ * @property {number} status - Status code in case of error
+ * @property {string} message - Error message
+ */
+
+/**
+ *
+ * @param {string} accountId - PS Accounr ID
+ * @param {string} psSku - PS SKU of a particular product
+ * @param {string} countryCode - Country code
+ * @returns
+ */
+exports.getSellerData = async (accountId, psSku, countryCode) => {
+  let matches,
+    sellersOk = false,
+    status,
+    message;
+
+  try {
+    const {
+      getAccountDataSkusCountrySku,
+      getAccountDataProductsPid
+    } = require("./ps.drivers.js");
+
+    const { productId: pid } = await getAccountDataSkusCountrySku(
+      accountId,
+      countryCode.toUpperCase(),
+      psSku
+    );
+
+    const {
+      productMatches: { id, seller, price }
+    } = await getAccountDataProductsPid(
+      // Has to be imported like this otherwise it throws Circular Depenedencies error
+      accountId,
+      pid
+    );
+
+    matches = Array.from({ length: id.length }, (_, i) => ({
+      pmid: id[i],
+      sid: seller[i].id,
+      retailerName: seller[i].name,
+      price: price[i]
+    }));
+
+    sellersOk = true;
+  } catch (error) {
+    error = error.isAxiosError ? error.toJSON() : error;
+    console.warn(
+      "Error occurred while fetching PS data for single product, ",
+      error
+    );
+    status = error.status;
+    message = error.message;
+  }
+
+  /**
+   * @type {SellerDataResult}
+   */
+  return {
+    psSku,
+    sellersOk,
+    matches,
+    status,
+    message
+  };
+};

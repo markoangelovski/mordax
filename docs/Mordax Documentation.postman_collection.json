@@ -1527,6 +1527,103 @@
 							"response": []
 						}
 					]
+				},
+				{
+					"name": "GET Product data single",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/ps/product-data/single?key={{key}}&url=https://www.ninjamas.co/products/large-and-extra-large-bedwetting-underwear/&psSkuFieldName=psSku&countryCode=US",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"ps",
+								"product-data",
+								"single"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://www.ninjamas.co/products/large-and-extra-large-bedwetting-underwear/",
+									"description": "Product URL"
+								},
+								{
+									"key": "id",
+									"value": "1",
+									"description": "Product ID",
+									"disabled": true
+								},
+								{
+									"key": "psSkuFieldName",
+									"value": "psSku",
+									"description": "Field name in xlsx template for PS SKU"
+								},
+								{
+									"key": "countryCode",
+									"value": "US",
+									"description": "Country Code"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "GET Product data",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/api/1/ps/product-data?key={{key}}&url=https://www.ninjamas.co/&psSkuFieldName=psSku&countryCode=US",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"api",
+								"1",
+								"ps",
+								"product-data"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://www.ninjamas.co/",
+									"description": "Locale URL"
+								},
+								{
+									"key": "id",
+									"value": "62117a4f64ff2312bf870635",
+									"description": "Locale ID",
+									"disabled": true
+								},
+								{
+									"key": "psSkuFieldName",
+									"value": "psSku",
+									"description": "Field name in xlsx template for PS SKU"
+								},
+								{
+									"key": "countryCode",
+									"value": "US",
+									"description": "Country Code"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

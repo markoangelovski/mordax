@@ -6,7 +6,7 @@
   "private": "true",
   "scripts": {
     "start": "node ./api/index.js",
-    "dev": "docker-compose up & nodemon ./api/index.js",
+    "dev": "docker-compose up & nodemon --trace-warnings ./api/index.js",
     "heroku-postbuild": "node ./api/ps/ps.jobs.js"
   },
   "keywords": [],

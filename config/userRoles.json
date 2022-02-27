@@ -29,7 +29,9 @@
         [["GET"], "/api/1/sc/retailers"],
         [["GET"], "/api/1/binlite/product-data/single"],
         [["POST"], "/api/1/binlite/product-data"],
-        [["GET"], "/api/1/binlite/retailers"]
+        [["GET"], "/api/1/binlite/retailers"],
+        [["GET"], "/api/1/ps/product-data/single"],
+        [["POST"], "/api/1/ps/product-data"]
       ]
     },
     "editor": {
@@ -49,7 +51,9 @@
         [["GET"], "/api/1/sc/retailers"],
         [["GET"], "/api/1/binlite/product-data/single"],
         [["POST"], "/api/1/binlite/product-data"],
-        [["GET"], "/api/1/binlite/retailers"]
+        [["GET"], "/api/1/binlite/retailers"],
+        [["GET"], "/api/1/ps/product-data/single"],
+        [["POST"], "/api/1/ps/product-data"]
       ]
     },
     "analyst": {

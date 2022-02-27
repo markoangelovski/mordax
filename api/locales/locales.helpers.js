@@ -38,7 +38,8 @@ exports.makeLocaleForDb = (req, xmlSitemap) => {
     },
     PS: {
       psType: makeAttr(req.query.psType),
-      psKey: makeAttr(req.query.psKey)
+      psKey: makeAttr(req.query.psKey),
+      psAccountId: makeAttr(req.query.psAccountId)
     }
   };
 };
@@ -57,7 +58,8 @@ exports.makeLocaleForRes = locale => ({
   BINLiteKey: locale.BINLite.BINLiteKey?.value,
   psType: locale.PS.psType?.value,
   psKey: locale.PS.psKey?.value,
-  psType: locale.PS.psType?.value
+  psType: locale.PS.psType?.value,
+  psAccountId: locale.PS.psAccountId?.value
 });
 
 exports.updateLocale = req => {

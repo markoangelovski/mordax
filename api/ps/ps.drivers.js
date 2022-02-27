@@ -1,4 +1,6 @@
 // @ts-check
+const axios = require("axios").default;
+
 const {
   // @ts-ignore
   psCdnUrl,

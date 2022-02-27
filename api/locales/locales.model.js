@@ -66,7 +66,14 @@ const localeSchema = new mongoose.Schema(
           enum: ["embedded", "lightbox"]
         }
       },
-      psKey: objProps
+      psKey: objProps,
+      psAccountId: {
+        ...objProps,
+        value: {
+          type: String,
+          default: "1766"
+        }
+      }
     },
     privacy: {
       // TODO: dodaj i privacy da se šalje
@@ -91,6 +98,7 @@ localeSchema.pre("save", function (next) {
   if (!this.BINLite.BINLiteKey?.value) this.BINLite.BINLiteKey = undefined;
   if (!this.PS.psType?.value) this.PS.psType = undefined;
   if (!this.PS.psKey?.value) this.PS.psKey = undefined;
+  if (!this.PS.psKey?.value) this.PS.psAccountId = undefined;
   if (!this.capitol?.value) this.capitol = undefined;
   next();
 });

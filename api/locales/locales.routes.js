@@ -162,7 +162,7 @@ router.get("/single", locMw, async (req, res, next) => {
     if (includePages)
       queries.push(
         Page.find({ localeUrl: url }).select(
-          "url type source inXmlSitemap data SC BINLite"
+          "url type source inXmlSitemap data SC BINLite PS"
         )
       );
 
@@ -180,6 +180,7 @@ router.get("/single", locMw, async (req, res, next) => {
 
       if (page.SC.matches.length) productsWithSellers++;
       if (page.BINLite.matches.length) productsWithSellers++;
+      if (page.PS.matches.length) productsWithSellers++;
 
       if (!page.type) otherPages++;
     });
