@@ -24,6 +24,8 @@ exports.makePagesForRes = pages => {
       url: page.url,
       source: page.source,
       type: page.type,
+      SKU: page.SKU,
+      inXmlSitemap: page.inXmlSitemap,
       data: page.data,
       BINLite: {
         ...page.BINLite,

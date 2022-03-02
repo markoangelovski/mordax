@@ -99,7 +99,7 @@ router.delete("/", async (req, res, next) => {
   const ids = id.split(",").map(id => id.trim());
 
   try {
-    const { deletedCount } = await Page.remove({ _id: ids });
+    const { deletedCount } = await Page.deleteMany({ _id: ids });
 
     if (deletedCount) {
       response(

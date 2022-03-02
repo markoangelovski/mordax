@@ -7,24 +7,11 @@ const pageSchema = new mongoose.Schema(
       ref: "Locale",
       required: true
     },
-    localeUrl: {
-      type: String,
-      maxlength: 2048,
-      required: true
-    },
-    url: {
-      type: String,
-      maxlength: 2048,
-      required: true
-    },
-    type: {
-      type: String,
-      max: 256
-    },
-    source: {
-      type: String,
-      enum: ["feed", "single"]
-    },
+    localeUrl: { type: String, maxlength: 2048, required: true },
+    url: { type: String, maxlength: 2048, required: true },
+    source: { type: String, enum: ["feed", "single"] },
+    type: { type: String, max: 256 },
+    SKU: { type: String, max: 256 },
     inXmlSitemap: Boolean,
     data: {},
     SC: {

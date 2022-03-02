@@ -175,6 +175,7 @@ exports.updatePages = async req => {
           localeUrl: req.locale.url.value,
           url: page.url,
           type: page.type,
+          SKU: page.SKU,
           source: "feed",
           inXmlSitemap: page.inXmlSitemap,
           data: page.data
@@ -259,58 +260,89 @@ exports.getPageUrls = async (id, url, hrefLang) => {
     : [];
 };
 
-const mapTemplateDataToPage = (req, fields, template, xmlPages) =>
-  // Iterate over items in uploaded xlsx template file {url: "https://...", Title: "page title", SKU: "product sku",etc}
-  template.map(templatePage => {
-    // Find the corresponding page in the list of all xmlPages
-    const page = xmlPages.find(xmlPage => xmlPage.url === templatePage.url);
-    const pageData = page?.data;
+const mapTemplateDataToPage = (req, fields, template, existingPages) =>
+  // Iterate over items in uploaded xlsx template file {url: "https://...", Title: "page title", psSku: "pricespider sku",etc}
+  {
+    const existingPagesData = [];
 
-    const updatedData = {};
-    fields.forEach(field => {
-      const pageField = pageData && page.data[field]?.value;
-      const templateField = templatePage[field] && `${templatePage[field]}`;
-      if (templateField) {
-        // Create the data entry for specific key/column in the uploaded xlsx template file or reapply existing data
-        updatedData[field] = {
-          value: pageField || templateField,
-          createdAt: page?.data?.[field]?.createdAt || new Date().toISOString(),
-          history: page?.data?.[field]?.history || []
-        };
-      }
+    const updatedPages = template.map(templatePage => {
+      // Previously existing product pages will have the SKU as a unique identifier, first try finding the page to update by SKU first
+      let page = existingPages.find(existingPage => {
+        if (!templatePage.SKU || !existingPage.SKU) return false;
+        return existingPage.SKU === templatePage.SKU;
+      });
 
-      // If page exists in XML Sitemap and it has the data for the specific key/column, check if they are different and store the difference in history array
-      if (
-        page &&
-        pageData &&
-        pageField &&
-        templateField &&
-        pageField !== templateField
-      ) {
-        updatedData[field] = {
-          value: templateField,
-          createdAt: page.data[field].createdAt,
-          history: [
-            ...page.data[field].history,
-            {
-              previousValue: page.data[field].value,
-              updatedValue: `${templateField}`,
-              updatedAt: new Date().toISOString(),
-              updatedBy: req.admin ? "admin" : req.query.key
-            }
-          ]
-        };
-      }
+      // If page is not found, in case of new locale and fresh pages from xml, find the page by URL
+      if (!page)
+        page = existingPages.find(
+          existingPage => existingPage.url === templatePage.url
+        );
+
+      const pageData = page?.data;
+
+      const updatedData = {};
+      fields.forEach(field => {
+        const pageField = pageData && page.data[field]?.value;
+        let templateField = templatePage[field] && `${templatePage[field]}`; // remove apostrophes
+        if (/'/gi.test(templateField))
+          templateField = templateField.replace(/'/gi, "");
+        if (templateField) {
+          // Create the data entry for specific key/column in the uploaded xlsx template file or reapply existing data
+          updatedData[field] = {
+            value: pageField || templateField,
+            createdAt:
+              page?.data?.[field]?.createdAt || new Date().toISOString(),
+            history: page?.data?.[field]?.history || []
+          };
+        }
+
+        // If page exists in XML Sitemap and it has the data for the specific key/column, check if they are different and store the difference in history array
+        if (
+          page &&
+          pageData &&
+          pageField &&
+          templateField &&
+          pageField !== templateField
+        ) {
+          updatedData[field] = {
+            value: templateField,
+            createdAt: page.data[field].createdAt,
+            history: [
+              ...page.data[field].history,
+              {
+                previousValue: page.data[field].value,
+                updatedValue: `${templateField}`,
+                updatedAt: new Date().toISOString(),
+                updatedBy: req.admin ? "admin" : req.query.key
+              }
+            ]
+          };
+        }
+      });
+
+      const isVariant = existingPagesData.indexOf(page?._id.toString()) > -1;
+
+      const payload = {
+        _id:
+          isVariant || !page?.inXmlSitemap
+            ? new mongoose.Types.ObjectId()
+            : page?._id,
+        url: page?.url || templatePage.url,
+        type: templatePage.type,
+        SKU: templatePage.SKU?.toString().replace(/'/gi, ""),
+        inXmlSitemap: page?.inXmlSitemap || false,
+        data: updatedData
+      };
+
+      // Save a record of all URLs/pages in uploaded template. If single URL/page appears multiple times (in cases of variants of a single product), create a new Object ID for each variant.
+      existingPagesData.push(page?._id.toString());
+
+      return payload;
     });
 
-    return {
-      _id: page?._id || new mongoose.Types.ObjectId(),
-      url: page?.url || templatePage.url,
-      type: templatePage.type,
-      inXmlSitemap: page?.inXmlSitemap || false,
-      data: updatedData
-    };
-  });
+    // console.log("existingPagesData", existingPagesData);
+    return updatedPages;
+  };
 
 // exports.updateUrl=(url,newUrl)=>{
 //     // Update the URL in pages

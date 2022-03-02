@@ -126,10 +126,10 @@ router.post("/", async (req, res, next) => {
       false,
       {
         newLocale: req.newLocale,
-        pagesFound: req.pages.length || 0,
-        pagesSubmitted: updatedPagesRes?.pagesSubmitted,
-        pagesUpdated: updatedPagesRes?.pagesUpdated,
-        pagesCreated: updatedPagesRes?.pagesCreated
+        entriesFound: req.pages.length || 0,
+        entriesSubmitted: updatedPagesRes?.pagesSubmitted,
+        entriesUpdated: updatedPagesRes?.pagesUpdated,
+        entriesCreated: updatedPagesRes?.pagesCreated
       },
       makeLocaleForRes(updateLocale(req))
     );
@@ -160,27 +160,38 @@ router.get("/single", locMw, async (req, res, next) => {
       )
     ];
     if (includePages)
-      queries.push(
-        Page.find({ localeUrl: url }).select(
-          "url type source inXmlSitemap data SC BINLite PS"
-        )
-      );
+      queries.push(Page.find({ localeUrl: url }).select("-__v"));
 
     const [existingLocale, existingLocalePages] = await Promise.all(queries);
 
-    let products = 0,
-      productsWithSellers = 0,
-      pagesNotInSitemap = 0;
-    otherPages = 0;
+    const data = {};
+    let productsOrVariants = 0,
+      entriesWithSellers = 0,
+      pagesNotInSitemap = 0,
+      otherPages = 0;
+
+    const uniquePages = new Set(),
+      singleProducts = new Set();
 
     existingLocalePages.forEach(page => {
-      if (page.type === "product") products++;
+      uniquePages.add(page.url);
+
+      if (page.type === "product") {
+        productsOrVariants++;
+        singleProducts.add(page.url);
+      }
+
+      // Adds all other custom page types, such as articles, etc.
+      if (page.type && page.type !== "product") {
+        data[`${page.type}s`] = data[`${page.type}s`] || 0;
+        data[`${page.type}s`]++;
+      }
 
       if (!page.inXmlSitemap) pagesNotInSitemap++;
 
-      if (page.SC.matches.length) productsWithSellers++;
-      if (page.BINLite.matches.length) productsWithSellers++;
-      if (page.PS.matches.length) productsWithSellers++;
+      if (page.SC.matches.length) entriesWithSellers++;
+      if (page.BINLite.matches.length) entriesWithSellers++;
+      if (page.PS.matches.length) entriesWithSellers++;
 
       if (!page.type) otherPages++;
     });
@@ -192,10 +203,13 @@ router.get("/single", locMw, async (req, res, next) => {
         200,
         false,
         {
-          pages: existingLocalePages.length,
+          pages: uniquePages.size,
+          entries: existingLocalePages.length,
           pagesNotInSitemap,
-          products,
-          productsWithSellers,
+          products: singleProducts.size,
+          variants: productsOrVariants - singleProducts.size,
+          entriesWithSellers,
+          ...data,
           otherPages
         },
         {
@@ -242,30 +256,30 @@ router.get("/single", locMw, async (req, res, next) => {
 // Path: /api/1/locales/single/download?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
 // Desc: Fetches the pages data for a single locale
 router.get("/single/download", async (req, res, next) => {
-  // Detect if Vercel app is being used and redirect the request to Heroku app
-  // Vercel app has read-only filesystem and new files cannot be created
-  if (req.headers["x-vercel-forwarded-for"])
-    return res.redirect(require("../../config").hostHeroku + req.originalUrl);
-
   let { url } = req.query;
 
   try {
     const existingLocalePages = await Page.find({ localeUrl: url }).select(
-      "-_id url type data"
+      "-_id url source type SKU inXmlSitemap data"
     );
 
     if (existingLocalePages.length) {
-      const json = existingLocalePages.map(({ url, type, data }) => {
-        const keys = data && Object.keys(data);
+      const json = existingLocalePages.map(
+        ({ url, source, type, SKU, inXmlSitemap, data }) => {
+          const keys = data && Object.keys(data);
 
-        const payload = {
-          url,
-          type
-        };
+          const payload = {
+            url,
+            source,
+            type,
+            SKU,
+            inXmlSitemap
+          };
 
-        keys && keys.forEach(key => (payload[key] = data[key].value));
-        return payload;
-      });
+          keys && keys.forEach(key => (payload[key] = data[key].value));
+          return payload;
+        }
+      );
 
       const wb = xlsx.utils.book_new();
 
@@ -305,7 +319,7 @@ router.delete("/single", locMw, async (req, res, next) => {
   const { url } = req.query;
 
   try {
-    const [deletedLocales, deletedPages] = await Promise.all([
+    const [deletedLocales, deletedEntries] = await Promise.all([
       Locale.deleteOne({ "url.value": url }),
       Page.deleteMany({ localeUrl: url })
     ]);
@@ -317,7 +331,7 @@ router.delete("/single", locMw, async (req, res, next) => {
         false,
         {
           deletedLocales: deletedLocales.deletedCount,
-          deletedPages: deletedPages.deletedCount
+          deletedEntries: deletedEntries.deletedCount
         },
         {
           message: `Locale ${url} deleted successfully.`
@@ -383,3 +397,42 @@ router.get("/sitemap.xml", async (req, res, next) => {
 });
 
 module.exports = router;
+
+/**
+ *     if (existingLocalePages.length) {
+      const json = existingLocalePages.map(({ url, type, data }) => {
+        const keys = data && Object.keys(data);
+
+        const payload = {
+          url,
+          type
+        };
+
+        keys && keys.forEach(key => (payload[key] = data[key].value));
+        return payload;
+      });
+
+      const wb = xlsx.utils.book_new();
+
+      const ws_name = "Download";
+
+      const ws = xlsx.utils.json_to_sheet(json);
+
+      xlsx.utils.book_append_sheet(wb, ws, ws_name);
+
+      const savePath = `${path.join(__dirname, "../../", "/public")}/${url
+        .replace("https://", "")
+        .replace(/\//gi, "-")}_${Date.now()}.xlsx`;
+
+      xlsx.writeFile(wb, savePath);
+
+      res.download(savePath);
+
+      // TODO: napravi da se može downloadat ili cijela SKU lista kao exelica, ili samo proizvodi bez sellera
+    } else {
+      res.status(404);
+      next({
+        message: `Locale ${url} not found.`
+      });
+    }
+ */
