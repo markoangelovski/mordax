@@ -17,7 +17,8 @@ const {
   sortItems,
   getPageUrls,
   getXmlSitemapUrl,
-  updatePages
+  updatePages,
+  calculateLocaleStats
 } = require("./locales.helpers.js");
 
 const { makePagesForRes } = require("../pages/pages.helpers.js");
@@ -28,14 +29,22 @@ const { localeRgx, urlRgx } = require("../../lib/regex.js");
 // Desc: Fetches all brands and locales
 router.get("/", async (req, res, next) => {
   try {
-    const locales = await Locale.find().select("-_id brand locale url");
+    // const locales = await Locale.find().select("-_id brand locale url");
+
+    const [locales, total] = await Promise.all([
+      Locale.find()
+        .select("-_id brand locale url")
+        .skip(req.skip)
+        .limit(req.limit),
+      Locale.countDocuments().select("-_id brand locale url")
+    ]);
 
     if (locales.length) {
       response(
         res,
         200,
         false,
-        { locales: locales.length },
+        { locales: locales.length, skipped: req.skip || undefined, total },
         sortItems(
           locales.map(locale => makeLocaleForRes(locale)),
           "brand"
@@ -93,6 +102,9 @@ router.post("/", upload.single("template"), async (req, res, next) => {
       { newLocale: true, pagesFound: pages.length || 0 },
       makeLocaleForRes(savedLocale._doc)
     );
+
+    // Update locale stats
+    calculateLocaleStats(url);
   } catch (error) {
     console.warn(
       "Error occurred in POST (New, without template) /api/1/locales route",
@@ -134,6 +146,9 @@ router.post("/", async (req, res, next) => {
       makeLocaleForRes(updateLocale(req))
     );
 
+    // Update locale stats
+    calculateLocaleStats(req.query.url);
+
     // TODO: napravi funkciju koja uzima newUrl i updatea url u lokalu i pagevima. Zovi je u svakom post /locales endpointu.
   } catch (error) {
     console.warn(
@@ -159,42 +174,20 @@ router.get("/single", locMw, async (req, res, next) => {
         "-createdBy -_id -__v -brand.history._id -locale.history._id -url.history._id -SC.scButtonKey.history._id -SC.scCarouselKey.history._id -SC.scEcEndpointKey.history._id -BINLite.BINLiteKey.history._id -PS.psType.history._id -PS.psKey.history._id -capitol.history._id"
       )
     ];
-    if (includePages)
-      queries.push(Page.find({ localeUrl: url }).select("-__v"));
+    if (includePages) {
+      queries.push(
+        Page.find({ localeUrl: url })
+          .select("-__v")
+          .limit(req.limit)
+          .skip(req.skip)
+      );
 
-    const [existingLocale, existingLocalePages] = await Promise.all(queries);
+      queries.push(Page.countDocuments({ localeUrl: url }));
+    }
 
-    const data = {};
-    let productsOrVariants = 0,
-      entriesWithSellers = 0,
-      pagesNotInSitemap = 0,
-      otherPages = 0;
-
-    const uniquePages = new Set(),
-      singleProducts = new Set();
-
-    existingLocalePages.forEach(page => {
-      uniquePages.add(page.url);
-
-      if (page.type === "product") {
-        productsOrVariants++;
-        singleProducts.add(page.url);
-      }
-
-      // Adds all other custom page types, such as articles, etc.
-      if (page.type && page.type !== "product") {
-        data[`${page.type}s`] = data[`${page.type}s`] || 0;
-        data[`${page.type}s`]++;
-      }
-
-      if (!page.inXmlSitemap) pagesNotInSitemap++;
-
-      if (page.SC.matches.length) entriesWithSellers++;
-      if (page.BINLite.matches.length) entriesWithSellers++;
-      if (page.PS.matches.length) entriesWithSellers++;
-
-      if (!page.type) otherPages++;
-    });
+    const [existingLocale, existingLocalePages, total] = await Promise.all(
+      queries
+    );
 
     if (existingLocale) {
       // TODO: napravi da se može downloadat ili cijela SKU lista kao exelica, ili samo proizvodi bez sellera
@@ -203,39 +196,36 @@ router.get("/single", locMw, async (req, res, next) => {
         200,
         false,
         {
-          pages: uniquePages.size,
-          entries: existingLocalePages.length,
-          pagesNotInSitemap,
-          products: singleProducts.size,
-          variants: productsOrVariants - singleProducts.size,
-          entriesWithSellers,
-          ...data,
-          otherPages
+          entries: existingLocalePages?.length,
+          skipped: req.skip || undefined,
+          total
         },
         {
           ...existingLocale._doc,
-          pages: makePagesForRes(existingLocalePages).sort((first, second) => {
-            var A = first;
-            var B = second;
+          pages:
+            existingLocalePages &&
+            makePagesForRes(existingLocalePages).sort((first, second) => {
+              var A = first;
+              var B = second;
 
-            // Sort the pages with type first
-            if (A.type && !B.type) {
-              return -1;
-            }
-            if (!A.type && B.type) {
-              return 1;
-            }
+              // Sort the pages with type first
+              if (A.type && !B.type) {
+                return -1;
+              }
+              if (!A.type && B.type) {
+                return 1;
+              }
 
-            // Sort the pages with type alphabetically?
-            if (A.type < B.type) {
-              return -1;
-            }
-            if (A.type > B.type) {
-              return 1;
-            }
+              // Sort the pages with type alphabetically?
+              if (A.type < B.type) {
+                return -1;
+              }
+              if (A.type > B.type) {
+                return 1;
+              }
 
-            return 0;
-          })
+              return 0;
+            })
         }
       );
     } else {
@@ -397,42 +387,3 @@ router.get("/sitemap.xml", async (req, res, next) => {
 });
 
 module.exports = router;
-
-/**
- *     if (existingLocalePages.length) {
-      const json = existingLocalePages.map(({ url, type, data }) => {
-        const keys = data && Object.keys(data);
-
-        const payload = {
-          url,
-          type
-        };
-
-        keys && keys.forEach(key => (payload[key] = data[key].value));
-        return payload;
-      });
-
-      const wb = xlsx.utils.book_new();
-
-      const ws_name = "Download";
-
-      const ws = xlsx.utils.json_to_sheet(json);
-
-      xlsx.utils.book_append_sheet(wb, ws, ws_name);
-
-      const savePath = `${path.join(__dirname, "../../", "/public")}/${url
-        .replace("https://", "")
-        .replace(/\//gi, "-")}_${Date.now()}.xlsx`;
-
-      xlsx.writeFile(wb, savePath);
-
-      res.download(savePath);
-
-      // TODO: napravi da se može downloadat ili cijela SKU lista kao exelica, ili samo proizvodi bez sellera
-    } else {
-      res.status(404);
-      next({
-        message: `Locale ${url} not found.`
-      });
-    }
- */

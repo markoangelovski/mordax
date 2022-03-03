@@ -46,6 +46,7 @@ const localeSchema = new mongoose.Schema(
         unique: true
       }
     },
+    stats: {}, // Contains the stats for pages, such as a number of entries, unique pages, pages not in sitemap, etc.
     fields: [stringProps],
     thirdParties: [stringProps],
     xmlSitemap: stringProps,

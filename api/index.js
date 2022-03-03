@@ -8,6 +8,7 @@ const { connectDb } = require("../db/mongo.js");
 const { checkKey } = require("../middleware/auth.js");
 const { analytics } = require("../middleware/analytics.js");
 const { notFound, errorHandler } = require("../middleware/errorHandlers.js");
+const { pagination } = require("../middleware/pagination.js");
 
 const app = express();
 
@@ -21,11 +22,7 @@ app.use(morgan("combined"));
 const savedKeys = [];
 app.use(checkKey(savedKeys));
 app.use(analytics);
-app.use((req, res, next) => {
-  // Sets the cache for Vercel https://vercel.com/guides/using-express-with-vercel#standalone-express
-  res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
-  next();
-});
+app.use(pagination);
 
 // Home route
 app.get("/", (req, res) => {

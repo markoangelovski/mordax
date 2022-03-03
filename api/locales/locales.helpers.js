@@ -5,6 +5,7 @@ const xlsx = require("xlsx");
 
 const { urlRgx, localeRgx } = require("../../lib/regex");
 
+const Locale = require("./locales.model.js");
 const Page = require("../pages/pages.model.js");
 
 exports.makeLocaleForDb = (req, xmlSitemap) => {
@@ -343,6 +344,68 @@ const mapTemplateDataToPage = (req, fields, template, existingPages) =>
     // console.log("existingPagesData", existingPagesData);
     return updatedPages;
   };
+
+exports.calculateLocaleStats = url => {
+  Page.find({ localeUrl: url })
+    .select("url type inXmlSitemap SC BINLite PS")
+    .then(pages => {
+      const data = {};
+      let productsOrVariants = 0,
+        entriesWithSellers = 0,
+        pagesNotInSitemap = 0,
+        otherPages = 0;
+
+      const uniquePages = new Set(),
+        singleProducts = new Set();
+
+      pages.forEach(page => {
+        uniquePages.add(page.url);
+
+        if (page.type === "product") {
+          productsOrVariants++;
+          singleProducts.add(page.url);
+        }
+
+        // Adds all other custom page types, such as articles, etc.
+        if (page.type && page.type !== "product") {
+          data[`${page.type}s`] = data[`${page.type}s`] || 0;
+          data[`${page.type}s`]++;
+        }
+
+        if (!page.inXmlSitemap) pagesNotInSitemap++;
+
+        if (page.SC.matches.length) entriesWithSellers++;
+        if (page.BINLite.matches.length) entriesWithSellers++;
+        if (page.PS.matches.length) entriesWithSellers++;
+
+        if (!page.type) otherPages++;
+      });
+
+      const stats = {
+        pages: uniquePages.size,
+        entries: pages.length,
+        pagesNotInSitemap,
+        products: singleProducts.size,
+        variants: productsOrVariants - singleProducts.size,
+        entriesWithSellers,
+        ...data,
+        otherPages
+      };
+
+      return Locale.updateOne({ "url.value": url }, { $set: { stats } });
+    })
+    .then(({ modifiedCount }) =>
+      console.log(`Locale ${url} ${modifiedCount ? "" : "not "}updated.`)
+    )
+    .catch(err =>
+      console.warn(
+        "Error occurred while adding pages stats to locale",
+        url,
+        ".",
+        err
+      )
+    );
+};
 
 // exports.updateUrl=(url,newUrl)=>{
 //     // Update the URL in pages

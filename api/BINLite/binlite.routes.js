@@ -1,14 +1,15 @@
 const axios = require("axios").default;
 const router = require("express").Router();
 
-const { getSellerData } = require("./binlite.helpers.js");
-
-const { response } = require("../../lib/helpers.js");
-
-const { BINLiteUrl } = require("./binlite.config.json");
-
 const Locale = require("../locales/locales.model.js");
 const Page = require("../pages/pages.model.js");
+
+const { getSellerData } = require("./binlite.helpers.js");
+const { BINLiteUrl } = require("./binlite.config.json");
+
+const { calculateLocaleStats } = require("../locales/locales.helpers.js");
+
+const { response } = require("../../lib/helpers.js");
 
 // Path: /api/1/binlite/product-data/single
 // Desc: Fetch BIN Lite details for single SKU
@@ -91,6 +92,9 @@ router.get("/product-data/single", async (req, res, next) => {
         }
       }
     );
+
+    // Update locale stats
+    calculateLocaleStats(req.query.url);
   } catch (error) {
     console.warn(
       "Error occurred in GET /api/1/binlite/product-data/single route",
@@ -221,6 +225,9 @@ router.post("/product-data", async (req, res, next) => {
       },
       [...successPayload, ...failsPayload]
     );
+
+    // Update locale stats
+    calculateLocaleStats(req.query.url);
   } catch (error) {
     console.warn("Error occurred in GET /api/1/sc/product-data route", error);
     next({

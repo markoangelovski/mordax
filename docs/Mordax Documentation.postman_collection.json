@@ -134,6 +134,18 @@
 									"key": "key",
 									"value": "{{key}}",
 									"description": "API key, required"
+								},
+								{
+									"key": "limit",
+									"value": null,
+									"description": "Number of locales to fetch, max 100",
+									"disabled": true
+								},
+								{
+									"key": "skip",
+									"value": null,
+									"description": "Number of locales to skip",
+									"disabled": true
 								}
 							]
 						}
@@ -257,7 +269,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/locales/single?key={{key}}&url=https://herbalessences.com/en-us/&includePages=true",
+							"raw": "{{host}}/api/1/locales/single?key={{key}}&url=https://herbalessences.com/en-us/&includePages=true&limit=20&skip=0",
 							"host": [
 								"{{host}}"
 							],
@@ -280,7 +292,7 @@
 								},
 								{
 									"key": "download",
-									"value": null,
+									"value": "",
 									"description": "Not available",
 									"disabled": true
 								},
@@ -288,6 +300,16 @@
 									"key": "includePages",
 									"value": "true",
 									"description": "Send \"true\" to include individual pages in response"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Number of pages to fetch, max 100"
+								},
+								{
+									"key": "skip",
+									"value": "0",
+									"description": "Number of pages to skip"
 								}
 							]
 						}

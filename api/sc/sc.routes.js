@@ -8,8 +8,10 @@ const { getSellerData } = require("./sc.helpers.js");
 
 const { scButtonUrl, scCarouselUrl } = require("./sc.config.json");
 
-const { response } = require("../../lib/helpers.js");
 const { makePagesForRes } = require("../pages/pages.helpers.js");
+const { calculateLocaleStats } = require("../locales/locales.helpers.js");
+
+const { response } = require("../../lib/helpers.js");
 
 // Path: /api/1/sc/product-data/single?key=1234&url=https://herbalessences.com/en-us/&productUrl=https://&sku=1234
 // Desc: Fetches and updates the SC data for a single product for single locale in one SKU List
@@ -93,6 +95,9 @@ router.get("/product-data/single", async (req, res, next) => {
         }
       })
     );
+
+    // Update locale stats
+    calculateLocaleStats(req.query.url);
   } catch (error) {
     console.warn("Error occurred in GET /api/1/sc/product-data route", error);
     next({
@@ -219,6 +224,9 @@ router.post("/product-data", async (req, res, next) => {
       },
       [...successPayload, ...failsPayload, ...noSellersPayload]
     );
+
+    // Update locale stats
+    calculateLocaleStats(req.query.url);
   } catch (error) {
     console.warn("Error occurred in GET /api/1/sc/product-data route", error);
     next({

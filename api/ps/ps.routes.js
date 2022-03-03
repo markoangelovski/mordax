@@ -23,6 +23,8 @@ const {
   psRedirect
 } = require("./ps.interfaces.js");
 
+const { calculateLocaleStats } = require("../locales/locales.helpers.js");
+
 // Path: /api/1/ps/product-data/single?key=1234&url=https://www.ninjamas.co/products/large-and-extra-large-bedwetting-underwear/&psSkuFieldName=psSku&countryCode=US
 // Desc: Fetch PS details for single SKU
 router.get("/product-data/single", async (req, res, next) => {
@@ -105,6 +107,9 @@ router.get("/product-data/single", async (req, res, next) => {
         }
       }
     );
+
+    // Update locale stats
+    calculateLocaleStats(req.query.url);
   } catch (error) {
     console.warn(
       "Error occurred in GET /api/1/ps/product-data/single route",
@@ -235,6 +240,9 @@ router.post("/product-data", async (req, res, next) => {
       },
       [...successPayload, ...failsPayload, ...noSellersPayload]
     );
+
+    // Update locale stats
+    calculateLocaleStats(req.query.url);
   } catch (error) {
     console.warn("Error occurred in GET /api/1/ps/product-data route", error);
     next({
