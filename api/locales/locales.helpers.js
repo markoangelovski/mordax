@@ -60,7 +60,9 @@ exports.makeLocaleForRes = locale => ({
   psType: locale.PS.psType?.value,
   psKey: locale.PS.psKey?.value,
   psType: locale.PS.psType?.value,
-  psAccountId: locale.PS.psAccountId?.value
+  psAccountId: locale.PS.psAccountId?.value,
+  createdAt: locale.createdAt,
+  updatedAt: locale.updatedAt
 });
 
 exports.updateLocale = req => {

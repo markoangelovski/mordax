@@ -33,7 +33,7 @@ router.get("/", async (req, res, next) => {
 
     const [locales, total] = await Promise.all([
       Locale.find()
-        .select("-_id brand locale url")
+        .select("-_id brand locale url createdAt updatedAt")
         .skip(req.skip)
         .limit(req.limit),
       Locale.countDocuments().select("-_id brand locale url")
@@ -44,7 +44,12 @@ router.get("/", async (req, res, next) => {
         res,
         200,
         false,
-        { locales: locales.length, skipped: req.skip || undefined, total },
+        {
+          locales: locales.length,
+          limit: req.limit,
+          skipped: req.skip || undefined,
+          total
+        },
         sortItems(
           locales.map(locale => makeLocaleForRes(locale)),
           "brand"
