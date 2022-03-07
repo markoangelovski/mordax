@@ -247,12 +247,6 @@
 									"disabled": true
 								},
 								{
-									"key": "psType",
-									"value": "embedded",
-									"description": "embedded or lightbox",
-									"disabled": true
-								},
-								{
 									"key": "psKey",
 									"value": "123",
 									"description": "PS key",
@@ -1225,7 +1219,7 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/families/:countryCode/:locale.js?key={{key}}",
+									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/families/:countryCode/:instance.js?key=38bdc151d133343bd6234563d40895c5",
 									"host": [
 										"{{host}}"
 									],
@@ -1239,13 +1233,18 @@
 										"data",
 										"families",
 										":countryCode",
-										":locale.js"
+										":instance.js"
 									],
 									"query": [
 										{
 											"key": "key",
 											"value": "{{key}}",
-											"description": "API key, required"
+											"description": "API key, required",
+											"disabled": true
+										},
+										{
+											"key": "key",
+											"value": "38bdc151d133343bd6234563d40895c5"
 										}
 									],
 									"variable": [
@@ -1260,9 +1259,8 @@
 											"description": "Country code"
 										},
 										{
-											"key": "locale.js",
-											"value": "UK_GilletteVenus.js",
-											"description": "Locale code"
+											"key": "instance.js",
+											"value": "UK_GilletteVenus.js"
 										}
 									]
 								}

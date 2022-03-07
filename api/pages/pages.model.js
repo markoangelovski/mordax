@@ -13,6 +13,8 @@ const pageSchema = new mongoose.Schema(
     type: { type: String, max: 256 },
     SKU: { type: String, max: 256 },
     inXmlSitemap: Boolean,
+    active: Boolean,
+    comment: { type: String, max: 256 }, // Comment on why the page is no longer active, if needed
     data: {},
     SC: {
       ok: Boolean,

@@ -7,6 +7,7 @@ const { urlRgx, localeRgx } = require("../../lib/regex");
 
 const Locale = require("./locales.model.js");
 const Page = require("../pages/pages.model.js");
+const { getAccountCidConfig } = require("../ps/ps.drivers");
 
 exports.makeLocaleForDb = (req, xmlSitemap) => {
   const makeAttr = attribute => ({
@@ -38,29 +39,23 @@ exports.makeLocaleForDb = (req, xmlSitemap) => {
       BINLiteKey: makeAttr(req.query.BINLiteKey)
     },
     PS: {
-      psType: makeAttr(req.query.psType),
-      psKey: makeAttr(req.query.psKey),
-      psAccountId: makeAttr(req.query.psAccountId)
+      psAccountId: makeAttr(req.query.psKey.split("-")[0]),
+      psCid: makeAttr(req.query.psKey.split("-")[1])
     }
   };
 };
 
 exports.makeLocaleForRes = locale => ({
-  // createdBy: locale.createdBy,
-  brand: locale.brand.value,
-  locale: locale.locale.value,
-  url: locale.url.value,
+  createdBy: locale.createdBy,
+  brand: locale.brand,
+  locale: locale.locale,
+  url: locale.url,
   fields: locale.fields,
   thirdParties: locale.thirdParties,
-  capitol: locale.capitol?.value,
-  scButtonKey: locale.SC.scButtonKey?.value,
-  scCarouselKey: locale.SC.scCarouselKey?.value,
-  scEcEndpointKey: locale.SC.scEcEndpointKey?.value,
-  BINLiteKey: locale.BINLite.BINLiteKey?.value,
-  psType: locale.PS.psType?.value,
-  psKey: locale.PS.psKey?.value,
-  psType: locale.PS.psType?.value,
-  psAccountId: locale.PS.psAccountId?.value,
+  capitol: locale.capitol,
+  SC: locale.SC,
+  BINLite: locale.BINLite,
+  PS: locale.PS,
   createdAt: locale.createdAt,
   updatedAt: locale.updatedAt
 });
@@ -140,15 +135,23 @@ exports.updateLocale = req => {
     req.query.BINLiteKey,
     key
   );
-  locale.PS.psType = updateAttr(locale.PS.psType, req.query.psType, key);
-  locale.PS.psKey = updateAttr(locale.PS.psKey, req.query.psKey, key);
+  locale.PS.psAccountId = updateAttr(
+    locale.PS.psAccountId,
+    req.query.psKey.split("-")[0],
+    key
+  );
+  locale.PS.psCid = updateAttr(
+    locale.PS.psCid,
+    req.query.psKey.split("-")[1],
+    key
+  );
 
   if (!locale.SC?.scButtonKey?.value) locale.SC.scButtonKey = undefined;
   if (!locale.SC?.scCarouselKey?.value) locale.SC.scCarouselKey = undefined;
   if (!locale.SC?.scEcEndpointKey?.value) locale.SC.scEcEndpointKey = undefined;
   if (!locale.BINLite.BINLiteKey?.value) locale.BINLite.BINLiteKey = undefined;
-  if (!locale.PS.psType?.value) locale.PS.psType = undefined;
-  if (!locale.PS.psKey?.value) locale.PS.psKey = undefined;
+  if (!locale.PS.psAccountId?.value) locale.PS.psAccountId = undefined;
+  if (!locale.PS.psCid?.value) locale.PS.psCid = undefined;
   if (!locale.capitol?.value) locale.capitol = undefined;
 
   return locale;
@@ -181,6 +184,7 @@ exports.updatePages = async req => {
           SKU: page.SKU,
           source: "feed",
           inXmlSitemap: page.inXmlSitemap,
+          active: page.active ? page.active : true,
           data: page.data
         }
       },
@@ -246,7 +250,8 @@ exports.getPageUrls = async (id, url, hrefLang) => {
             locale: id,
             localeUrl: url,
             url: /https:\/\//gi.test(pageUrl) ? pageUrl : "https://" + pageUrl,
-            inXmlSitemap: true
+            inXmlSitemap: true,
+            active: true
           };
         })
         .sort((first, second) => {
@@ -397,7 +402,9 @@ exports.calculateLocaleStats = url => {
       return Locale.updateOne({ "url.value": url }, { $set: { stats } });
     })
     .then(({ modifiedCount }) =>
-      console.log(`Locale ${url} ${modifiedCount ? "" : "not "}updated.`)
+      console.log(
+        `Pages stats for locale ${url}${modifiedCount ? "" : "not"} updated.`
+      )
     )
     .catch(err =>
       console.warn(
@@ -405,6 +412,49 @@ exports.calculateLocaleStats = url => {
         url,
         ".",
         err
+      )
+    );
+};
+
+exports.updateLocalePsDetails = locale => {
+  if (!locale.PS.psAccountId.value) return;
+
+  return getAccountCidConfig(locale.PS.psAccountId.value, locale.PS.psCid.value)
+    .then(result => {
+      const filteredMatches = result.rules.filter(
+        rule => rule.match.countryCode.length && rule.match.tag.length
+      );
+      const psInstances = filteredMatches.map(({ match }) =>
+        match.tag[0].replace(" ", "_")
+      );
+      const psCountries = filteredMatches.map(
+        ({ match }) => match.countryCode[0]
+      );
+      const psLanguages = Object.keys(result.res);
+
+      return Locale.updateOne(
+        { _id: locale._id },
+        {
+          $set: {
+            "PS.psInstances": psInstances,
+            "PS.psCountries": psCountries,
+            "PS.psLanguages": psLanguages
+          }
+        }
+      );
+    })
+    .then(({ modifiedCount }) =>
+      console.log(
+        `PriceSpider details for locale ${locale.url.value}${
+          modifiedCount ? "" : "not"
+        } updated.`
+      )
+    )
+    .catch(error =>
+      console.warn(
+        "Error occured when adding PS data to locale ",
+        locale.url,
+        error
       )
     );
 };

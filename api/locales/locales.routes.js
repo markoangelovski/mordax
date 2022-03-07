@@ -18,7 +18,8 @@ const {
   getPageUrls,
   getXmlSitemapUrl,
   updatePages,
-  calculateLocaleStats
+  calculateLocaleStats,
+  updateLocalePsDetails
 } = require("./locales.helpers.js");
 
 const { makePagesForRes } = require("../pages/pages.helpers.js");
@@ -110,6 +111,9 @@ router.post("/", upload.single("template"), async (req, res, next) => {
 
     // Update locale stats
     calculateLocaleStats(url);
+
+    // Update PS details
+    updateLocalePsDetails(req.locale);
   } catch (error) {
     console.warn(
       "Error occurred in POST (New, without template) /api/1/locales route",
@@ -154,6 +158,9 @@ router.post("/", async (req, res, next) => {
     // Update locale stats
     calculateLocaleStats(req.query.url);
 
+    // Update PS details
+    updateLocalePsDetails(req.locale);
+
     // TODO: napravi funkciju koja uzima newUrl i updatea url u lokalu i pagevima. Zovi je u svakom post /locales endpointu.
   } catch (error) {
     console.warn(
@@ -176,7 +183,7 @@ router.get("/single", locMw, async (req, res, next) => {
   try {
     const queries = [
       Locale.findOne({ "url.value": url }).select(
-        "-createdBy -_id -__v -brand.history._id -locale.history._id -url.history._id -SC.scButtonKey.history._id -SC.scCarouselKey.history._id -SC.scEcEndpointKey.history._id -BINLite.BINLiteKey.history._id -PS.psType.history._id -PS.psKey.history._id -capitol.history._id"
+        "-createdBy -_id -__v -brand.history._id -locale.history._id -url.history._id -SC.scButtonKey.history._id -SC.scCarouselKey.history._id -SC.scEcEndpointKey.history._id -BINLite.BINLiteKey.history._id -PS.psKey.history._id -capitol.history._id"
       )
     ];
     if (includePages) {
