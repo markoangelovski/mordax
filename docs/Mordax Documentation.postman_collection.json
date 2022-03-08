@@ -1554,7 +1554,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/ps/product-data/single?key={{key}}&url=https://www.ninjamas.co/products/large-and-extra-large-bedwetting-underwear/&psSkuFieldName=psSku&countryCode=US",
+							"raw": "{{host}}/api/1/ps/product-data/single?key={{key}}&url=https://www.ninjamas.co/products/large-and-extra-large-bedwetting-underwear/&psSkuFieldName=psSku&countryCode=US&psInstance=US_Ninjamas",
 							"host": [
 								"{{host}}"
 							],
@@ -1591,6 +1591,11 @@
 									"key": "countryCode",
 									"value": "US",
 									"description": "Country Code"
+								},
+								{
+									"key": "psInstance",
+									"value": "US_Ninjamas",
+									"description": "PS Instance, ex. US_Ninjamas"
 								}
 							]
 						}
@@ -1603,7 +1608,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/ps/product-data?key={{key}}&url=https://www.ninjamas.co/&psSkuFieldName=psSku&countryCode=US",
+							"raw": "{{host}}/api/1/ps/product-data?key={{key}}&url=https://www.ninjamas.co/&psSkuFieldName=psSku&countryCode=US&psInstance=US_Ninjamas",
 							"host": [
 								"{{host}}"
 							],
@@ -1639,6 +1644,11 @@
 									"key": "countryCode",
 									"value": "US",
 									"description": "Country Code"
+								},
+								{
+									"key": "psInstance",
+									"value": "US_Ninjamas",
+									"description": "PS Instance, ex. US_Ninjamas"
 								}
 							]
 						}
