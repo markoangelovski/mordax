@@ -268,37 +268,50 @@ function createGuid() {
  */
 
 /**
- *
+ * Get seller data
  * @param {string} accountId - PS Accounr ID
  * @param {string} psSku - PS SKU of a particular product
  * @param {string} countryCode - Country code
- * @returns
+ * @param {string} psInstance - PS Instance
+ * @returns {Promise<SellerDataResult>} Seller data result
  */
-exports.getSellerData = async (accountId, psSku, countryCode) => {
+exports.getSellerData = async (accountId, psSku, countryCode, psInstance) => {
   let matches,
     sellersOk = false,
     status,
-    message;
+    message,
+    psInstanceData,
+    pid;
 
   try {
+    // Has to be imported like this otherwise it throws Circular Depenedencies error
     const {
       getAccountDataSkusCountrySku,
       getAccountDataProductsPid
     } = require("./ps.drivers.js");
 
-    const { productId: pid } = await getAccountDataSkusCountrySku(
-      accountId,
-      countryCode.toUpperCase(),
-      psSku
-    );
+    try {
+      psInstanceData = require(`./data/skus/${countryCode.toUpperCase()}/${psInstance}.json`);
+    } catch (error) {
+      console.warn(
+        `No local PS data found for country: ${countryCode} and PS instance: ${psInstance}`
+      );
+    }
+
+    if (psInstanceData) {
+      pid = psInstanceData[psSku];
+    } else {
+      const { productId } = await getAccountDataSkusCountrySku(
+        accountId,
+        countryCode.toUpperCase(),
+        psSku
+      );
+      pid = productId;
+    }
 
     const {
       productMatches: { id, seller, price }
-    } = await getAccountDataProductsPid(
-      // Has to be imported like this otherwise it throws Circular Depenedencies error
-      accountId,
-      pid
-    );
+    } = await getAccountDataProductsPid(accountId, pid);
 
     matches = Array.from({ length: id.length }, (_, i) => ({
       pmid: id[i],

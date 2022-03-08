@@ -28,7 +28,7 @@ const { calculateLocaleStats } = require("../locales/locales.helpers.js");
 // Path: /api/1/ps/product-data/single?key=1234&url=https://www.ninjamas.co/products/large-and-extra-large-bedwetting-underwear/&psSkuFieldName=psSku&countryCode=US
 // Desc: Fetch PS details for single SKU
 router.get("/product-data/single", async (req, res, next) => {
-  const { url, id, psSkuFieldName, countryCode } = req.query;
+  const { url, id, psSkuFieldName, countryCode, psInstance } = req.query;
 
   const query = {};
 
@@ -43,7 +43,14 @@ router.get("/product-data/single", async (req, res, next) => {
       return next({
         message: "Multiple products found that match the search query.",
         query,
-        products: product
+        products: product.map(product => {
+          const payload = {
+            id: product._doc._id,
+            ...product._doc
+          };
+          delete payload._id;
+          return payload;
+        })
       });
     } else if (!product.length) {
       return next({
@@ -66,7 +73,8 @@ router.get("/product-data/single", async (req, res, next) => {
     const { sellersOk, matches, status, message } = await getSellerData(
       locale.PS.psAccountId.value,
       product[0].data[psSkuFieldName].value,
-      countryCode
+      countryCode,
+      psInstance
     );
 
     const lastScan = new Date().toISOString();
@@ -125,7 +133,7 @@ router.get("/product-data/single", async (req, res, next) => {
 // Path: /api/1/ps/product-data?key=1234&url=https://herbalessences.com/en-us/&productUrl=https://&sku=1234
 // Desc: Fetches the PS data for a all products for single locale in one SKU List
 router.post("/product-data", async (req, res, next) => {
-  const { url, id, psSkuFieldName, countryCode } = req.query;
+  const { url, id, psSkuFieldName, countryCode, psInstance } = req.query;
 
   const productsQuery = { type: "product" };
 
@@ -138,14 +146,14 @@ router.post("/product-data", async (req, res, next) => {
   if (url) localeQuery["url.value"] = url;
 
   try {
-    const [products, locale] = await Promise.all([
-      Page.find(productsQuery).select(`url data.${psSkuFieldName}.value`),
+    const [entries, locale] = await Promise.all([
+      Page.find(productsQuery).select(`url type data.${psSkuFieldName}.value`),
       Locale.find(localeQuery).select("PS.psAccountId.value")
     ]);
 
-    if (!products.length || !locale.length) {
+    if (!entries.length || !locale.length) {
       return next({
-        message: "No products or locales found that match the search query.",
+        message: "No entries or locales found that match the search query.",
         queries: { productsQuery, localeQuery }
       });
     }
@@ -157,19 +165,20 @@ router.post("/product-data", async (req, res, next) => {
       });
     }
 
-    const sellerDataQueries = products
-      .filter(product => product.data[psSkuFieldName]?.value !== undefined)
-      .map(product =>
+    const sellerDataQueries = entries
+      .filter(entry => entry.data[psSkuFieldName]?.value !== undefined)
+      .map(entry =>
         getSellerData(
           locale[0].PS.psAccountId.value,
-          product.data[psSkuFieldName].value,
-          countryCode
+          entry.data[psSkuFieldName].value,
+          countryCode,
+          psInstance
         )
           .then(result => result)
           .catch(err =>
             console.warn(
-              "Error occurred while fetching PS data for product: ",
-              product.url,
+              "Error occurred while fetching PS data for entry: ",
+              entry.url,
               err
             )
           )
@@ -205,14 +214,14 @@ router.post("/product-data", async (req, res, next) => {
     const { nModified } = await Page.bulkWrite(bulkWrites);
 
     const mapResult = result => {
-      const product = products.find(
-        product => product.data[psSkuFieldName]?.value === result.psSku
+      const entry = entries.find(
+        entry => entry.data[psSkuFieldName]?.value === result.psSku
       );
 
       return {
-        id: product._id,
-        url: product.url,
-        [psSkuFieldName]: product.data[psSkuFieldName]?.value,
+        id: entry._id,
+        url: entry.url,
+        [psSkuFieldName]: entry.data[psSkuFieldName]?.value,
         PS: {
           ok: result.sellersOk,
           matchesCount: result.matches?.length,
@@ -227,13 +236,17 @@ router.post("/product-data", async (req, res, next) => {
     const failsPayload = failedAttempts.map(mapResult);
     const noSellersPayload = failedAttempts.map(mapResult);
 
+    const singleProducts = new Set();
+    entries.forEach(entry => singleProducts.add(entry.url));
+
     response(
       res,
       200,
       false,
       {
-        productsCount: products.length,
-        updatedProductsCount: nModified,
+        productsCount: singleProducts.size,
+        variantsCount: entries.length - singleProducts.size,
+        updatedEntriesCount: nModified,
         successAttemptsCount: successAttempts.length,
         failedAttemptsCount: failedAttempts.length,
         noSellersAttemptsCount: noSellersAttempts.length
