@@ -36,7 +36,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-app.use("/api/1", require("./router.js"));
+app.use("/1", require("./router.js"));
 
 // Error handlers
 app.use(notFound);
