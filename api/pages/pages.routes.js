@@ -6,21 +6,25 @@ const Locale = require("../locales/locales.model.js");
 const { response } = require("../../lib/helpers");
 const { parsePageData, makePagesForRes } = require("./pages.helpers.js");
 
-// Path: /api/1/pages
-// Desc: Fetch a page
+// Path: /1/pages
+// Desc: Fetch a single page
 router.get("/", async (req, res, next) => {
-  const { pageUrl } = req.query;
+  const { pageUrl, id } = req.query;
+
+  const query = { url: pageUrl };
+  if (id) query._id = id;
+
   try {
-    let pages = await Page.find({ url: pageUrl }).select("-__v -locale");
+    let pages = await Page.find(query).select("-__v -locale");
 
     if (pages.length) {
-      pages = pages.map(page => {
-        page = { id: page._id, ...page._doc };
-        delete page._id;
-        return page;
-      });
-
-      response(res, 200, false, { pages: pages.length }, pages);
+      response(
+        res,
+        200,
+        false,
+        { pages: pages.length },
+        makePagesForRes(pages)
+      );
     } else {
       res.status(404);
       next({
@@ -64,7 +68,7 @@ router.post("/", async (req, res, next) => {
 
       if (!locale) {
         res.status(404);
-        next({
+        return next({
           message: `Locale ${localeUrl} not found.`
         });
       }
@@ -82,7 +86,7 @@ router.post("/", async (req, res, next) => {
         201,
         false,
         { pages: 1, action: "Added new page" },
-        makePagesForRes([page])
+        makePagesForRes(page)
       );
     }
   } catch (error) {

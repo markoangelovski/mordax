@@ -22,6 +22,7 @@ exports.makePagesForRes = pages => {
     page = {
       id: page._id,
       url: page.url,
+      localeUrl: page.localeUrl,
       source: page.source,
       type: page.type,
       SKU: page.SKU,

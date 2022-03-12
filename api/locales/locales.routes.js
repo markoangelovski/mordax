@@ -26,7 +26,7 @@ const { makePagesForRes } = require("../pages/pages.helpers.js");
 const { response } = require("../../lib/helpers.js");
 const { localeRgx, urlRgx } = require("../../lib/regex.js");
 
-// Path: /api/1/locales
+// Path: /1/locales
 // Desc: Fetches all brands and locales
 router.get("/", async (req, res, next) => {
   try {
@@ -71,7 +71,7 @@ router.get("/", async (req, res, next) => {
   }
 });
 
-// Path: /api/1/locales
+// Path: /1/locales
 // Desc: Creates a new locale
 router.post("/", upload.single("template"), async (req, res, next) => {
   const { url, hrefLang } = req.query;
@@ -126,7 +126,7 @@ router.post("/", upload.single("template"), async (req, res, next) => {
   }
 });
 
-// Path: /api/1/locales
+// Path: /1/locales
 // Desc: Updates a locale
 router.post("/", async (req, res, next) => {
   try {
@@ -174,7 +174,7 @@ router.post("/", async (req, res, next) => {
   }
 });
 
-// Path: /api/1/locales/single?key=123456789&url=https://www.herbalessences.com
+// Path: /1/locales/single?key=123456789&url=https://www.herbalessences.com
 // Desc: Fetches the pages data for a single locale
 router.get("/single", locMw, async (req, res, next) => {
   let { url, includePages } = req.query;
@@ -213,7 +213,7 @@ router.get("/single", locMw, async (req, res, next) => {
           total
         },
         {
-          ...existingLocale._doc,
+          ...makeLocaleForRes(existingLocale._doc),
           pages:
             existingLocalePages &&
             makePagesForRes(existingLocalePages).sort((first, second) => {
@@ -255,7 +255,7 @@ router.get("/single", locMw, async (req, res, next) => {
   }
 });
 
-// Path: /api/1/locales/single/download?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
+// Path: /1/locales/single/download?key=123456789&url=https://www.herbalessences.com&download=all/noSellers
 // Desc: Fetches the pages data for a single locale
 router.get("/single/download", async (req, res, next) => {
   let { url } = req.query;
@@ -315,7 +315,7 @@ router.get("/single/download", async (req, res, next) => {
   }
 });
 
-// Path: /api/1/locales/single?key=123456789&url=https://www.herbalessences.com
+// Path: /1/locales/single?key=123456789&url=https://www.herbalessences.com
 // Desc: Deletes the locale and related pages list
 router.delete("/single", locMw, async (req, res, next) => {
   const { url } = req.query;
@@ -354,13 +354,13 @@ router.delete("/single", locMw, async (req, res, next) => {
   }
 });
 
-// Path: /api/1/locales/template
+// Path: /1/locales/template
 // Desc: Downloads the Pages List template
 router.get("/template", async (req, res, next) =>
   res.download(path.join(__dirname, "../../public/Example_Template.xlsx"))
 );
 
-// Path: /api/1/locales/sitemap.xml
+// Path: /1/locales/sitemap.xml
 // Desc: Fetches xml sitemap
 router.get("/sitemap.xml", async (req, res, next) => {
   const { url } = req.query;

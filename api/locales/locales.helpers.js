@@ -39,8 +39,8 @@ exports.makeLocaleForDb = (req, xmlSitemap) => {
       BINLiteKey: makeAttr(req.query.BINLiteKey)
     },
     PS: {
-      psAccountId: makeAttr(req.query.psKey.split("-")[0]),
-      psCid: makeAttr(req.query.psKey.split("-")[1])
+      psAccountId: makeAttr(req.query.psKey?.split("-")[0]),
+      psCid: makeAttr(req.query.psKey?.split("-")[1])
     }
   };
 };
@@ -50,12 +50,91 @@ exports.makeLocaleForRes = locale => ({
   brand: locale.brand,
   locale: locale.locale,
   url: locale.url,
+  stats: locale.stats,
   fields: locale.fields,
   thirdParties: locale.thirdParties,
-  capitol: locale.capitol,
-  SC: locale.SC,
-  BINLite: locale.BINLite,
-  PS: locale.PS,
+  xmlSitemap: locale.xmlSitemap,
+  capitol: locale.capitol?.value
+    ? {
+        ...locale.capitol,
+        history: locale.capitol.history.map(item => ({
+          previousValue: item.previousValue,
+          updatedValue: item.updatedValue,
+          updatedAt: item.updatedAt,
+          updatedBy: item.updatedBy
+        }))
+      }
+    : undefined,
+  SC:
+    locale.SC.scButtonKey.value ||
+    locale.SC.scCarouselKey.value ||
+    locale.SC.scEcEndpointKey.value
+      ? {
+          scButtonKey: {
+            ...locale.SC.scButtonKey,
+            history: locale.SC.scButtonKey.history?.map(item => ({
+              previousValue: item.previousValue,
+              updatedValue: item.updatedValue,
+              updatedAt: item.updatedAt,
+              updatedBy: item.updatedBy
+            }))
+          },
+          scCarouselKey: {
+            ...locale.SC.scCarouselKey,
+            history: locale.SC.scCarouselKey.history?.map(item => ({
+              previousValue: item.previousValue,
+              updatedValue: item.updatedValue,
+              updatedAt: item.updatedAt,
+              updatedBy: item.updatedBy
+            }))
+          },
+          scEcEndpointKey: {
+            ...locale.SC.scEcEndpointKey,
+            history: locale.SC.scEcEndpointKey.history?.map(item => ({
+              previousValue: item.previousValue,
+              updatedValue: item.updatedValue,
+              updatedAt: item.updatedAt,
+              updatedBy: item.updatedBy
+            }))
+          }
+        }
+      : undefined,
+  BINLite: locale.BINLite.BINLiteKey?.value
+    ? {
+        BINLiteKey: {
+          ...locale.BINLite.BINLiteKey,
+          history: locale.BINLite.BINLiteKey.history?.map(item => ({
+            previousValue: item.previousValue,
+            updatedValue: item.updatedValue,
+            updatedAt: item.updatedAt,
+            updatedBy: item.updatedBy
+          }))
+        }
+      }
+    : undefined,
+  PS: locale.PS.psAccountId?.value
+    ? {
+        ...locale.PS,
+        psAccountId: {
+          ...locale.PS.psAccountId,
+          history: locale.PS.psAccountId?.history?.map(item => ({
+            previousValue: item.previousValue,
+            updatedValue: item.updatedValue,
+            updatedAt: item.updatedAt,
+            updatedBy: item.updatedBy
+          }))
+        },
+        psCid: {
+          ...locale.PS.psCid,
+          history: locale.PS.psCid?.history?.map(item => ({
+            previousValue: item.previousValue,
+            updatedValue: item.updatedValue,
+            updatedAt: item.updatedAt,
+            updatedBy: item.updatedBy
+          }))
+        }
+      }
+    : undefined,
   createdAt: locale.createdAt,
   updatedAt: locale.updatedAt
 });
@@ -137,12 +216,12 @@ exports.updateLocale = req => {
   );
   locale.PS.psAccountId = updateAttr(
     locale.PS.psAccountId,
-    req.query.psKey.split("-")[0],
+    req.query.psKey?.split("-")[0],
     key
   );
   locale.PS.psCid = updateAttr(
     locale.PS.psCid,
-    req.query.psKey.split("-")[1],
+    req.query.psKey?.split("-")[1],
     key
   );
 
@@ -417,7 +496,7 @@ exports.calculateLocaleStats = url => {
 };
 
 exports.updateLocalePsDetails = locale => {
-  if (!locale.PS.psAccountId.value) return;
+  if (!locale.PS.psAccountId?.value) return;
 
   return getAccountCidConfig(locale.PS.psAccountId.value, locale.PS.psCid.value)
     .then(result => {
@@ -453,8 +532,8 @@ exports.updateLocalePsDetails = locale => {
     .catch(error =>
       console.warn(
         "Error occured when adding PS data to locale ",
-        locale.url,
-        error
+        locale.url.value,
+        error.isAxiosError ? error.toJSON() : error.message
       )
     );
 };

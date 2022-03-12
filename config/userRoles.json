@@ -1,6 +1,6 @@
 {
   "allRoles": ["user", "team", "editor", "analyst"],
-  "openEndpoints": ["", "/", "/api/1/docs"],
+  "openEndpoints": ["", "/", "/1/docs"],
   "roleMap": {
     "admin": {
       "allowedRoles": ["// All roles"],
@@ -8,52 +8,52 @@
     },
     "user": {
       "allowedRoles": [],
-      "allowedEndpoints": [[["GET"], "/api/1/locales/template"]]
+      "allowedEndpoints": [[["GET"], "/1/locales/template"]]
     },
     "team": {
       "allowedRoles": ["user", "editor"],
       "allowedEndpoints": [
-        [["POST"], "/api/1/keys/create-key"],
-        [["POST"], "/api/1/keys/deactivate-key"],
-        [["GET"], "/api/1/keys/key-info"],
-        [["GET", "POST"], "/api/1/locales"],
-        [["GET", "DELETE"], "/api/1/locales/single"],
-        [["GET"], "/api/1/locales/single/download"],
-        [["GET"], "/api/1/locales/template"],
-        [["GET"], "/api/1/locales/sitemap.xml"],
-        [["GET", "POST", "DELETE"], "/api/1/pages"],
-        [["GET"], "/api/1/sc/button"],
-        [["GET"], "/api/1/sc/carousel"],
-        [["GET"], "/api/1/sc/product-data/single"],
-        [["POST"], "/api/1/sc/product-data"],
-        [["GET"], "/api/1/sc/retailers"],
-        [["GET"], "/api/1/binlite/product-data/single"],
-        [["POST"], "/api/1/binlite/product-data"],
-        [["GET"], "/api/1/binlite/retailers"],
-        [["GET"], "/api/1/ps/product-data/single"],
-        [["POST"], "/api/1/ps/product-data"]
+        [["POST"], "/1/keys/create-key"],
+        [["POST"], "/1/keys/deactivate-key"],
+        [["GET"], "/1/keys/key-info"],
+        [["GET", "POST"], "/1/locales"],
+        [["GET", "DELETE"], "/1/locales/single"],
+        [["GET"], "/1/locales/single/download"],
+        [["GET"], "/1/locales/template"],
+        [["GET"], "/1/locales/sitemap.xml"],
+        [["GET", "POST", "DELETE"], "/1/pages"],
+        [["GET"], "/1/sc/button"],
+        [["GET"], "/1/sc/carousel"],
+        [["GET"], "/1/sc/product-data/single"],
+        [["POST"], "/1/sc/product-data"],
+        [["GET"], "/1/sc/retailers"],
+        [["GET"], "/1/binlite/product-data/single"],
+        [["POST"], "/1/binlite/product-data"],
+        [["GET"], "/1/binlite/retailers"],
+        [["GET"], "/1/ps/product-data/single"],
+        [["POST"], "/1/ps/product-data"]
       ]
     },
     "editor": {
       "allowedRoles": ["user"],
       "allowedEndpoints": [
-        [["GET"], "/api/1/keys/key-info"],
-        [["GET"], "/api/1/locales"],
-        [["GET"], "/api/1/locales/single"],
-        [["GET"], "/api/1/locales/single/download"],
-        [["GET"], "/api/1/locales/template"],
-        [["GET"], "/api/1/locales/sitemap.xml"],
-        [["GET", "POST", "DELETE"], "/api/1/pages"],
-        [["GET"], "/api/1/sc/button"],
-        [["GET"], "/api/1/sc/carousel"],
-        [["GET"], "/api/1/sc/product-data/single"],
-        [["POST"], "/api/1/sc/product-data"],
-        [["GET"], "/api/1/sc/retailers"],
-        [["GET"], "/api/1/binlite/product-data/single"],
-        [["POST"], "/api/1/binlite/product-data"],
-        [["GET"], "/api/1/binlite/retailers"],
-        [["GET"], "/api/1/ps/product-data/single"],
-        [["POST"], "/api/1/ps/product-data"]
+        [["GET"], "/1/keys/key-info"],
+        [["GET"], "/1/locales"],
+        [["GET"], "/1/locales/single"],
+        [["GET"], "/1/locales/single/download"],
+        [["GET"], "/1/locales/template"],
+        [["GET"], "/1/locales/sitemap.xml"],
+        [["GET", "POST", "DELETE"], "/1/pages"],
+        [["GET"], "/1/sc/button"],
+        [["GET"], "/1/sc/carousel"],
+        [["GET"], "/1/sc/product-data/single"],
+        [["POST"], "/1/sc/product-data"],
+        [["GET"], "/1/sc/retailers"],
+        [["GET"], "/1/binlite/product-data/single"],
+        [["POST"], "/1/binlite/product-data"],
+        [["GET"], "/1/binlite/retailers"],
+        [["GET"], "/1/ps/product-data/single"],
+        [["POST"], "/1/ps/product-data"]
       ]
     },
     "analyst": {
