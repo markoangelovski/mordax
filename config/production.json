@@ -1,4 +1,5 @@
 {
+  "host": "https://api.mordax.ga",
   "hostVercel": "https://mordax.vercel.app",
   "hostHeroku": "https://mordax.herokuapp.com"
 }

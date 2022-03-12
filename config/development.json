@@ -1,5 +1,5 @@
 {
-  "hostLocal": "http://localhost:3000",
+  "host": "http://localhost:3000",
   "hostVercel": "https://mordax.vercel.app",
   "hostHeroku": "https://mordax.herokuapp.com"
 }

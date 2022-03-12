@@ -5,6 +5,8 @@ const morgan = require("morgan");
 
 const { connectDb } = require("../db/mongo.js");
 
+const { host } = require("../config");
+
 const { checkKey } = require("../middleware/auth.js");
 const { analytics } = require("../middleware/analytics.js");
 const { notFound, errorHandler } = require("../middleware/errorHandlers.js");
@@ -26,12 +28,10 @@ app.use(pagination);
 
 // Home route
 app.get("/", (req, res) => {
-  const protocol =
-    process.env.NODE_ENV === "development" ? "http://" : "https://";
   res.json({
     status: "ok",
     message: "Greetings from Mordax!",
-    docs: protocol + req.get("host") + "/api/1/docs"
+    docs: host + "/api/1/docs"
   });
 });
 
