@@ -56,7 +56,7 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
 
   const sellersInfo = carouselData
     ? carouselData.data.included.retailers?.map(retailer => ({
-        name: retailer.attributes.name,
+        retailerName: retailer.attributes.name,
         url: retailer.attributes.url,
         logo: retailer.attributes.logo,
         miniLogo: retailer.attributes["mini-logo"]
@@ -71,10 +71,11 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
       retailerName: match.retailerName,
       url: match.url,
       price: match.price,
-      logo: sellersInfo.filter(seller => seller.name === match.retailerName)[0]
-        .logo,
+      logo: sellersInfo.filter(
+        seller => seller.retailerName === match.retailerName
+      )[0].logo,
       miniLogo: sellersInfo.filter(
-        seller => seller.name === match.retailerName
+        seller => seller.retailerName === match.retailerName
       )[0].miniLogo
     })),
     status,

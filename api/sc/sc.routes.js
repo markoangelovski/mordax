@@ -236,6 +236,59 @@ router.post("/product-data", async (req, res, next) => {
   }
 });
 
+// Path: /api/1/sc/retailers?url=https://herbalessences.com/en-us/&sku=1&key=1234355
+// Desc: Fetches the configured retailers
+router.get("/retailers", async (req, res, next) => {
+  const { url, id, SKU, mpIdFieldName } = req.query;
+
+  const query = {};
+
+  if (id) query._id = id;
+  if (url) query.url = url;
+  if (SKU) query["data.SKU.value"] = SKU;
+
+  try {
+    let product = await Page.find(query).select(`-_id -__v`);
+
+    if (product.length > 1) {
+      res.status(422);
+      return next({
+        message: "Multiple products found that match the search query.",
+        query,
+        products: product
+      });
+    } else if (!product.length) {
+      return next({
+        message: "No products found that match the search query.",
+        query
+      });
+    }
+
+    const locale = await Locale.findById(product[0].locale).select(
+      "SC.scCarouselKey.value"
+    );
+
+    const { sellersInfo } = await getSellerData(
+      locale.SC.scCarouselKey.value,
+      product[0].data[mpIdFieldName].value
+    );
+
+    response(
+      res,
+      200,
+      false,
+      { sellersCount: sellersInfo.length },
+      sellersInfo
+    );
+  } catch (error) {
+    console.warn("Error occurred in GET /api/1/sc/product-data route", error);
+    next({
+      message: error.message,
+      ...error
+    });
+  }
+});
+
 // Path: /api/1/sc/button?url=https://herbalessences.com/en-us/&sku=1
 // Desc: Fetches the Button SC data for a single product for single locale in one SKU List
 router.get("/button", async (req, res, next) => {
@@ -349,59 +402,6 @@ router.get("/carousel", async (req, res, next) => {
     );
   } catch (error) {
     console.warn("Error occurred in GET /api/1/sc/carousel route", error);
-    next({
-      message: error.message,
-      ...error
-    });
-  }
-});
-
-// Path: /api/1/sc/retailers?url=https://herbalessences.com/en-us/&sku=1&key=1234355
-// Desc: Fetches the configured retailers
-router.get("/retailers", async (req, res, next) => {
-  const { url, id, SKU, mpIdFieldName } = req.query;
-
-  const query = {};
-
-  if (id) query._id = id;
-  if (url) query.url = url;
-  if (SKU) query["data.SKU.value"] = SKU;
-
-  try {
-    let product = await Page.find(query).select(`-_id -__v`);
-
-    if (product.length > 1) {
-      res.status(422);
-      return next({
-        message: "Multiple products found that match the search query.",
-        query,
-        products: product
-      });
-    } else if (!product.length) {
-      return next({
-        message: "No products found that match the search query.",
-        query
-      });
-    }
-
-    const locale = await Locale.findById(product[0].locale).select(
-      "SC.scCarouselKey.value"
-    );
-
-    const { sellersInfo } = await getSellerData(
-      locale.SC.scCarouselKey.value,
-      product[0].data[mpIdFieldName].value
-    );
-
-    response(
-      res,
-      200,
-      false,
-      { sellersCount: sellersInfo.length },
-      sellersInfo
-    );
-  } catch (error) {
-    console.warn("Error occurred in GET /api/1/sc/product-data route", error);
     next({
       message: error.message,
       ...error

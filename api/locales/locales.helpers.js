@@ -66,9 +66,9 @@ exports.makeLocaleForRes = locale => ({
       }
     : undefined,
   SC:
-    locale.SC.scButtonKey.value ||
-    locale.SC.scCarouselKey.value ||
-    locale.SC.scEcEndpointKey.value
+    locale.SC.scButtonKey?.value ||
+    locale.SC.scCarouselKey?.value ||
+    locale.SC.scEcEndpointKey?.value
       ? {
           scButtonKey: {
             ...locale.SC.scButtonKey,

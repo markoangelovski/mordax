@@ -14,12 +14,11 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/keys/create-key?key={{key}}&roles=user&issuedFor=",
+							"raw": "{{host}}/1/keys/create-key?key={{key}}&roles=user&issuedFor=",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"keys",
 								"create-key"
@@ -51,12 +50,11 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/keys/deactivate-key?key={{key}}&keyToDeactivate=",
+							"raw": "{{host}}/1/keys/deactivate-key?key={{key}}&keyToDeactivate=",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"keys",
 								"deactivate-key"
@@ -83,12 +81,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/keys/key-info?key={{key}}",
+							"raw": "{{host}}/1/keys/key-info?key={{key}}",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"keys",
 								"key-info"
@@ -120,12 +117,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/locales?key={{key}}",
+							"raw": "{{host}}/1/locales?key={{key}}",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"locales"
 							],
@@ -168,12 +164,11 @@
 							]
 						},
 						"url": {
-							"raw": "{{host}}/api/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&hrefLang=en-ca&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&thirdParties=Bazaarvoice,SmartCommerce,PriceSpider&capitol=Washington&scButtonKey=&scCarouselKey=",
+							"raw": "{{host}}/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&hrefLang=en-ca&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&thirdParties=Bazaarvoice,SmartCommerce,PriceSpider&capitol=Washington&scButtonKey=&scCarouselKey=",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"locales"
 							],
@@ -263,12 +258,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/locales/single?key={{key}}&url=https://herbalessences.com/en-us/&includePages=true&limit=20&skip=0",
+							"raw": "{{host}}/1/locales/single?key={{key}}&url=https://herbalessences.com/en-us/&includePages=true&limit=20&skip=0",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"locales",
 								"single"
@@ -316,12 +310,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/locales/single/download?key={{key}}&url=https://herbalessences.com/en-us/",
+							"raw": "{{host}}/1/locales/single/download?key={{key}}&url=https://herbalessences.com/en-us/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"locales",
 								"single",
@@ -349,12 +342,11 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/locales/single?key={{key}}&url=https://herbalessences.com/en-us/",
+							"raw": "{{host}}/1/locales/single?key={{key}}&url=https://herbalessences.com/en-us/",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"locales",
 								"single"
@@ -381,12 +373,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/locales/template?key={{key}}",
+							"raw": "{{host}}/1/locales/template?key={{key}}",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"locales",
 								"template"
@@ -408,12 +399,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/locales/sitemap.xml?key={{key}}&url=https://herbalessences.com/en-us",
+							"raw": "{{host}}/1/locales/sitemap.xml?key={{key}}&url=https://herbalessences.com/en-us",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"locales",
 								"sitemap.xml"
@@ -445,12 +435,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/pages?key={{key}}&pageUrl=https://alwaysdiscreet.com/en-us/incontinence-products/liners-and-pads/boutique-extra-heavy-long-pads",
+							"raw": "{{host}}/1/pages?key={{key}}&pageUrl=https://alwaysdiscreet.com/en-us/incontinence-products/liners-and-pads/boutique-extra-heavy-long-pads",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"pages"
 							],
@@ -476,12 +465,11 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/pages?key={{key}}&localeUrl=https://alwaysdiscreet.com/en-us&pageUrl=https://alwaysdiscreet.com/en-us/test-url&type=product&data=Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
+							"raw": "{{host}}/1/pages?key={{key}}&localeUrl=https://alwaysdiscreet.com/en-us&pageUrl=https://alwaysdiscreet.com/en-us/test-url&type=product&data=Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"pages"
 							],
@@ -528,12 +516,11 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/pages?key={{key}}&id=620ae72dacb101245ab58ca7,620ae7c6d7b2a9cbdf8db46f,620ae7d94aa551be32b35a4a,620ae7edcd2eed3314232630",
+							"raw": "{{host}}/1/pages?key={{key}}&id=620ae72dacb101245ab58ca7,620ae7c6d7b2a9cbdf8db46f,620ae7d94aa551be32b35a4a,620ae7edcd2eed3314232630",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"pages"
 							],
@@ -564,12 +551,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/sc/product-data/single?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/aloe/potent-aloe-hemp-sulfate-free-shampoo/&mpIdFieldName=mpId",
+							"raw": "{{host}}/1/sc/product-data/single?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/aloe/potent-aloe-hemp-sulfate-free-shampoo/&mpIdFieldName=mpId",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"sc",
 								"product-data",
@@ -608,12 +594,11 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/sc/product-data?key={{key}}&url=https://herbalessences.ca/en-ca&mpIdFieldName=mpId",
+							"raw": "{{host}}/1/sc/product-data?key={{key}}&url=https://herbalessences.ca/en-ca&mpIdFieldName=mpId",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"sc",
 								"product-data"
@@ -651,12 +636,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/sc/retailers?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/aloe/potent-aloe-hemp-sulfate-free-shampoo/&mpIdFieldName=mpId",
+							"raw": "{{host}}/1/sc/retailers?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/aloe/potent-aloe-hemp-sulfate-free-shampoo/&mpIdFieldName=mpId",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"sc",
 								"retailers"
@@ -694,12 +678,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/sc/button?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/coconut-milk/coconut-milk-conditioner/&mpIdFieldName=mpId",
+							"raw": "{{host}}/1/sc/button?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/coconut-milk/coconut-milk-conditioner/&mpIdFieldName=mpId",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"sc",
 								"button"
@@ -737,12 +720,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/sc/carousel?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/coconut-milk/coconut-milk-conditioner/&mpIdFieldName=mpId",
+							"raw": "{{host}}/1/sc/carousel?key={{key}}&url=https://herbalessences.ca/en-ca/our-products/coconut-milk/coconut-milk-conditioner/&mpIdFieldName=mpId",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"sc",
 								"carousel"
@@ -785,12 +767,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/binlite/product-data/single?key={{key}}&url=https://www.gillettevenus.ca/en-ca/choose-your-smooth/refillable-razors/deluxe-smooth-platinum-razor/&binliteIdFieldName=BINLiteSku",
+							"raw": "{{host}}/1/binlite/product-data/single?key={{key}}&url=https://www.gillettevenus.ca/en-ca/choose-your-smooth/refillable-razors/deluxe-smooth-platinum-razor/&binliteIdFieldName=BINLiteSku",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"binlite",
 								"product-data",
@@ -829,12 +810,11 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/binlite/product-data?key={{key}}&url=https://gillettevenus.ca/en-ca&binliteIdFieldName=BINLiteSku",
+							"raw": "{{host}}/1/binlite/product-data?key={{key}}&url=https://gillettevenus.ca/en-ca&binliteIdFieldName=BINLiteSku",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"binlite",
 								"product-data"
@@ -872,12 +852,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/binlite/retailers?key={{key}}&url=https://www.gillettevenus.ca/en-ca&RetailerName=Amazon",
+							"raw": "{{host}}/1/binlite/retailers?key={{key}}&url=https://www.gillettevenus.ca/en-ca&RetailerName=Amazon",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"binlite",
 								"retailers"
@@ -917,12 +896,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/config.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/:accountId/config.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -954,12 +932,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/:cid/config.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/:accountId/:cid/config.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -997,12 +974,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/skus/map.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/:accountId/data/skus/map.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1036,12 +1012,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/:cid/res/:lang.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/:accountId/:cid/res/:lang.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1085,12 +1060,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/locate?key={{key}}&ip=0&callback=PriceSpider.jsonp&_={{$timestamp}}",
+									"raw": "{{host}}/1/ps/int/locate?key={{key}}&ip=0&callback=PriceSpider.jsonp&_={{$timestamp}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1125,12 +1099,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/skus/:countryCode/:sku.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/:accountId/data/skus/:countryCode/:sku.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1175,12 +1148,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/products/:pid.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/:accountId/data/products/:pid.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1219,12 +1191,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/families/:countryCode/:instance.js?key=38bdc151d133343bd6234563d40895c5",
+									"raw": "{{host}}/1/ps/int/1/:accountId/data/families/:countryCode/:instance.js?key=38bdc151d133343bd6234563d40895c5",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1273,12 +1244,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/postal-map/:countryCode.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/postal-map/:countryCode.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1310,12 +1280,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/stores/:countryCode/:areaCode/:pid.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/:accountId/data/stores/:countryCode/:areaCode/:pid.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1366,12 +1335,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/stock/:countryCode/:areaCode/:pid.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/:accountId/data/stock/:countryCode/:areaCode/:pid.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1422,12 +1390,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/1/:accountId/data/regionalPricing/:countryCode/:areaCode/:pid.js?key={{key}}",
+									"raw": "{{host}}/1/ps/int/1/:accountId/data/regionalPricing/:countryCode/:areaCode/:pid.js?key={{key}}",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1478,12 +1445,11 @@
 								"method": "GET",
 								"header": [],
 								"url": {
-									"raw": "{{host}}/api/1/ps/int/redirect?key={{key}}&cid=599cc3ce1a208d06c0fd2caa&iid=0522e76d-2597-4379-bf1b-9c9f95ee3146&v=2.4.15&pmid=91800296&price=9&stockStatus=1&widgetType=lightbox&t=2832840&postalCode=WC2&_={{$timestamp}}&includeSellerUrl",
+									"raw": "{{host}}/1/ps/int/redirect?key={{key}}&cid=599cc3ce1a208d06c0fd2caa&iid=0522e76d-2597-4379-bf1b-9c9f95ee3146&v=2.4.15&pmid=91800296&price=9&stockStatus=1&widgetType=lightbox&t=2832840&postalCode=WC2&_={{$timestamp}}&includeSellerUrl",
 									"host": [
 										"{{host}}"
 									],
 									"path": [
-										"api",
 										"1",
 										"ps",
 										"int",
@@ -1554,12 +1520,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/ps/product-data/single?key={{key}}&url=https://www.ninjamas.co/products/large-and-extra-large-bedwetting-underwear/&psSkuFieldName=psSku&countryCode=US&psInstance=US_Ninjamas",
+							"raw": "{{host}}/1/ps/product-data/single?key={{key}}&url=https://www.ninjamas.co/products/large-and-extra-large-bedwetting-underwear/&psSkuFieldName=psSku&countryCode=US&psInstance=US_Ninjamas",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"ps",
 								"product-data",
@@ -1608,12 +1573,11 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/ps/product-data?key={{key}}&url=https://www.ninjamas.co/&psSkuFieldName=psSku&countryCode=US&psInstance=US_Ninjamas",
+							"raw": "{{host}}/1/ps/product-data?key={{key}}&url=https://www.ninjamas.co/&psSkuFieldName=psSku&countryCode=US&psInstance=US_Ninjamas",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"ps",
 								"product-data"
@@ -1666,12 +1630,11 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/api/1/docs",
+							"raw": "{{host}}/1/docs",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
-								"api",
 								"1",
 								"docs"
 							]
@@ -1705,7 +1668,7 @@
 	"variable": [
 		{
 			"key": "host",
-			"value": "https://mordax.vercel.app",
+			"value": "https://api.mordax.ga",
 			"type": "string"
 		},
 		{

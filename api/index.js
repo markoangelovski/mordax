@@ -31,7 +31,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "ok",
     message: "Greetings from Mordax!",
-    docs: host + "/api/1/docs"
+    docs: host + "/1/docs"
   });
 });
 
