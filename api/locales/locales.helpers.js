@@ -282,8 +282,8 @@ exports.updatePages = async req => {
 
 exports.sortItems = (items, attr) =>
   items.sort((first, second) => {
-    var A = first[attr].toUpperCase();
-    var B = second[attr].toUpperCase();
+    var A = first[attr].value.toUpperCase();
+    var B = second[attr].value.toUpperCase();
     if (A < B) {
       return -1;
     }
