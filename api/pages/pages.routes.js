@@ -11,7 +11,8 @@ const { parsePageData, makePagesForRes } = require("./pages.helpers.js");
 router.get("/", async (req, res, next) => {
   const { pageUrl, id } = req.query;
 
-  const query = { url: pageUrl };
+  const query = {};
+  if (pageUrl && pageUrl !== "undefined") query.url = pageUrl;
   if (id) query._id = id;
 
   try {
