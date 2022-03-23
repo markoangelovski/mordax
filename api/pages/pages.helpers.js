@@ -4,11 +4,13 @@ exports.parsePageData = pageData => {
     const data = {};
     pageData.split(";").forEach(dataPair => {
       const [field, value] = dataPair.split(":");
-      data[field] = {
-        value,
-        createdAt: new Date().toISOString(),
-        history: []
-      };
+      if (field.length)
+        // In case empty field is submitted, filter out empty fields
+        data[field] = {
+          value,
+          createdAt: new Date().toISOString(),
+          history: []
+        };
     });
     return data;
   }

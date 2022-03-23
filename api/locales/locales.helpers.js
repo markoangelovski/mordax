@@ -1,7 +1,9 @@
-const axios = require("axios");
+const axios = require("axios").default;
 const mongoose = require("mongoose");
 const xmlParser = require("xml2js").parseStringPromise;
 const xlsx = require("xlsx");
+
+const { pmspaApiUrl } = require("./locales.config.json");
 
 const { urlRgx, localeRgx } = require("../../lib/regex");
 
@@ -537,6 +539,11 @@ exports.updateLocalePsDetails = locale => {
       )
     );
 };
+
+exports.getLocaleInfo = async url =>
+  axios(pmspaApiUrl + "/v1/locale?url=" + url, {
+    headers: { "X-Service-Key": process.env.PMSPA_API_KEY }
+  });
 
 // exports.updateUrl=(url,newUrl)=>{
 //     // Update the URL in pages

@@ -423,6 +423,37 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET Locale Info",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/1/locales/locale-info?key={{key}}&url=https://alwaysdiscreet.com/en-us",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"1",
+								"locales",
+								"locale-info"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://alwaysdiscreet.com/en-us",
+									"description": "Locale URL, required"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

@@ -19,12 +19,15 @@ const {
   getXmlSitemapUrl,
   updatePages,
   calculateLocaleStats,
-  updateLocalePsDetails
+  updateLocalePsDetails,
+  getLocaleInfo
 } = require("./locales.helpers.js");
 
 const { makePagesForRes } = require("../pages/pages.helpers.js");
 const { response } = require("../../lib/helpers.js");
 const { localeRgx, urlRgx } = require("../../lib/regex.js");
+
+const { pmspaApi } = require("./locales.config.json");
 
 // Path: /1/locales
 // Desc: Fetches all brands and locales
@@ -390,10 +393,31 @@ router.get("/sitemap.xml", async (req, res, next) => {
       { ...xmlData }
     );
   } catch (error) {
-    console.warn("Error occurred in POST (New) /api/1/locales route", error);
+    console.warn("Error occurred in GET /1/locales/sitemap.xml route", error);
     next({
       message: error.message,
       ...error
+    });
+  }
+});
+
+// Path: /1/locales/locale-info
+// Desc: Downloads the Pages List template
+router.get("/locale-info", async (req, res, next) => {
+  const { url } = req.query;
+
+  try {
+    const { data } = await getLocaleInfo(url);
+
+    response(res, 200, false, {}, { ...data });
+  } catch (error) {
+    error = error.isAxiosError ? error.toJSON() : error;
+    console.warn(
+      "Error occurred in GET /api/1/locales/locale-info route",
+      error
+    );
+    next({
+      message: error.message
     });
   }
 });
