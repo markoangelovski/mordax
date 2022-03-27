@@ -64,7 +64,9 @@ exports.makePagesForRes = pages => {
           retailerName: match.retailerName,
           price: match.price
         }))
-      }
+      },
+      createdAt: page.createdAt,
+      updatedAt: page.updatedAt
     };
 
     if (!page.BINLite?.lastScan) delete page.BINLite;

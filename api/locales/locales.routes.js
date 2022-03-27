@@ -208,7 +208,7 @@ router.get("/single", locMw, async (req, res, next) => {
       total
     ] = await Promise.all(queries);
 
-    // Clean data from PMSPA API
+    // Clean the data from PMSPA API
     const metaData = {
       metaUrl: pmspaResponse.locales[0].metaUrl,
       metaTitle: pmspaResponse.locales[0].metaTitle,
