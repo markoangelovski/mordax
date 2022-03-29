@@ -6,9 +6,9 @@ const Locale = require("../locales/locales.model.js");
 const { response } = require("../../lib/helpers");
 const { parsePageData, makePagesForRes } = require("./pages.helpers.js");
 
-// Path: /1/pages
+// Path: /1/pages/single
 // Desc: Fetch a single page
-router.get("/", async (req, res, next) => {
+router.get("/single", async (req, res, next) => {
   const { pageUrl, id } = req.query;
 
   const query = {};
@@ -16,6 +16,7 @@ router.get("/", async (req, res, next) => {
   if (id) query._id = id;
 
   try {
+    // TODO: napravi provjeru ako Object.keys(query).length postoji prije nego što ide query
     let pages = await Page.find(query).select("-__v -locale");
 
     if (pages.length) {
@@ -33,14 +34,69 @@ router.get("/", async (req, res, next) => {
       });
     }
   } catch (error) {
+    console.warn("Error occurred in GET /api/1/pages/single", error);
+    next(error);
+  }
+});
+
+// Path: /1/pages
+// Desc: Fetch all pages for single locale
+router.get("/", async (req, res, next) => {
+  const { localeUrl } = req.query;
+
+  const query = {};
+  if (localeUrl && localeUrl !== "undefined") query.localeUrl = localeUrl;
+
+  try {
+    let [entries, total] = await Promise.all([
+      Page.find(query).select("-__v -locale").limit(req.limit).skip(req.skip),
+      Page.countDocuments({ localeUrl })
+    ]);
+
+    if (entries.length) {
+      response(
+        res,
+        200,
+        false,
+        { entries: entries?.length, skipped: req.skip || undefined, total },
+        makePagesForRes(entries).sort((first, second) => {
+          var A = first;
+          var B = second;
+
+          // Sort the pages with type first
+          if (A.type && !B.type) {
+            return -1;
+          }
+          if (!A.type && B.type) {
+            return 1;
+          }
+
+          // Sort the pages with type alphabetically?
+          if (A.type < B.type) {
+            return -1;
+          }
+          if (A.type > B.type) {
+            return 1;
+          }
+
+          return 0;
+        })
+      );
+    } else {
+      res.status(404);
+      next({
+        message: `No pages with URL ${pageUrl} found.`
+      });
+    }
+  } catch (error) {
     console.warn("Error occurred in GET /api/1/pages", error);
     next(error);
   }
 });
 
-// Path: /api/1/pages
+// Path: /1/pages/single
 // Desc: Create/edit new page
-router.post("/", async (req, res, next) => {
+router.post("/single", async (req, res, next) => {
   const { localeUrl, id, pageUrl, type, data } = req.query;
 
   const query = {};
@@ -91,14 +147,14 @@ router.post("/", async (req, res, next) => {
       );
     }
   } catch (error) {
-    console.warn("Error occurred in GET /api/1/pages", error);
+    console.warn("Error occurred in GET /api/1/pages/single", error);
     next(error);
   }
 });
 
-// Path: /api/1/pages
+// Path: /1/pages/single
 // Desc: Delete a page
-router.delete("/", async (req, res, next) => {
+router.delete("/single", async (req, res, next) => {
   const { id } = req.query;
 
   const ids = id.split(",").map(id => id.trim());
@@ -121,7 +177,7 @@ router.delete("/", async (req, res, next) => {
       });
     }
   } catch (error) {
-    console.warn("Error occurred in GET /api/1/pages", error);
+    console.warn("Error occurred in GET /api/1/pages/single", error);
     next(error);
   }
 });

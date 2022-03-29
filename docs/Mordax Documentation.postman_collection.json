@@ -466,13 +466,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/1/pages?key={{key}}&pageUrl=https://alwaysdiscreet.com/en-us/incontinence-products/liners-and-pads/boutique-extra-heavy-long-pads",
+							"raw": "{{host}}/1/pages/single?key={{key}}&pageUrl=https://alwaysdiscreet.com/en-us/incontinence-products/liners-and-pads/boutique-extra-heavy-long-pads",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"1",
-								"pages"
+								"pages",
+								"single"
 							],
 							"query": [
 								{
@@ -491,18 +492,59 @@
 					"response": []
 				},
 				{
-					"name": "POST Page",
+					"name": "GET Pages",
 					"request": {
-						"method": "POST",
+						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/1/pages?key={{key}}&localeUrl=https://alwaysdiscreet.com/en-us&pageUrl=https://alwaysdiscreet.com/en-us/test-url&type=product&data=Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
+							"raw": "{{host}}/1/pages?key={{key}}&localeUrl=https://www.ninjamas.co/&limit=20&skip=0",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"1",
 								"pages"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "localeUrl",
+									"value": "https://www.ninjamas.co/",
+									"description": "Required pages' locale url"
+								},
+								{
+									"key": "limit",
+									"value": "20",
+									"description": "Number of pages to fetch, max 100"
+								},
+								{
+									"key": "skip",
+									"value": "0",
+									"description": "Number of pages to skip"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST Page",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/1/pages/single?key={{key}}&localeUrl=https://alwaysdiscreet.com/en-us&pageUrl=https://alwaysdiscreet.com/en-us/test-url&type=product&data=Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"1",
+								"pages",
+								"single"
 							],
 							"query": [
 								{
@@ -547,13 +589,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/1/pages?key={{key}}&id=620ae72dacb101245ab58ca7,620ae7c6d7b2a9cbdf8db46f,620ae7d94aa551be32b35a4a,620ae7edcd2eed3314232630",
+							"raw": "{{host}}/1/pages/single?key={{key}}&id=620ae72dacb101245ab58ca7,620ae7c6d7b2a9cbdf8db46f,620ae7d94aa551be32b35a4a,620ae7edcd2eed3314232630",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"1",
-								"pages"
+								"pages",
+								"single"
 							],
 							"query": [
 								{
