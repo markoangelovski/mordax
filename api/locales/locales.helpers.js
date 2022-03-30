@@ -502,13 +502,13 @@ exports.updateLocalePsDetails = locale => {
 
   return getAccountCidConfig(locale.PS.psAccountId.value, locale.PS.psCid.value)
     .then(result => {
-      const filteredMatches = result.rules.filter(
+      const filteredRules = result.rules.filter(
         rule => rule.match.countryCode.length && rule.match.tag.length
       );
-      const psInstances = filteredMatches.map(({ match }) =>
-        match.tag[0].replace(" ", "_")
-      );
-      const psCountries = filteredMatches.map(
+      const psInstances = filteredRules
+        .map(({ match }) => match.tag[0].replace(/ /gi, "_"))
+        .filter(instance => instance.length > 2);
+      const psCountries = filteredRules.map(
         ({ match }) => match.countryCode[0]
       );
       const psLanguages = Object.keys(result.res);
@@ -518,7 +518,7 @@ exports.updateLocalePsDetails = locale => {
         {
           $set: {
             "PS.psInstances": psInstances,
-            "PS.psCountries": psCountries,
+            "PS.psCountries": [...new Set(psCountries)],
             "PS.psLanguages": psLanguages
           }
         }
