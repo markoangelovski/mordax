@@ -57,13 +57,13 @@ exports.makePagesForRes = pages => {
           sid: match.sid,
           retailerName: match.retailerName,
           price: match.price
-        })),
-        offlineMatches: page.PS.offlineMatches.map(match => ({
-          pmid: match.pmid,
-          sid: match.sid,
-          retailerName: match.retailerName,
-          price: match.price
         }))
+        // offlineMatches: page.PS.offlineMatches.map(match => ({
+        //   pmid: match.pmid,
+        //   sid: match.sid,
+        //   retailerName: match.retailerName,
+        //   price: match.price
+        // }))
       },
       createdAt: page.createdAt,
       updatedAt: page.updatedAt

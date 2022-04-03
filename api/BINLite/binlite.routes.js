@@ -10,6 +10,7 @@ const { BINLiteUrl } = require("./binlite.config.json");
 const { calculateLocaleStats } = require("../locales/locales.helpers.js");
 
 const { response } = require("../../lib/helpers.js");
+const { makePagesForRes } = require("../pages/pages.helpers.js");
 
 // Path: /api/1/binlite/product-data/single
 // Desc: Fetch BIN Lite details for single SKU
@@ -71,7 +72,6 @@ router.get("/product-data/single", async (req, res, next) => {
     );
 
     product[0]._doc.id = product[0]._doc._id;
-    delete product[0]._doc._id;
     delete product[0]._doc.locale;
 
     response(
@@ -83,14 +83,14 @@ router.get("/product-data/single", async (req, res, next) => {
         matchesCount: matches?.length,
         BINLiteAPI: status && { status, message }
       },
-      {
+      makePagesForRes({
         ...product[0]._doc,
         BINLite: {
           ok: sellersOk,
           lastScan,
           matches
         }
-      }
+      })
     );
 
     // Update locale stats

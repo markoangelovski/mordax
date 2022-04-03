@@ -24,6 +24,7 @@ const {
 } = require("./ps.interfaces.js");
 
 const { calculateLocaleStats } = require("../locales/locales.helpers.js");
+const { makePagesForRes } = require("../pages/pages.helpers.js");
 
 // Path: /api/1/ps/product-data/single?key=1234&url=https://www.ninjamas.co/products/large-and-extra-large-bedwetting-underwear/&psSkuFieldName=psSku&countryCode=US
 // Desc: Fetch PS details for single SKU
@@ -53,6 +54,7 @@ router.get("/product-data/single", async (req, res, next) => {
         })
       });
     } else if (!product.length) {
+      res.status(404);
       return next({
         message: "No products found that match the search query.",
         query
@@ -94,7 +96,6 @@ router.get("/product-data/single", async (req, res, next) => {
     );
 
     product[0]._doc.id = product[0]._doc._id;
-    delete product[0]._doc._id;
     delete product[0]._doc.locale;
 
     response(
@@ -106,14 +107,14 @@ router.get("/product-data/single", async (req, res, next) => {
         matchesCount: matches?.length,
         PSAPI: status && { status, message }
       },
-      {
+      makePagesForRes({
         ...product[0]._doc,
         PS: {
           ok: sellersOk,
           lastScan,
           matches
         }
-      }
+      })
     );
 
     // Update locale stats

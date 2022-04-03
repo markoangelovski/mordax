@@ -74,7 +74,6 @@ router.get("/product-data/single", async (req, res, next) => {
     );
     // TODO: handle SC API errors in the same way as BINLiteAPI
     product[0]._doc.id = product[0]._doc._id;
-    delete product[0]._doc._id;
     delete product[0]._doc.locale;
 
     response(
