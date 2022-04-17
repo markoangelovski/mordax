@@ -540,7 +540,7 @@ exports.updateLocalePsDetails = locale => {
     );
 };
 
-exports.getLocaleInfo = async url =>
+exports.getLocaleMetadata = async url =>
   axios(pmspaApiUrl + "/v1/locale?url=" + url, {
     headers: { "X-Service-Key": process.env.PMSPA_API_KEY }
   });

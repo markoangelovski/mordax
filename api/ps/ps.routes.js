@@ -153,6 +153,7 @@ router.post("/product-data", async (req, res, next) => {
     ]);
 
     if (!entries.length || !locale.length) {
+      res.status(404);
       return next({
         message: "No entries or locales found that match the search query.",
         queries: { productsQuery, localeQuery }
@@ -202,7 +203,7 @@ router.post("/product-data", async (req, res, next) => {
       ...noSellersAttempts
     ].map(({ psSku, sellersOk, matches }) => ({
       updateOne: {
-        filter: { [`data.${psSkuFieldName}.value`]: psSku },
+        filter: { [`data.${psSkuFieldName}.value`]: psSku }, // TODO: Ovaj filter ne radi jer se zna desit da više lokala imaju iste psSku. Prebaci da se proizvodi updateaju po _id
         update: {
           $set: {
             PS: { ok: sellersOk, lastScan: new Date().toISOString(), matches }

@@ -425,19 +425,19 @@
 					"response": []
 				},
 				{
-					"name": "GET Locale Info",
+					"name": "GET Locale metadata",
 					"request": {
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/1/locales/locale-info?key={{key}}&url=https://alwaysdiscreet.com/en-us",
+							"raw": "{{host}}/1/locales/metadata?key={{key}}&url=https://alwaysdiscreet.com/en-us",
 							"host": [
 								"{{host}}"
 							],
 							"path": [
 								"1",
 								"locales",
-								"locale-info"
+								"metadata"
 							],
 							"query": [
 								{
@@ -537,7 +537,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/1/pages/single?key={{key}}&localeUrl=https://alwaysdiscreet.com/en-us&pageUrl=https://alwaysdiscreet.com/en-us/test-url&type=product&data=Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
+							"raw": "{{host}}/1/pages/single?key={{key}}&localeUrl=https://alwaysdiscreet.com/en-us&pageUrl=https://alwaysdiscreet.com/en-us/test-url&type=product&active=true&data=Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
 							"host": [
 								"{{host}}"
 							],
@@ -572,6 +572,11 @@
 									"key": "type",
 									"value": "product",
 									"description": "Page type"
+								},
+								{
+									"key": "active",
+									"value": "true",
+									"description": "true or false, Set page as active or inactive"
 								},
 								{
 									"key": "data",

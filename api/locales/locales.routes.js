@@ -20,14 +20,12 @@ const {
   updatePages,
   calculateLocaleStats,
   updateLocalePsDetails,
-  getLocaleInfo
+  getLocaleMetadata
 } = require("./locales.helpers.js");
 
 const { makePagesForRes } = require("../pages/pages.helpers.js");
 const { response } = require("../../lib/helpers.js");
 const { localeRgx, urlRgx } = require("../../lib/regex.js");
-
-const { pmspaApi } = require("./locales.config.json");
 
 // Path: /1/locales
 // Desc: Fetches all brands and locales
@@ -187,8 +185,7 @@ router.get("/single", locMw, async (req, res, next) => {
     const queries = [
       Locale.findOne({ "url.value": url }).select(
         "-createdBy -_id -__v -brand.history._id -locale.history._id -url.history._id -SC.scButtonKey.history._id -SC.scCarouselKey.history._id -SC.scEcEndpointKey.history._id -BINLite.BINLiteKey.history._id -PS.psKey.history._id -capitol.history._id"
-      ),
-      getLocaleInfo(url)
+      )
     ];
     if (includePages) {
       queries.push(
@@ -201,24 +198,9 @@ router.get("/single", locMw, async (req, res, next) => {
       queries.push(Page.countDocuments({ localeUrl: url }));
     }
 
-    const [
-      existingLocale,
-      { data: pmspaResponse },
-      existingLocalePages,
-      total
-    ] = await Promise.all(queries);
-
-    // Clean the data from PMSPA API
-    const metaData = {
-      metaUrl: pmspaResponse.locales[0].metaUrl,
-      metaTitle: pmspaResponse.locales[0].metaTitle,
-      metaDescription: pmspaResponse.locales[0].metaDescription,
-      metaImage: pmspaResponse.locales[0].metaImage,
-      favicon: pmspaResponse.locales[0].favicon,
-      GTM: pmspaResponse.locales[0].GTM,
-      createdAt: pmspaResponse.locales[0].createdAt,
-      updatedAt: pmspaResponse.locales[0].updatedAt
-    };
+    const [existingLocale, existingLocalePages, total] = await Promise.all(
+      queries
+    );
 
     if (existingLocale) {
       // TODO: napravi da se može downloadat ili cijela SKU lista kao exelica, ili samo proizvodi bez sellera
@@ -233,7 +215,7 @@ router.get("/single", locMw, async (req, res, next) => {
         },
         {
           ...makeLocaleForRes(existingLocale._doc),
-          metaData,
+
           pages:
             existingLocalePages &&
             makePagesForRes(existingLocalePages).sort((first, second) => {
@@ -414,6 +396,45 @@ router.get("/sitemap.xml", async (req, res, next) => {
     next({
       message: error.message,
       ...error
+    });
+  }
+});
+
+// Path: /1/locales/template
+// Desc: Downloads the Pages List template
+router.get("/metadata", async (req, res, next) => {
+  const { url } = req.query;
+
+  try {
+    const { data: pmspaResponse } = await getLocaleMetadata(url);
+
+    // Clean the data from PMSPA API
+    const metaData = {
+      metaUrl: pmspaResponse.locales[0].metaUrl,
+      metaTitle: pmspaResponse.locales[0].metaTitle,
+      metaDescription: pmspaResponse.locales[0].metaDescription,
+      metaImage: pmspaResponse.locales[0].metaImage,
+      favicon: pmspaResponse.locales[0].favicon,
+      GTM: pmspaResponse.locales[0].GTM,
+      createdAt: pmspaResponse.locales[0].createdAt,
+      updatedAt: pmspaResponse.locales[0].updatedAt
+    };
+
+    response(
+      res,
+      200,
+      false,
+      { locale: url },
+      {
+        ...metaData
+      }
+    );
+  } catch (error) {
+    error = error.isAxiosError ? error.toJSON() : error;
+    console.warn("Error occurred in GET /api/1/locales/metadata route", error);
+    res.status(error.status || 404);
+    next({
+      message: `Locale ${url} not found.`
     });
   }
 });
