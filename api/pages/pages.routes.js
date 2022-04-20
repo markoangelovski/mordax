@@ -97,7 +97,7 @@ router.get("/", async (req, res, next) => {
 // Path: /1/pages/single
 // Desc: Create/edit new page
 router.post("/single", async (req, res, next) => {
-  const { localeUrl, id, pageUrl, type, data } = req.query;
+  const { localeUrl, id, pageUrl, type, sku, active, data } = req.query;
 
   const query = {};
   if (id) query._id = id;
@@ -134,7 +134,10 @@ router.post("/single", async (req, res, next) => {
         locale: locale._id,
         localeUrl,
         url: pageUrl,
+        SKU: sku,
+        active,
         type,
+
         data: parsePageData(data)
       });
 
