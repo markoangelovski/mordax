@@ -1,4 +1,10 @@
 {
-  "scButtonUrl": "https://api.smartcommerce.co/api/v1/smartbutton/{{scButtonKey}}?globalCatalog=true&sepmId={{scMpId}}",
-  "scCarouselUrl": "https://api.smartcommerce.co/api/v1/widget/{{scCarouselKey}}?sepmId={{scMpId}}"
+  "US": {
+    "scButtonUrl": "https://api.smartcommerce.co/api/v1/smartbutton/{{scButtonKey}}?globalCatalog=true&sepmId={{scMpId}}",
+    "scCarouselUrl": "https://api.smartcommerce.co/api/v1/widget/{{scCarouselKey}}?sepmId={{scMpId}}"
+  },
+  "EU": {
+    "scButtonUrl": "https://eu-sc-api.click2cart.com/api/v1/smartbutton/{{scButtonKey}}?globalCatalog=true&sepmId={{scMpId}}",
+    "scCarouselUrl": "https://eu-sc-api.click2cart.com/api/v1/widget/{{scCarouselKey}}?sepmId={{scMpId}}"
+  }
 }

@@ -537,7 +537,7 @@
 						"method": "POST",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/1/pages/single?key={{key}}&localeUrl=https://alwaysdiscreet.com/en-us&pageUrl=https://alwaysdiscreet.com/en-us/test-url&type=product&active=true&data=Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
+							"raw": "{{host}}/1/pages/single?key={{key}}&localeUrl=https://alwaysdiscreet.com/en-us&pageUrl=https://alwaysdiscreet.com/en-us/test-url&type=product&sku=123456789&active=true&data=Title:Always Discreet Boutique Incontinence Liners Very Light;mpId:558575;scSku:0037000547501;bvId:AlwaysDiscreet_Boutique_Pads_Extra Heavy_Long",
 							"host": [
 								"{{host}}"
 							],
@@ -572,6 +572,11 @@
 									"key": "type",
 									"value": "product",
 									"description": "Page type"
+								},
+								{
+									"key": "sku",
+									"value": "123456789",
+									"description": "If page is a product, submit product SKU"
 								},
 								{
 									"key": "active",

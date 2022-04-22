@@ -33,6 +33,7 @@ exports.makeLocaleForDb = (req, xmlSitemap) => {
     xmlSitemap,
     capitol: makeAttr(req.query.capitol),
     SC: {
+      scLocale: makeAttr(req.query.scLocale),
       scButtonKey: makeAttr(req.query.scButtonKey),
       scCarouselKey: makeAttr(req.query.scCarouselKey),
       scEcEndpointKey: makeAttr(req.query.scEcEndpointKey)
@@ -68,13 +69,23 @@ exports.makeLocaleForRes = locale => ({
       }
     : undefined,
   SC:
+    locale.SC.scLocale?.value ||
     locale.SC.scButtonKey?.value ||
     locale.SC.scCarouselKey?.value ||
     locale.SC.scEcEndpointKey?.value
       ? {
+          scLocale: {
+            ...locale.SC.scLocale,
+            history: locale.SC.scLocale?.history?.map(item => ({
+              previousValue: item.previousValue,
+              updatedValue: item.updatedValue,
+              updatedAt: item.updatedAt,
+              updatedBy: item.updatedBy
+            }))
+          },
           scButtonKey: {
             ...locale.SC.scButtonKey,
-            history: locale.SC.scButtonKey.history?.map(item => ({
+            history: locale.SC.scButtonKey?.history?.map(item => ({
               previousValue: item.previousValue,
               updatedValue: item.updatedValue,
               updatedAt: item.updatedAt,
@@ -83,7 +94,7 @@ exports.makeLocaleForRes = locale => ({
           },
           scCarouselKey: {
             ...locale.SC.scCarouselKey,
-            history: locale.SC.scCarouselKey.history?.map(item => ({
+            history: locale.SC.scCarouselKey?.history?.map(item => ({
               previousValue: item.previousValue,
               updatedValue: item.updatedValue,
               updatedAt: item.updatedAt,
@@ -92,7 +103,7 @@ exports.makeLocaleForRes = locale => ({
           },
           scEcEndpointKey: {
             ...locale.SC.scEcEndpointKey,
-            history: locale.SC.scEcEndpointKey.history?.map(item => ({
+            history: locale.SC.scEcEndpointKey?.history?.map(item => ({
               previousValue: item.previousValue,
               updatedValue: item.updatedValue,
               updatedAt: item.updatedAt,
@@ -196,6 +207,7 @@ exports.updateLocale = req => {
   locale.fields = updateList(locale, "fields", fields);
   locale.thirdParties = updateList(locale, "thirdParties", thirdParties);
   locale.capitol = updateAttr(locale.capitol, req.query.capitol, key);
+  locale.SC.scLocale = updateAttr(locale.SC.scLocale, req.query.scLocale, key);
   locale.SC.scButtonKey = updateAttr(
     locale.SC.scButtonKey,
     req.query.scButtonKey,
@@ -484,7 +496,7 @@ exports.calculateLocaleStats = url => {
     })
     .then(({ modifiedCount }) =>
       console.log(
-        `Pages stats for locale ${url}${modifiedCount ? "" : "not"} updated.`
+        `Pages stats for locale ${url} ${modifiedCount ? "" : "not"} updated.`
       )
     )
     .catch(err =>

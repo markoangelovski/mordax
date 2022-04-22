@@ -1,8 +1,9 @@
 const axios = require("axios");
 
 const { scCarouselUrl } = require("./sc.config.json");
+const SCUrls = require("./sc.config.json");
 
-exports.getSellerData = async (scCarouselKey, scMpId) => {
+exports.getSellerData = async (scLocale, scCarouselKey, scMpId) => {
   let carouselData,
     sellersOk = false,
     status,
@@ -10,7 +11,7 @@ exports.getSellerData = async (scCarouselKey, scMpId) => {
 
   try {
     carouselData = await axios(
-      scCarouselUrl
+      SCUrls[scLocale].scCarouselUrl
         .replace("{{scCarouselKey}}", scCarouselKey)
         .replace("{{scMpId}}", scMpId)
     );

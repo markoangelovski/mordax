@@ -52,6 +52,15 @@ const localeSchema = new mongoose.Schema(
     xmlSitemap: stringProps,
     capitol: objProps,
     SC: {
+      scLocale: {
+        ...objProps,
+        value: {
+          ...stringProps,
+          enum: ["US", "EU"],
+          default: "US",
+          required: true
+        }
+      },
       scButtonKey: objProps,
       scCarouselKey: objProps,
       scEcEndpointKey: objProps

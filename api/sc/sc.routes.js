@@ -6,7 +6,7 @@ const Locale = require("../locales/locales.model.js");
 
 const { getSellerData } = require("./sc.helpers.js");
 
-const { scButtonUrl, scCarouselUrl } = require("./sc.config.json");
+const SCUrls = require("./sc.config.json");
 
 const { makePagesForRes } = require("../pages/pages.helpers.js");
 const { calculateLocaleStats } = require("../locales/locales.helpers.js");
@@ -16,12 +16,13 @@ const { response } = require("../../lib/helpers.js");
 // Path: /api/1/sc/product-data/single?key=1234&url=https://herbalessences.com/en-us/&productUrl=https://&sku=1234
 // Desc: Fetches and updates the SC data for a single product for single locale in one SKU List
 router.get("/product-data/single", async (req, res, next) => {
-  const { url, id, mpIdFieldName } = req.query;
+  const { url, id, SKU, mpIdFieldName } = req.query;
 
   const query = {};
 
   if (id) query._id = id;
   if (url) query.url = url;
+  if (SKU) query["data.SKU.value"] = SKU;
 
   try {
     let product = await Page.find(query).select(`-__v`);
@@ -42,7 +43,7 @@ router.get("/product-data/single", async (req, res, next) => {
     }
 
     const locale = await Locale.findById(product[0].locale).select(
-      "SC.scCarouselKey.value"
+      "SC.scLocale.value SC.scCarouselKey.value"
     );
 
     if (!locale.SC?.scCarouselKey?.value) {
@@ -53,6 +54,7 @@ router.get("/product-data/single", async (req, res, next) => {
     }
 
     const { sellersOk, matches, status, message } = await getSellerData(
+      locale.SC.scLocale.value,
       locale.SC.scCarouselKey.value,
       product[0].data[mpIdFieldName].value
     );
@@ -124,7 +126,9 @@ router.post("/product-data", async (req, res, next) => {
   try {
     const [products, locale] = await Promise.all([
       Page.find(productsQuery).select(`url data.${mpIdFieldName}.value`),
-      Locale.find(localeQuery).select("SC.scCarouselKey.value")
+      Locale.find(localeQuery).select(
+        "SC.scLocale.value SC.scCarouselKey.value"
+      )
     ]);
 
     if (!products.length || !locale.length) {
@@ -134,7 +138,7 @@ router.post("/product-data", async (req, res, next) => {
       });
     }
 
-    if (!locale[0].SC?.scCarouselKey?.value) {
+    if (!locale[0].SC?.scLocale?.value) {
       res.status(400);
       return next({
         message: `Locale ${locale.url.value} does not have SC related data.`
@@ -145,6 +149,7 @@ router.post("/product-data", async (req, res, next) => {
       .filter(product => product.data[mpIdFieldName]?.value !== undefined)
       .map(product =>
         getSellerData(
+          locale[0].SC.scLocale.value,
           locale[0].SC.scCarouselKey.value,
           product.data[mpIdFieldName].value
         )
@@ -152,7 +157,7 @@ router.post("/product-data", async (req, res, next) => {
           .catch(err =>
             console.warn(
               "Error occurred while fetching SC data for product: ",
-              product.data.mpId,
+              product.data[mpIdFieldName]?.value,
               err
             )
           )
@@ -264,10 +269,11 @@ router.get("/retailers", async (req, res, next) => {
     }
 
     const locale = await Locale.findById(product[0].locale).select(
-      "SC.scCarouselKey.value"
+      "SC.scLocale.value SC.scCarouselKey.value"
     );
 
     const { sellersInfo } = await getSellerData(
+      locale.SC.scLocale.value,
       locale.SC.scCarouselKey.value,
       product[0].data[mpIdFieldName].value
     );
@@ -312,6 +318,7 @@ router.get("/button", async (req, res, next) => {
         products: product
       });
     } else if (!product.length) {
+      res.status(422);
       return next({
         message: "No products found that match the search query.",
         query
@@ -319,11 +326,11 @@ router.get("/button", async (req, res, next) => {
     }
 
     const locale = await Locale.findById(product[0].locale).select(
-      "SC.scButtonKey.value"
+      "SC.scLocale.value SC.scButtonKey.value"
     );
 
     const { data } = await axios(
-      scButtonUrl
+      SCUrls[locale.SC.scLocale.value].scButtonUrl
         .replace("{{scButtonKey}}", locale.SC.scButtonKey.value)
         .replace("{{scMpId}}", product[0].data[mpIdFieldName].value)
     );
@@ -332,11 +339,12 @@ router.get("/button", async (req, res, next) => {
       res,
       200,
       false,
-      {},
       {
         id: product[0]._id,
-        url: product[0].url,
-        data
+        url: product[0].url
+      },
+      {
+        ...data
       }
     );
   } catch (error) {
@@ -379,11 +387,11 @@ router.get("/carousel", async (req, res, next) => {
     }
 
     const locale = await Locale.findById(product[0].locale).select(
-      "SC.scCarouselKey.value"
+      "SC.scLocale.value SC.scCarouselKey.value"
     );
 
     const { data } = await axios(
-      scCarouselUrl
+      SCUrls[locale.SC.scLocale.value].scCarouselUrl
         .replace("{{scCarouselKey}}", locale.SC.scCarouselKey.value)
         .replace("{{scMpId}}", product[0].data[mpIdFieldName].value)
     );
@@ -392,11 +400,12 @@ router.get("/carousel", async (req, res, next) => {
       res,
       200,
       false,
-      {},
       {
         id: product[0]._id,
-        url: product[0].url,
-        data
+        url: product[0].url
+      },
+      {
+        ...data
       }
     );
   } catch (error) {

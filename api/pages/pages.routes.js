@@ -85,7 +85,7 @@ router.get("/", async (req, res, next) => {
     } else {
       res.status(404);
       next({
-        message: `No pages with URL ${pageUrl} found.`
+        message: `No pages found for locale ${localeUrl}.`
       });
     }
   } catch (error) {
