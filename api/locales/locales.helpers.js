@@ -69,7 +69,6 @@ exports.makeLocaleForRes = locale => ({
       }
     : undefined,
   SC:
-    locale.SC.scLocale?.value ||
     locale.SC.scButtonKey?.value ||
     locale.SC.scCarouselKey?.value ||
     locale.SC.scEcEndpointKey?.value
@@ -293,19 +292,6 @@ exports.updatePages = async req => {
     pagesCreated: nUpserted
   };
 };
-
-exports.sortItems = (items, attr) =>
-  items.sort((first, second) => {
-    var A = first[attr].value.toUpperCase();
-    var B = second[attr].value.toUpperCase();
-    if (A < B) {
-      return -1;
-    }
-    if (A > B) {
-      return 1;
-    }
-    return 0;
-  });
 
 const getXmlSitemapUrl = async url => {
   let robotsUrl = url.replace(localeRgx, "");
@@ -556,6 +542,31 @@ exports.getLocaleMetadata = async url =>
   axios(pmspaApiUrl + "/v1/locale?url=" + url, {
     headers: { "X-Service-Key": process.env.PMSPA_API_KEY }
   });
+
+exports.makeSort = sort => {
+  if (!sort) return "";
+
+  const baseFields = ["createdAt", "updatedAt"];
+
+  const objPropsFields = ["url", "brand", "locale"];
+
+  const sortArray = sort.split(",");
+
+  return sortArray
+    .map(sortItem => {
+      const desc = sortItem[0] === "-";
+
+      const tempSortItem = desc ? sortItem.slice(1) : sortItem;
+
+      // If sort field is a base field, return the original base field
+      if (baseFields.indexOf(tempSortItem) > -1) return sortItem;
+
+      // If sort field is from objPropsFields fields, format the sort to access the value
+      if (objPropsFields.indexOf(tempSortItem) > -1)
+        return `${desc ? "-" : ""}${tempSortItem}.value`;
+    })
+    .join(" ");
+};
 
 // exports.updateUrl=(url,newUrl)=>{
 //     // Update the URL in pages

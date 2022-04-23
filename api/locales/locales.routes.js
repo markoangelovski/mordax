@@ -14,13 +14,13 @@ const {
   makeLocaleForDb,
   makeLocaleForRes,
   updateLocale,
-  sortItems,
   getPageUrls,
   getXmlSitemapUrl,
   updatePages,
   calculateLocaleStats,
   updateLocalePsDetails,
-  getLocaleMetadata
+  getLocaleMetadata,
+  makeSort
 } = require("./locales.helpers.js");
 
 const { makePagesForRes } = require("../pages/pages.helpers.js");
@@ -30,12 +30,13 @@ const { localeRgx, urlRgx } = require("../../lib/regex.js");
 // Path: /1/locales
 // Desc: Fetches all brands and locales
 router.get("/", async (req, res, next) => {
-  try {
-    // const locales = await Locale.find().select("-_id brand locale url");
+  const { sort } = req.query;
 
+  try {
     const [locales, total] = await Promise.all([
       Locale.find()
         .select("-_id brand locale url createdAt updatedAt")
+        .sort(makeSort(sort))
         .skip(req.skip)
         .limit(req.limit),
       Locale.countDocuments().select("-_id brand locale url")
@@ -46,16 +47,14 @@ router.get("/", async (req, res, next) => {
         res,
         200,
         false,
-        {
-          locales: locales.length,
-          limit: req.limit,
-          skipped: req.skip || undefined,
-          total
-        },
-        sortItems(
-          locales.map(locale => makeLocaleForRes(locale)),
-          "brand"
-        )
+        // {
+        //   locales: locales.length,
+        //   limit: req.limit,
+        //   skipped: req.skip || undefined,
+        //   total
+        // },
+        { entries: locales?.length, skipped: req.skip || undefined, total },
+        locales.map(locale => makeLocaleForRes(locale))
       );
     } else {
       res.status(404);
@@ -215,7 +214,6 @@ router.get("/single", locMw, async (req, res, next) => {
         },
         {
           ...makeLocaleForRes(existingLocale._doc),
-
           pages:
             existingLocalePages &&
             makePagesForRes(existingLocalePages).sort((first, second) => {
