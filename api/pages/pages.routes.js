@@ -4,7 +4,11 @@ const Page = require("./pages.model.js");
 const Locale = require("../locales/locales.model.js");
 
 const { response } = require("../../lib/helpers");
-const { parsePageData, makePagesForRes } = require("./pages.helpers.js");
+const {
+  parsePageData,
+  makePagesForRes,
+  makeSort
+} = require("./pages.helpers.js");
 
 // Path: /1/pages/single
 // Desc: Fetch a single page
@@ -42,15 +46,19 @@ router.get("/single", async (req, res, next) => {
 // Path: /1/pages
 // Desc: Fetch all pages for single locale
 router.get("/", async (req, res, next) => {
-  const { localeUrl } = req.query;
+  const { localeUrl, sort } = req.query;
 
   const query = {};
   if (localeUrl && localeUrl !== "undefined") query.localeUrl = localeUrl;
 
   try {
     let [entries, total] = await Promise.all([
-      Page.find(query).select("-__v -locale").limit(req.limit).skip(req.skip),
-      Page.countDocuments({ localeUrl })
+      Page.find(query)
+        .sort(makeSort(sort))
+        .select("-__v -locale")
+        .limit(req.limit)
+        .skip(req.skip),
+      Page.countDocuments(query)
     ]);
 
     if (entries.length) {
@@ -59,28 +67,7 @@ router.get("/", async (req, res, next) => {
         200,
         false,
         { entries: entries?.length, skipped: req.skip || undefined, total },
-        makePagesForRes(entries).sort((first, second) => {
-          var A = first;
-          var B = second;
-
-          // Sort the pages with type first
-          if (A.type && !B.type) {
-            return -1;
-          }
-          if (!A.type && B.type) {
-            return 1;
-          }
-
-          // Sort the pages with type alphabetically?
-          if (A.type < B.type) {
-            return -1;
-          }
-          if (A.type > B.type) {
-            return 1;
-          }
-
-          return 0;
-        })
+        makePagesForRes(entries)
       );
     } else {
       res.status(404);

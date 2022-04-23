@@ -164,9 +164,9 @@
 							]
 						},
 						"url": {
-							"raw": "{{host}}/1/locales?key={{key}}&brand=Herbal Essences&locale=en-us&hrefLang=en-ca&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&thirdParties=Bazaarvoice,SmartCommerce,PriceSpider&capitol=Washington&scButtonKey=&scCarouselKey=",
+							"raw": "{{hostLocal}}/1/locales?key={{key}}&brand=Always Discreet&locale=en-us&url=https://herbalessences.com/en-us/&fields=Title,SKU,mpId&thirdParties=Bazaarvoice,SmartCommerce,PriceSpider&capitol=Washington&scLocale=EU&scButtonKey=&scCarouselKey=",
 							"host": [
-								"{{host}}"
+								"{{hostLocal}}"
 							],
 							"path": [
 								"1",
@@ -180,7 +180,7 @@
 								},
 								{
 									"key": "brand",
-									"value": "Herbal Essences",
+									"value": "Always Discreet",
 									"description": "Brand name, required"
 								},
 								{
@@ -191,7 +191,8 @@
 								{
 									"key": "hrefLang",
 									"value": "en-ca",
-									"description": "Include if sitemap.xml does not have good URLs"
+									"description": "Include if sitemap.xml does not have good URLs",
+									"disabled": true
 								},
 								{
 									"key": "url",
@@ -218,6 +219,11 @@
 									"key": "capitol",
 									"value": "Washington",
 									"description": "Locale capitol, for location"
+								},
+								{
+									"key": "scLocale",
+									"value": "EU",
+									"description": "SC Locale, US or EU"
 								},
 								{
 									"key": "scButtonKey",
@@ -497,7 +503,7 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "{{host}}/1/pages?key={{key}}&localeUrl=https://www.ninjamas.co/&limit=20&skip=0",
+							"raw": "{{host}}/1/pages?key={{key}}&localeUrl=https://www.ninjamas.co/&sort=type&limit=20&skip=0",
 							"host": [
 								"{{host}}"
 							],
@@ -515,6 +521,11 @@
 									"key": "localeUrl",
 									"value": "https://www.ninjamas.co/",
 									"description": "Required pages' locale url"
+								},
+								{
+									"key": "sort",
+									"value": "type",
+									"description": "Sort by"
 								},
 								{
 									"key": "limit",

@@ -79,3 +79,46 @@ exports.makePagesForRes = pages => {
     return page;
   });
 };
+
+exports.makeSort = sort => {
+  if (!sort) return "";
+
+  const baseFields = [
+    "url",
+    "SKU",
+    "active",
+    "inXmlSitemap",
+    "localeUrl",
+    "source",
+    "type",
+    "createdAt",
+    "updatedAt"
+  ];
+
+  const sellerFields = ["lastScan", "ok"];
+
+  const sortArray = sort.split(",");
+
+  return sortArray
+    .map(sortItem => {
+      const desc = sortItem[0] === "-";
+
+      const tempSortItem = desc ? sortItem.slice(1) : sortItem;
+
+      // If sort field is a base field, return the original base field
+      if (baseFields.indexOf(tempSortItem) > -1) return sortItem;
+
+      // If sort field is from sellers fields, add seller prefix
+      if (sellerFields.indexOf(tempSortItem) > -1)
+        return [
+          `${desc ? "-" : ""}PS.${tempSortItem}`,
+          `${desc ? "-" : ""}SC.${tempSortItem}`,
+          `${desc ? "-" : ""}BINLite.${tempSortItem}`
+        ];
+
+      // If sort field is not from sellers fields or base fields, assume it is from data fields
+      return `${desc ? "-" : ""}data.${tempSortItem}.value`;
+    })
+    .flat(1)
+    .join(" ");
+};
