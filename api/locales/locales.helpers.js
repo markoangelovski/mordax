@@ -543,7 +543,7 @@ exports.getLocaleMetadata = async url =>
     headers: { "X-Service-Key": process.env.PMSPA_API_KEY }
   });
 
-exports.makeSort = sort => {
+exports.makeLocalesSort = sort => {
   if (!sort) return "";
 
   const baseFields = ["createdAt", "updatedAt"];

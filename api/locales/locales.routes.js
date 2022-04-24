@@ -20,10 +20,14 @@ const {
   calculateLocaleStats,
   updateLocalePsDetails,
   getLocaleMetadata,
-  makeSort
+  makeLocalesSort
 } = require("./locales.helpers.js");
 
-const { makePagesForRes } = require("../pages/pages.helpers.js");
+const {
+  makePagesForRes,
+  makePagesSort,
+  makePagesFilter
+} = require("../pages/pages.helpers.js");
 const { response } = require("../../lib/helpers.js");
 const { localeRgx, urlRgx } = require("../../lib/regex.js");
 
@@ -36,7 +40,7 @@ router.get("/", async (req, res, next) => {
     const [locales, total] = await Promise.all([
       Locale.find()
         .select("-_id brand locale url createdAt updatedAt")
-        .sort(makeSort(sort))
+        .sort(makeLocalesSort(sort))
         .skip(req.skip)
         .limit(req.limit),
       Locale.countDocuments().select("-_id brand locale url")
@@ -171,7 +175,7 @@ router.post("/", async (req, res, next) => {
 // Path: /1/locales/single?key=123456789&url=https://www.herbalessences.com
 // Desc: Fetches the pages data for a single locale
 router.get("/single", locMw, async (req, res, next) => {
-  let { url, includePages } = req.query;
+  let { url, includePages, filter, sort } = req.query;
   includePages = includePages === "true";
 
   try {
@@ -182,10 +186,11 @@ router.get("/single", locMw, async (req, res, next) => {
     ];
     if (includePages) {
       queries.push(
-        Page.find({ localeUrl: url })
+        Page.find({ localeUrl: url, ...makePagesFilter(filter) })
+          .sort(makePagesSort(sort))
           .select("-__v")
-          .limit(req.limit)
           .skip(req.skip)
+          .limit(req.limit)
       );
 
       queries.push(Page.countDocuments({ localeUrl: url }));
@@ -208,30 +213,7 @@ router.get("/single", locMw, async (req, res, next) => {
         },
         {
           ...makeLocaleForRes(existingLocale._doc),
-          pages:
-            existingLocalePages &&
-            makePagesForRes(existingLocalePages).sort((first, second) => {
-              var A = first;
-              var B = second;
-
-              // Sort the pages with type first
-              if (A.type && !B.type) {
-                return -1;
-              }
-              if (!A.type && B.type) {
-                return 1;
-              }
-
-              // Sort the pages with type alphabetically?
-              if (A.type < B.type) {
-                return -1;
-              }
-              if (A.type > B.type) {
-                return 1;
-              }
-
-              return 0;
-            })
+          pages: existingLocalePages && makePagesForRes(existingLocalePages)
         }
       );
     } else {

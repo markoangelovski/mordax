@@ -7,7 +7,7 @@ const { response } = require("../../lib/helpers");
 const {
   parsePageData,
   makePagesForRes,
-  makeSort
+  makePagesSort
 } = require("./pages.helpers.js");
 
 // Path: /1/pages/single
@@ -54,7 +54,7 @@ router.get("/", async (req, res, next) => {
   try {
     let [entries, total] = await Promise.all([
       Page.find(query)
-        .sort(makeSort(sort))
+        .sort(makePagesSort(sort))
         .select("-__v -locale")
         .limit(req.limit)
         .skip(req.skip),

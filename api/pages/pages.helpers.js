@@ -80,7 +80,7 @@ exports.makePagesForRes = pages => {
   });
 };
 
-exports.makeSort = sort => {
+exports.makePagesSort = sort => {
   if (!sort) return "";
 
   const baseFields = [
@@ -121,4 +121,53 @@ exports.makeSort = sort => {
     })
     .flat(1)
     .join(" ");
+};
+
+exports.makePagesFilter = filter => {
+  if (!filter) return {};
+
+  // filter = inXmlSitemap:false,type:product
+  const baseFields = [
+    "id",
+    "url",
+    "localeUrl",
+    "source",
+    "type",
+    "SKU",
+    "inXmlSitemap",
+    "active"
+  ];
+
+  const sellerFields = [
+    "SC-ok",
+    "SC-lastScan",
+    "PS-ok",
+    "PS-lastScan",
+    "BINLite-ok",
+    "BINLite-lastScan"
+  ];
+
+  const filters = filter.split(",").map(filterPair => {
+    let [key, value] = filterPair.split(":");
+    value = /(true|false)/i.test(value)
+      ? value.toLowerCase() === "true"
+      : value; // If value is true or false, transform from string to boolean
+    return { [key]: value };
+  });
+
+  const mappedFilters = filters.map(mappedFilter => {
+    const key = Object.keys(mappedFilter)[0];
+
+    if (baseFields.indexOf(key) > -1) return mappedFilter; // If passed filter is one of the base fields, use the filter as is.
+
+    if (sellerFields.indexOf(key) > -1) {
+      // If passed filter is one of the seller fields, add the seller prefix.
+      const modKey = key.split("-").join(".");
+      return { [modKey]: mappedFilter[key] };
+    }
+
+    return { [`data.${key}.value`]: mappedFilter[key] }; // For the remaining fields, assume they are from data object (custom fields)
+  });
+
+  return mappedFilters.reduce((acc, current) => ({ ...acc, ...current }), {});
 };
