@@ -47,12 +47,6 @@ router.get("/", async (req, res, next) => {
         res,
         200,
         false,
-        // {
-        //   locales: locales.length,
-        //   limit: req.limit,
-        //   skipped: req.skip || undefined,
-        //   total
-        // },
         { entries: locales?.length, skipped: req.skip || undefined, total },
         locales.map(locale => makeLocaleForRes(locale))
       );

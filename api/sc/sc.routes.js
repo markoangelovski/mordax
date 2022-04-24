@@ -268,6 +268,13 @@ router.get("/retailers", async (req, res, next) => {
       });
     }
 
+    if (!product[0].data?.[mpIdFieldName]) {
+      res.status(422);
+      return next({
+        message: "Entry does not have SmartCommerce-related data."
+      });
+    }
+
     const locale = await Locale.findById(product[0].locale).select(
       "SC.scLocale.value SC.scCarouselKey.value"
     );
