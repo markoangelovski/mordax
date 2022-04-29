@@ -260,7 +260,7 @@ function createGuid() {
 /**
  * Seller data result
  * @typedef {Object} SellerDataResult
- * @property {string} psSku - Product's PS SKU value
+ * @property {string} pageId - Product's page id from Mongo
  * @property {boolean} sellersOk - Indicates whether API response is ok
  * @property {Array<object>} matches - Matches array
  * @property {number} status - Status code in case of error
@@ -270,12 +270,19 @@ function createGuid() {
 /**
  * Get seller data
  * @param {string} accountId - PS Accounr ID
- * @param {string} psSku - PS SKU of a particular product
  * @param {string} countryCode - Country code
  * @param {string} psInstance - PS Instance
+ * @param {string} pageId - Page ID of a particular product
+ * @param {string} psSku - PS SKU of a particular product
  * @returns {Promise<SellerDataResult>} Seller data result
  */
-exports.getSellerData = async (accountId, psSku, countryCode, psInstance) => {
+exports.getSellerData = async (
+  accountId,
+  countryCode,
+  psInstance,
+  pageId,
+  psSku
+) => {
   let matches,
     sellersOk = false,
     status,
@@ -298,9 +305,11 @@ exports.getSellerData = async (accountId, psSku, countryCode, psInstance) => {
       );
     }
 
-    if (psInstanceData) {
+    // Check if Product ID exists in the local products data json file
+    if (psInstanceData && psInstanceData[psSku]) {
       pid = psInstanceData[psSku];
     } else {
+      // If Product ID does not exist in the local products data json file, fetch it from PS
       const { productId } = await getAccountDataSkusCountrySku(
         accountId,
         countryCode.toUpperCase(),
@@ -310,7 +319,7 @@ exports.getSellerData = async (accountId, psSku, countryCode, psInstance) => {
     }
 
     const {
-      productMatches: { id, seller, price }
+      productMatches: { id = [], seller, price } // id = [] default to empty array for products with no matches that do not have the id array in the productMatches
     } = await getAccountDataProductsPid(accountId, pid);
 
     matches = Array.from({ length: id.length }, (_, i) => ({
@@ -325,6 +334,7 @@ exports.getSellerData = async (accountId, psSku, countryCode, psInstance) => {
     error = error.isAxiosError ? error.toJSON() : error;
     console.warn(
       "Error occurred while fetching PS data for single product, ",
+      psSku,
       error
     );
     status = error.status;
@@ -335,7 +345,7 @@ exports.getSellerData = async (accountId, psSku, countryCode, psInstance) => {
    * @type {SellerDataResult}
    */
   return {
-    psSku,
+    pageId,
     sellersOk,
     matches,
     status,

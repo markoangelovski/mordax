@@ -482,7 +482,7 @@ exports.calculateLocaleStats = url => {
     })
     .then(({ modifiedCount }) =>
       console.log(
-        `Pages stats for locale ${url} ${modifiedCount ? "" : "not"} updated.`
+        `Pages stats for locale ${url} ${modifiedCount ? "" : "not "}updated.`
       )
     )
     .catch(err =>

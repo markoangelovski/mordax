@@ -74,9 +74,10 @@ router.get("/product-data/single", async (req, res, next) => {
 
     const { sellersOk, matches, status, message } = await getSellerData(
       locale.PS.psAccountId.value,
-      product[0].data[psSkuFieldName].value,
       countryCode,
-      psInstance
+      psInstance,
+      product[0]._id.toString(),
+      product[0].data[psSkuFieldName].value
     );
 
     const lastScan = new Date().toISOString();
@@ -118,7 +119,7 @@ router.get("/product-data/single", async (req, res, next) => {
     );
 
     // Update locale stats
-    calculateLocaleStats(req.query.url);
+    calculateLocaleStats(product[0].localeUrl);
   } catch (error) {
     console.warn(
       "Error occurred in GET /api/1/ps/product-data/single route",
@@ -172,9 +173,10 @@ router.post("/product-data", async (req, res, next) => {
       .map(entry =>
         getSellerData(
           locale[0].PS.psAccountId.value,
-          entry.data[psSkuFieldName].value,
           countryCode,
-          psInstance
+          psInstance,
+          entry._id,
+          entry.data[psSkuFieldName].value
         )
           .then(result => result)
           .catch(err =>
@@ -201,9 +203,9 @@ router.post("/product-data", async (req, res, next) => {
       ...successAttempts,
       ...failedAttempts,
       ...noSellersAttempts
-    ].map(({ psSku, sellersOk, matches }) => ({
+    ].map(({ pageId, sellersOk, matches }) => ({
       updateOne: {
-        filter: { [`data.${psSkuFieldName}.value`]: psSku }, // TODO: Ovaj filter ne radi jer se zna desit da više lokala imaju iste psSku. Prebaci da se proizvodi updateaju po _id
+        filter: { _id: pageId },
         update: {
           $set: {
             PS: { ok: sellersOk, lastScan: new Date().toISOString(), matches }
@@ -216,9 +218,7 @@ router.post("/product-data", async (req, res, next) => {
     const { nModified } = await Page.bulkWrite(bulkWrites);
 
     const mapResult = result => {
-      const entry = entries.find(
-        entry => entry.data[psSkuFieldName]?.value === result.psSku
-      );
+      const entry = entries.find(entry => entry._id === result.pageId);
 
       return {
         id: entry._id,
@@ -236,7 +236,7 @@ router.post("/product-data", async (req, res, next) => {
 
     const successPayload = successAttempts.map(mapResult);
     const failsPayload = failedAttempts.map(mapResult);
-    const noSellersPayload = failedAttempts.map(mapResult);
+    const noSellersPayload = noSellersAttempts.map(mapResult);
 
     const singleProducts = new Set();
     entries.forEach(entry => singleProducts.add(entry.url));
