@@ -112,6 +112,32 @@
 			"name": "Locales",
 			"item": [
 				{
+					"name": "GET All Locales",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/1/locales/all?key={{key}}",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"1",
+								"locales",
+								"all"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
 					"name": "GET Locales",
 					"request": {
 						"method": "GET",

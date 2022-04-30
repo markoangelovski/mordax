@@ -70,6 +70,42 @@ router.get("/", async (req, res, next) => {
 });
 
 // Path: /1/locales
+// Desc: Fetches all brands and locales
+router.get("/all", async (req, res, next) => {
+  const { sort } = req.query;
+
+  try {
+    const locales = await Locale.find()
+      .select("-_id brand.value locale.value url")
+      .sort("brand.value locale.value");
+
+    if (locales.length) {
+      response(
+        res,
+        200,
+        false,
+        { entries: locales?.length },
+        locales.map(locale => ({
+          brand: locale.brand.value + " " + locale.locale.value,
+          url: locale.url.value
+        }))
+      );
+    } else {
+      res.status(404);
+      next({
+        message: `No locales found that match your query`
+      });
+    }
+  } catch (error) {
+    console.warn("Error occurred in GET /api/1/locales route", error);
+    next({
+      message: error.message,
+      ...error
+    });
+  }
+});
+
+// Path: /1/locales
 // Desc: Creates a new locale
 router.post("/", upload.single("template"), async (req, res, next) => {
   const { url, hrefLang } = req.query;
