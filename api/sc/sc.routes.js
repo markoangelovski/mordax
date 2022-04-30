@@ -163,7 +163,7 @@ router.post("/product-data", async (req, res, next) => {
           )
       );
     const sellerData = await Promise.all(sellerDataQueries);
-
+    console.log("sellerData", sellerData);
     const successAttempts = sellerData.filter(
       ({ sellersOk, matches }) => sellersOk === true && matches.length
     );

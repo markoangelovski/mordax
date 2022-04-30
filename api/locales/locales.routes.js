@@ -72,8 +72,6 @@ router.get("/", async (req, res, next) => {
 // Path: /1/locales
 // Desc: Fetches all brands and locales
 router.get("/all", async (req, res, next) => {
-  const { sort } = req.query;
-
   try {
     const locales = await Locale.find()
       .select("-_id brand.value locale.value url")
