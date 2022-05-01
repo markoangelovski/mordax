@@ -261,7 +261,9 @@ router.get("/retailers", async (req, res, next) => {
       });
     }
 
-    let result, status, message;
+    let result = [],
+      status,
+      message;
     try {
       const { data } = await axios(
         BINLiteUrl.replace("{{binliteUpc}}", 1).replace("desired", "all"),
@@ -290,6 +292,75 @@ router.get("/retailers", async (req, res, next) => {
       result = result.filter(
         retailer => retailer.RetailerName === retailerName
       );
+
+    response(
+      res,
+      200,
+      false,
+      {
+        sellersCount: result?.length,
+        BINLiteAPI: status && { status, message }
+      },
+      result
+    );
+  } catch (error) {
+    console.warn("Error occurred in GET /api/1/binlite/retailers route", error);
+    next({
+      message: error.message,
+      ...error
+    });
+  }
+});
+
+// Path: /api/1/binlite/product
+// Desc: Fetch BIN Lite sellers for single product
+router.get("/product", async (req, res, next) => {
+  const { url, BINLiteSku } = req.query;
+
+  try {
+    const locale = await Locale.find({ "url.value": url }).select(
+      "BINLite.BINLiteKey.value"
+    );
+
+    if (!locale.length) {
+      res.status(404);
+      return next({
+        message: `Locale ${url} not found.`
+      });
+    }
+
+    if (!locale[0].BINLite?.BINLiteKey?.value) {
+      res.status(400);
+      return next({
+        message: `Locale ${url} does not have BIN Lite related data.`
+      });
+    }
+
+    let result = [],
+      status,
+      message;
+    try {
+      const { data } = await axios(
+        BINLiteUrl.replace("{{binliteUpc}}", BINLiteSku),
+        {
+          headers: {
+            passkey: locale[0].BINLite.BINLiteKey.value,
+            "x-functions-key": process.env.X_FUNCTIONS_KEY,
+            "Ocp-Apim-Subscription-Key": process.env.OCP_APIM_SUBSCRIPTION_KEY
+          }
+        }
+      );
+
+      result = data;
+    } catch (error) {
+      error = error.isAxiosError ? error.toJSON() : error;
+      console.warn(
+        "Error occurred while fetching BINLite data for single procut, ",
+        error
+      );
+      status = error.status;
+      message = error.message;
+    }
 
     response(
       res,

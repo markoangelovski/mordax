@@ -1002,6 +1002,42 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET Product",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/1/binlite/product?key={{key}}&url=https://www.gillettevenus.com.br/pt-br/&BINLiteSku=07500435121002",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"1",
+								"binlite",
+								"product"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://www.gillettevenus.com.br/pt-br/",
+									"description": "Locale URL"
+								},
+								{
+									"key": "BINLiteSku",
+									"value": "07500435121002",
+									"description": "Get single Retailer data by Retailer name"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},

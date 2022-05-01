@@ -33,6 +33,7 @@
         [["GET"], "/1/binlite/product-data/single"],
         [["POST"], "/1/binlite/product-data"],
         [["GET"], "/1/binlite/retailers"],
+        [["GET"], "/1/binlite/product"],
         [["GET"], "/1/ps/product-data/single"],
         [["POST"], "/1/ps/product-data"]
       ]
@@ -57,6 +58,7 @@
         [["GET"], "/1/binlite/product-data/single"],
         [["POST"], "/1/binlite/product-data"],
         [["GET"], "/1/binlite/retailers"],
+        [["GET"], "/1/binlite/product"],
         [["GET"], "/1/ps/product-data/single"],
         [["POST"], "/1/ps/product-data"]
       ]
