@@ -283,7 +283,7 @@ exports.getSellerData = async (
   pageId,
   psSku
 ) => {
-  let matches,
+  let matches = [],
     sellersOk = false,
     status,
     message,
