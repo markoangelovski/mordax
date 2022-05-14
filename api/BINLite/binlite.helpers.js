@@ -1,4 +1,5 @@
 const axios = require("axios").default;
+const chalk = require("chalk");
 
 const { BINLiteUrl } = require("./binlite.config.json");
 
@@ -25,9 +26,13 @@ exports.getSellerData = async (binliteId, BINLiteKey) => {
   } catch (error) {
     error = error.isAxiosError ? error.toJSON() : error;
     console.warn(
-      "Error occurred while fetching BINLite data for single product, ",
+      chalk.red(
+        "Error occurred while fetching BINLite data for single product, "
+      ),
       binliteId,
-      error
+      error.status,
+      error.message,
+      error.config.url
     );
     status = error.status;
     message = error.message;
