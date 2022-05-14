@@ -29,7 +29,9 @@ exports.getSellerData = async (scLocale, scCarouselKey, scMpId) => {
   }
 
   const master_product_id =
-    (sellersOk && carouselData.data.included["master-products"]?.[0].id) || "";
+    (sellersOk &&
+      carouselData.data.included.products?.[0].attributes.master_product_id.toString()) ||
+    "";
 
   const product_retailers =
     sellersOk && carouselData.data.included["product-retailers"];
