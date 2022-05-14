@@ -56,7 +56,8 @@ exports.makePagesForRes = pages => {
           pmid: match.pmid,
           sid: match.sid,
           retailerName: match.retailerName,
-          price: match.price
+          price: match.price,
+          sellerLink: match.sellerLink
         }))
         // offlineMatches: page.PS.offlineMatches.map(match => ({
         //   pmid: match.pmid,

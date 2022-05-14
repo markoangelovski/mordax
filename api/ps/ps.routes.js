@@ -3,7 +3,11 @@ const router = require("express").Router();
 const Locale = require("../locales/locales.model.js");
 const Page = require("../pages/pages.model.js");
 
-const { getSellerData } = require("./ps.helpers.js");
+const {
+  getSellerData,
+  createRedirectUrl,
+  extractSellerUrl
+} = require("./ps.helpers.js");
 
 const { response } = require("../../lib/helpers.js");
 
@@ -148,15 +152,15 @@ router.post("/product-data", async (req, res, next) => {
   if (url) localeQuery["url.value"] = url;
 
   try {
-    const [entries, locale] = await Promise.all([
+    const [pages, locale] = await Promise.all([
       Page.find(productsQuery).select(`url type data.${psSkuFieldName}.value`),
       Locale.find(localeQuery).select("PS.psAccountId.value")
     ]);
 
-    if (!entries.length || !locale.length) {
+    if (!pages.length || !locale.length) {
       res.status(404);
       return next({
-        message: "No entries or locales found that match the search query.",
+        message: "No pages or locales found that match the search query.",
         queries: { productsQuery, localeQuery }
       });
     }
@@ -168,7 +172,7 @@ router.post("/product-data", async (req, res, next) => {
       });
     }
 
-    const sellerDataQueries = entries
+    const sellerDataQueries = pages
       .filter(entry => entry.data[psSkuFieldName]?.value !== undefined)
       .map(entry =>
         getSellerData(
@@ -218,7 +222,7 @@ router.post("/product-data", async (req, res, next) => {
     const { nModified } = await Page.bulkWrite(bulkWrites);
 
     const mapResult = result => {
-      const entry = entries.find(entry => entry._id === result.pageId);
+      const entry = pages.find(entry => entry._id === result.pageId);
 
       return {
         id: entry._id,
@@ -239,7 +243,7 @@ router.post("/product-data", async (req, res, next) => {
     const noSellersPayload = noSellersAttempts.map(mapResult);
 
     const singleProducts = new Set();
-    entries.forEach(entry => singleProducts.add(entry.url));
+    pages.forEach(entry => singleProducts.add(entry.url));
 
     response(
       res,
@@ -247,7 +251,7 @@ router.post("/product-data", async (req, res, next) => {
       false,
       {
         productsCount: singleProducts.size,
-        variantsCount: entries.length - singleProducts.size,
+        variantsCount: pages.length - singleProducts.size,
         updatedEntriesCount: nModified,
         successAttemptsCount: successAttempts.length,
         failedAttemptsCount: failedAttempts.length,
@@ -260,6 +264,108 @@ router.post("/product-data", async (req, res, next) => {
     calculateLocaleStats(req.query.url);
   } catch (error) {
     console.warn("Error occurred in GET /api/1/ps/product-data route", error);
+    next({
+      message: error.message,
+      ...error
+    });
+  }
+});
+
+// Path: /api/1/ps/seller-links?key=1234&url=https://herbalessences.com/en-us/
+// Desc: Fetches the seller links for products that already have PS matches
+router.post("/seller-links", async (req, res, next) => {
+  const { url } = req.query;
+
+  try {
+    let [locale, pages] = await Promise.all([
+      Locale.find({ "url.value": url }).select("PS.psCid.value"),
+      Page.find({
+        localeUrl: url,
+        "PS.lastScan": { $exists: true }
+      }).select("url PS")
+    ]);
+
+    if (!locale.length || !pages.length) {
+      res.status(404);
+      return next({
+        message: "Requested locale or pages do not have required PS data."
+      });
+    }
+
+    const sellerLinkRequests = pages
+      .map(page =>
+        page.PS.matches.map(match =>
+          createRedirectUrl(
+            locale[0].PS.psCid.value,
+            "",
+            match.pmid,
+            match.price,
+            "",
+            ""
+          )
+        )
+      )
+      .flat()
+      .map(redirectUrl => extractSellerUrl(redirectUrl));
+    const sellerLinks = await Promise.all(sellerLinkRequests);
+
+    const pmids = pages
+      .map(page => page.PS.matches.map(match => match.pmid))
+      .flat();
+
+    pages = pages.map(page => ({
+      ...page._doc,
+      PS: {
+        ...page.PS,
+        matches: page.PS.matches.map(match => {
+          const i = pmids.findIndex(pmid => pmid === match.pmid);
+          return {
+            ...match._doc,
+            sellerLink: sellerLinks[i]
+          };
+        })
+      }
+    }));
+
+    const bulkWrites = pages.map(page => ({
+      updateOne: {
+        filter: { _id: page._id },
+        update: {
+          $set: {
+            "PS.matches": page.PS.matches
+          }
+        }
+      }
+    }));
+
+    const { nModified } = await Page.bulkWrite(bulkWrites);
+
+    response(
+      res,
+      200,
+      false,
+      {
+        updatedEntriesCount: nModified
+      },
+      [
+        ...pages.map(page => ({
+          id: page._id,
+          url: page.url,
+          PS: {
+            ...page.PS,
+            matches: page.PS.matches.map(match => ({
+              pmid: match.pmid,
+              sid: match.sid,
+              retailerName: match.retailerName,
+              price: match.price,
+              sellerLink: match.sellerLink
+            }))
+          }
+        }))
+      ]
+    );
+  } catch (error) {
+    console.warn("Error occurred in GET /api/1/ps/seller-links route", error);
     next({
       message: error.message,
       ...error

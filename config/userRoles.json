@@ -35,7 +35,8 @@
         [["GET"], "/1/binlite/retailers"],
         [["GET"], "/1/binlite/product"],
         [["GET"], "/1/ps/product-data/single"],
-        [["POST"], "/1/ps/product-data"]
+        [["POST"], "/1/ps/product-data"],
+        [["POST"], "/1/ps/seller-links"]
       ]
     },
     "editor": {
@@ -60,6 +61,7 @@
         [["GET"], "/1/binlite/retailers"],
         [["GET"], "/1/binlite/product"],
         [["GET"], "/1/ps/product-data/single"],
+        [["POST"], "/1/ps/seller-links"],
         [["POST"], "/1/ps/product-data"]
       ]
     },

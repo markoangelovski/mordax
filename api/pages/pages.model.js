@@ -48,7 +48,8 @@ const pageSchema = new mongoose.Schema(
           pmid: { type: String, maxlength: 64 },
           sid: { type: String, maxlength: 64 },
           retailerName: { type: String, max: 256 },
-          price: { type: String, maxlength: 64 }
+          price: { type: String, maxlength: 64 },
+          sellerLink: { type: String, maxlength: 2048 }
         }
       ],
       offlineMatches: []

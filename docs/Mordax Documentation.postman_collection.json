@@ -1780,6 +1780,37 @@
 						}
 					},
 					"response": []
+				},
+				{
+					"name": "GET Seller links",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{host}}/1/ps/seller-links?key={{key}}&url=https://www.ninjamas.ca/fr-ca/",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"1",
+								"ps",
+								"seller-links"
+							],
+							"query": [
+								{
+									"key": "key",
+									"value": "{{key}}",
+									"description": "API key, required"
+								},
+								{
+									"key": "url",
+									"value": "https://www.ninjamas.ca/fr-ca/",
+									"description": "Locale URL"
+								}
+							]
+						}
+					},
+					"response": []
 				}
 			]
 		},
