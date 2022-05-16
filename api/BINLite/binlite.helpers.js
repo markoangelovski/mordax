@@ -26,7 +26,7 @@ exports.getSellerData = async (binliteId, BINLiteKey) => {
   } catch (error) {
     error = error.isAxiosError ? error.toJSON() : error;
     console.warn(
-      chalk.red(
+      console.warn(
         "Error occurred while fetching BINLite data for single product, "
       ),
       binliteId,

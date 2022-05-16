@@ -1,6 +1,5 @@
 // @ts-check
 const axios = require("axios").default;
-const chalk = require("chalk");
 
 const { errMsgs, psRedirUrl } = require("./ps.config.json");
 
@@ -334,7 +333,9 @@ exports.getSellerData = async (
   } catch (error) {
     error = error.isAxiosError ? error.toJSON() : error;
     console.warn(
-      chalk.red("Error occurred while fetching PS data for single product, "),
+      console.warn(
+        "Error occurred while fetching PS data for single product, "
+      ),
       psSku,
       error.status,
       error.message,
