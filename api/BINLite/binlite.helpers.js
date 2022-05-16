@@ -1,5 +1,4 @@
 const axios = require("axios").default;
-const chalk = require("chalk");
 
 const { BINLiteUrl } = require("./binlite.config.json");
 
