@@ -4,11 +4,13 @@
 
 ### Github repo: https://github.com/markoangelovski/mordax
 
-### Heroku project: https://dashboard.heroku.com/apps/mordax
+### Azure DevOps repo: https://dev.azure.com/angelovskimarko/Mordax-API
+
+### Heroku project **Deprecated**: https://dashboard.heroku.com/apps/mordax
 
 ## Pipeline
 
-Main app is hosted on Heroku and the project is connected to Github repo. Pushing to master branch triggers automatic deployment for Heroku.
+Main app is hosted on Azure and the project is connected to Azure DevOps repo. Pushing to master branch triggers automatic deployment to Azure.
 
 ---
 
@@ -18,11 +20,11 @@ Main app is hosted on Heroku and the project is connected to Github repo. Pushin
 
 ### Github repo: https://github.com/markoangelovski/mordax-proxy
 
-### Vercel project: https://vercel.com/markoangelovski/mordax
+### Vercel project: https://vercel.com/markoangelovski/mordax-backend-proxy
 
 ## Pipeline
 
-Mordax Proxy is implemented because of Vercel's limitation on number of endpoints. Mordax Proxy is proxying all requests to Heroku app. Mordax Proxy is connected to the Github repo. Pushing to master branch triggers automatic deployment.
+Mordax Proxy is implemented because of Vercel's limitation on number of endpoints. Mordax Proxy is proxying all requests to Azure app. Mordax Proxy is connected to the Github repo. Pushing to master branch triggers automatic deployment.
 
 DOMAINS
 
@@ -30,7 +32,11 @@ DOMAINS
 
   - https://mordax.vercel.app
 
-- Heroku main app:
+- Azure main app:
+
+  - https://mordax-api.azurewebsites.net
+
+- Heroku main app **Deprecated**:
   - https://mordax.herokuapp.com
 
 ## Local development
